@@ -69,6 +69,11 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
+# for GitHub Link
+rst_prolog = """
+:github_url: https://github.com/sec-airgraph/AirGraph
+
+"""
 
 # -- Options for HTML output -------------------------------------------------
 
