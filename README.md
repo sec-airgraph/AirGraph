@@ -1,7 +1,7 @@
 # AirGraph
 
 AirGraphはAIとRobot開発のための、グラフィカルなIDEです。
-詳細は [ドキュメント](https://sec-airgraph.github.io/airgraph) をお読みください.
+詳細は [ドキュメント](https://sec-airgraph.github.io/airgraph-doc) をお読みください.
 
 <img src="https://github.com/sec-airgraph/airgraph/blob/master/docs_src/img/airgraph.png" width="320px">
 
