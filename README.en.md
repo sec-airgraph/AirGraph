@@ -3,7 +3,7 @@
 AirGraph is AI and Robot Graphical IDE.
 Please read the [Document](https://sec-airgraph.github.io/airgraph-doc) for details.
 
-<img src="https://github.com/sec-airgraph/airgraph/blob/master/docs_src/img/airgraph.png" width="320px">
+<img src="https://github.com/sec-airgraph/airgraph/blob/master/docs/img/airgraph.png" width="320px">
 
 ## System Requirements
 * Ubuntu 16.04
