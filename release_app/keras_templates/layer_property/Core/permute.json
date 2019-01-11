@@ -1,0 +1,8 @@
+{
+	"class_name": "Permute",
+	"fields": [
+		{ "name": "dims",				"type": "int",	"required": true,	"html": { "caption": "Dims",				"page": 0,	"attr": "style=\"width:50px\"" } },
+		{ "name": "batch_input_shape",	"type": "text",	"required": false,	"html": { "caption": "Batch Input Shape",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "dtype",				"type": "list", "required": false,	"html": { "caption": "Dtype",				"page": 0,	"attr": "style=\"width:200px\"" } }
+	]
+}

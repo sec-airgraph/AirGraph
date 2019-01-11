@@ -1,0 +1,8 @@
+{
+	"config": {
+		"trainable": true,
+		"name": "masking_template",
+		"mask_value": 0.0
+	},
+	"class_name": "Masking"
+}

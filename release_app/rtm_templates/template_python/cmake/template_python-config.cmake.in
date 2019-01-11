@@ -1,0 +1,54 @@
+# template_python CMake config file
+#
+# This file sets the following variables:
+# template_python_FOUND - Always TRUE.
+# template_python_INCLUDE_DIRS - Directories containing the template_python include files.
+# template_python_IDL_DIRS - Directories containing the template_python IDL files.
+# template_python_LIBRARIES - Libraries needed to use template_python.
+# template_python_DEFINITIONS - Compiler flags for template_python.
+# template_python_VERSION - The version of template_python found.
+# template_python_VERSION_MAJOR - The major version of template_python found.
+# template_python_VERSION_MINOR - The minor version of template_python found.
+# template_python_VERSION_REVISION - The revision version of template_python found.
+# template_python_VERSION_CANDIDATE - The candidate version of template_python found.
+
+message(STATUS "Found template_python-@PROJECT_VERSION@")
+set(template_python_FOUND TRUE)
+
+find_package(<dependency> REQUIRED)
+
+#set(template_python_INCLUDE_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@"
+#    ${<dependency>_INCLUDE_DIRS}
+#    )
+#
+#set(template_python_IDL_DIRS
+#    "@CMAKE_INSTALL_PREFIX@/include/@PROJECT_NAME_LOWER@-@PROJECT_VERSION_MAJOR@/idl")
+set(template_python_INCLUDE_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@"
+    ${<dependency>_INCLUDE_DIRS}
+    )
+set(template_python_IDL_DIRS
+    "@CMAKE_INSTALL_PREFIX@/include/@CPACK_PACKAGE_FILE_NAME@/idl")
+
+
+if(WIN32)
+    set(template_python_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_STATIC_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+else(WIN32)
+    set(template_python_LIBRARIES
+        "@CMAKE_INSTALL_PREFIX@/@LIB_INSTALL_DIR@/@CMAKE_SHARED_LIBRARY_PREFIX@@PROJECT_NAME_LOWER@@CMAKE_SHARED_LIBRARY_SUFFIX@"
+        ${<dependency>_LIBRARIES}
+        )
+endif(WIN32)
+
+set(template_python_DEFINITIONS ${<dependency>_DEFINITIONS})
+
+set(template_python_VERSION @PROJECT_VERSION@)
+set(template_python_VERSION_MAJOR @PROJECT_VERSION_MAJOR@)
+set(template_python_VERSION_MINOR @PROJECT_VERSION_MINOR@)
+set(template_python_VERSION_REVISION @PROJECT_VERSION_REVISION@)
+set(template_python_VERSION_CANDIDATE @PROJECT_VERSION_CANDIDATE@)
+

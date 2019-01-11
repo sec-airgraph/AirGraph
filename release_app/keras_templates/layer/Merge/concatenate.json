@@ -1,0 +1,9 @@
+{
+	"class_name": "Concatenate",
+	"color": ["aquamarine", "limegreen"],
+	"config": {
+		"trainable": true,
+		"name": "concatenate_template",
+		"axis": -1
+	}
+}

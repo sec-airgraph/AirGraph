@@ -1,0 +1,52 @@
+{
+	"class_name": "Conv3D",
+	"color": ["lightcyan", "cyan"],
+	"config": {
+		"kernel_constraint": null,
+		"kernel_initializer": {
+			"class_name": "VarianceScaling",
+			"config": {
+				"distribution": "uniform",
+				"scale": 1.0,
+				"seed": null,
+				"mode": "fan_avg"
+			}
+		},
+		"name": "conv3d_template",
+		"bias_regularizer": null,
+		"bias_constraint": null,
+		"activation": "linear",
+		"trainable": true,
+		"data_format": "channels_last",
+		"padding": "valid",
+		"strides": [
+			1,
+			1,
+			1
+		],
+		"dilation_rate": [
+			1,
+			1,
+			1
+		],
+		"kernel_regularizer": null,
+		"filters": 1,
+		"bias_initializer": {
+			"class_name": "Zeros",
+			"config": {}
+		},
+		"use_bias": true,
+		"activity_regularizer": null,
+		"kernel_size": [
+			1,
+			1,
+			1
+		]
+	},
+	"inbound_nodes": [
+		[
+			[]
+		]
+	],
+	"name": "conv3d_template"
+}

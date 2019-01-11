@@ -1,0 +1,17 @@
+{
+	"class_name": "Dense",
+	"fields": [
+		{ "name": "units",					"type": "int",		"required": true,	"html": { "caption": "Units",				"page": 0,	"attr": "style=\"width:50px\"" } },
+		{ "name": "activation",				"type": "list",		"required": true,	"html": { "caption": "Activation",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "use_bias",				"type": "checkbox",	"required": true,	"html": { "caption": "Use Bias",			"page": 0,	"attr": "" } },
+		{ "name": "kernel_initializer",		"type": "list",	"required": true,		"html": { "caption": "Kernel Initializer",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "bias_initializer",		"type": "list",	"required": true,		"html": { "caption": "Bias Initializer",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "kernel_regularizer",		"type": "list",	"required": true,		"html": { "caption": "Kernel Reqularizer",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "bias_regularizer",		"type": "list",	"required": true,		"html": { "caption": "Bias Reqularizer",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "activity_regularizer",	"type": "list",	"required": true,		"html": { "caption": "Activity Reqularizer",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "kernel_constraint",		"type": "list",	"required": true,		"html": { "caption": "Kernel Constraint",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "bias_constraint",		"type": "list",	"required": true,		"html": { "caption": "Bias Constraint",		"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "batch_input_shape",		"type": "text",	"required": true,		"html": { "caption": "Batch Input Shape",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "dtype",					"type": "list",	"required": true,		"html": { "caption": "Dtype",				"page": 0,	"attr": "style=\"width:200px\"" } }
+	]
+}

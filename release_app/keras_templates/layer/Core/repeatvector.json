@@ -1,0 +1,8 @@
+{
+	"class_name": "RepeatVector",
+	"config": {
+		"n": 1,
+		"trainable": true,
+		"name": "repeat_vector_template"
+	}
+}

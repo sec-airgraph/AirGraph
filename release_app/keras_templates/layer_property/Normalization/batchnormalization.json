@@ -1,0 +1,18 @@
+{
+	"class_name": "BatchNormalization",
+	"fields": [
+		{ "name": "axis",							"type": "int",		"required": true,	"html": { "caption": "Axis",						"page": 0,	"attr": "style=\"width:50px\"" } },
+		{ "name": "momentum",						"type": "float",	"required": true,	"html": { "caption": "Momentum",					"page": 0,	"attr": "style=\"width:50px\"" } },
+		{ "name": "epsilon",						"type": "float",	"required": true,	"html": { "caption": "Epsilon",						"page": 0,	"attr": "style=\"width:50px\"" } },
+		{ "name": "center",							"type": "checkbox",	"required": true,	"html": { "caption": "Center",						"page": 0,	"attr": "" } },
+		{ "name": "scale",							"type": "checkbox",	"required": true,	"html": { "caption": "Scale",						"page": 0,	"attr": "" } },
+		{ "name": "beta_initializer",				"type": "list",	"required": true,		"html": { "caption": "Beta Initializer",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "gamma_initializer",				"type": "list",	"required": true,		"html": { "caption": "Gamma Initializer",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "moving_mean_initializer",		"type": "list",	"required": true,		"html": { "caption": "Moving Mean Initializer",		"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "moving_variance_initializer",	"type": "list",	"required": true,		"html": { "caption": "Moving Variance Initializer",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "beta_regularizer",				"type": "list",	"required": true,		"html": { "caption": "Beta Regularizer",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "gamma_regularizer",				"type": "list",	"required": true,		"html": { "caption": "Gamma Regularizer",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "beta_constraint",				"type": "list",	"required": true,		"html": { "caption": "Beta Constraint",				"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "gamma_constraint",				"type": "list",	"required": true,		"html": { "caption": "Gamma Constraint",			"page": 0,	"attr": "style=\"width:200px\"" } }
+	]
+}

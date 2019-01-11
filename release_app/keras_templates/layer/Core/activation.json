@@ -1,0 +1,8 @@
+{
+	"config": {
+		"activation": "softmax",
+		"name": "activation_template",
+		"trainable": true
+	},
+	"class_name": "Activation"
+}

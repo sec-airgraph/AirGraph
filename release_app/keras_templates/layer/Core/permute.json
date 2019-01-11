@@ -1,0 +1,11 @@
+{
+	"config": {
+		"dims": [
+			1,
+			2
+		],
+		"trainable": true,
+		"name": "permute_template"
+	},
+	"class_name": "Permute"
+}

@@ -1,0 +1,18 @@
+{
+	"class_name": "MaxPooling2D",
+	"color": ["cornsilk", "olive"],
+	"config": {
+		"name": "max_pooling2d_template",
+		"trainable": true,
+		"data_format": "channels_last",
+		"pool_size": [
+			2,
+			2
+		],
+		"padding": "valid",
+		"strides": [
+			2,
+			2
+		]
+	}
+}

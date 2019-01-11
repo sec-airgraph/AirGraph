@@ -1,0 +1,37 @@
+{
+	"class_name": "BatchNormalization",
+	"color": ["aquamarine", "limegreen"],
+	"config": {
+		"beta_constraint": null,
+		"gamma_initializer": {
+			"class_name": "Ones",
+			"config": {}
+		},
+		"moving_mean_initializer": {
+			"class_name": "Zeros",
+			"config": {}
+		},
+		"name": "batch_normalization_template",
+		"epsilon": 0.001,
+		"trainable": true,
+		"moving_variance_initializer": {
+			"class_name": "Ones",
+			"config": {}
+		},
+		"beta_initializer": {
+			"class_name": "Zeros",
+			"config": {}
+		},
+		"scale": true,
+		"axis": -1,
+		"gamma_constraint": null,
+		"gamma_regularizer": null,
+		"beta_regularizer": null,
+		"momentum": 0.99,
+		"center": true
+	},
+	"inbound_nodes": [
+		[]
+	],
+	"name": "batch_normalization_template"
+}

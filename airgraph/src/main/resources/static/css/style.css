@@ -1,0 +1,77 @@
+/* CSS Document */
+body,div,p,a,ul,li,ol,img,br,h1,h2,h3,h4,h5,h6,table,tr,td,th,em,strong{
+    margin:0;
+    padding:0;
+    border:0;
+    text-decoration:none;
+    list-style:none;
+    font-style:normal;
+}
+    
+#layout-panel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.panel {
+  width:100%;
+  height:100%;
+}
+
+#main-panel {
+  background-color:#ffffff;
+}
+
+#toolbar-panel {
+  background-color:#ecf0f8;
+}
+
+#component-panel {
+  background-color:#ffffff;
+}
+
+#property-panel {
+  background-color:#ffffff;
+}
+
+#configulation-panel {
+  background-color:#ffffff;
+}
+
+#footer-panel {
+  background-color:#ecf0f8;
+}
+
+.ui-accordion .ui-accordion-header {
+  border: none;
+  margin: 0 0 0 0;
+  border-radius : 0px;
+}
+
+.ui-accordion .ui-accordion-content {
+  border: none;
+  margin: 0 0 0 0;
+  border-radius : 0px;
+  padding: 0;
+  padding-left: 10px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.context-menu-list {
+  font-size: 0.8em;
+}
+
+.ui-dialog {
+  z-index: 10000 !important;
+}
+
+/* port styling */
+.available-magnet {
+    fill: yellow;
+}
+
+/* element styling */
+.available-cell rect {
+    stroke-dasharray: 5, 2;
+}

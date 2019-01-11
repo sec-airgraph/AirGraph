@@ -1,0 +1,44 @@
+{
+	"class_name": "Conv2D",
+	"color": ["lightcyan", "cyan"],
+	"config": {
+		"kernel_initializer": {
+			"class_name": "VarianceScaling",
+			"config": {
+				"distribution": "uniform",
+				"scale": 1.0,
+				"seed": null,
+				"mode": "fan_avg"
+			}
+		},
+		"name": "conv2d_template",
+		"kernel_constraint": null,
+		"bias_regularizer": null,
+		"bias_constraint": null,
+		"dtype": "float32",
+		"activation": "relu",
+		"trainable": true,
+		"data_format": "channels_last",
+		"filters": 1,
+		"padding": "valid",
+		"strides": [
+			1,
+			1
+		],
+		"dilation_rate": [
+			1,
+			1
+		],
+		"kernel_regularizer": null,
+		"bias_initializer": {
+			"class_name": "Zeros",
+			"config": {}
+		},
+		"use_bias": true,
+		"activity_regularizer": null,
+		"kernel_size": [
+			1,
+			1
+		]
+	}
+}

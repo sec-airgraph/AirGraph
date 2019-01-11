@@ -1,0 +1,9 @@
+{
+	"config": {
+		"l1": 0.0,
+		"l2": 0.0,
+		"trainable": true,
+		"name": "activity_regularization_template"
+	},
+	"class_name": "ActivityRegularization"
+}

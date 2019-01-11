@@ -1,0 +1,11 @@
+{
+	"class_name": "Reshape",
+	"config": {
+		"name": "reshape_template",
+		"trainable": true,
+		"target_shape": [
+			1,
+			2
+		]
+	}
+}

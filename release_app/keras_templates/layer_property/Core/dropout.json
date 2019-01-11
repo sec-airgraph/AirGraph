@@ -1,0 +1,6 @@
+{
+	"class_name": "Dropout",
+	"fields": [
+		{ "name": "rate",	"type": "float",	"required": true,	"html": { "caption": "Rate",	"page": 0,	"attr": "style=\"width:50px\"" } }
+	]
+}

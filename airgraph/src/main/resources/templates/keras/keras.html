@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="htmlhead">
+<meta charset="UTF-8" />
+<title>AirGraph - Keras Editor</title>
+
+<!--/* 共通ヘッダ読み込み */-->
+<link th:substituteby="common/head :: common_link" />
+
+<!--/* KERAS編集用Javascript読み込み */-->
+<script type="text/javascript" th:src="@{/js/keras-main.js}"        src="/js/keras-main.js" ></script>
+<script type="text/javascript" th:src="@{/js/keras-dao.js}"         src="/js/keras-dao.js"></script>
+<script type="text/javascript" th:src="@{/js/keras-contextmenu.js}" src="/js/keras-contextmenu.js"></script>
+
+<script th:inline="javascript">
+	/*[-----------------------------
+	 * ネットワーク領域定義
+	 * -----------------------------]*/
+
+	/*[- ネットワーク領域オブジェクトマップ -]*/
+	var templateLayerMap = new Object();
+	var templateModelMap = new Object();
+	var modelMap = new Object();
+	var templateLayerPropertyMap = new Object();
+	var networkAreaGraph;
+
+
+	/*[-----------------------------
+	 * 作業領域定義
+	 * -----------------------------]*/
+	/*[- 現在の作業領域名 -]*/
+	var WORKSPACE_PREFIX = 'keras_model';
+	var curWorkspaceName;
+	var workspaceCounter = 0;
+	
+	/*[- 編集中のLayer（プロパティ編集時に利用） -]*/
+	var editingLayerRecord = new Object();
+
+	/*[- 作業領域オブジェクトマップ -]*/
+	var mainKerasMap = new Object();
+
+	/*[- 作業領域描画フィールド -]*/
+	var mainGraph;
+	var mainPaper;
+	
+	/*[- JSONエディタ -]*/
+	var jsonEditor;
+
+	/*[- 作業領域に追加したモデル数（累計） -]*/
+	var counter = 0;
+
+	/*[- 選択中モデル -]*/
+	var selectedCellViews = [];
+	
+	/*[- 右クリック中レイヤー -]*/
+	var rightClickedCellView;
+	var rightClickInfo = new Object();
+	var onDragging = false;
+	
+	/*[-----------------------------
+	 * コンソール
+	 * -----------------------------]/
+	/*[- ログ監視用タイマID -]*/
+	var tailTimerID = 0;
+
+	/*[-----------------------------
+	 * 選択肢
+	 * -----------------------------]*/
+	/*[- Keras活性化関数 -]*/
+	var activationListItems = [
+		'softmax',
+		'elu',
+		'selu',
+		'softplus',
+		'softsign',
+		'relu',
+		'tanh',
+		'sigmoid',
+		'hard_sigmoid',
+		'linear'
+	];
+	
+	/*[- Keras初期化関数 -]*/
+	var initializerListItems = [
+		'Initializer',
+		'Zeros',
+		'Ones',
+		'Constant',
+		'RandomNormal',
+		'RandomUniform',
+		'TruncatedNormal',
+		'VarianceScaling',
+		'Orthogonal',
+		'Identity',
+		'glorot_normal',
+		'glorot_uniform',
+		'he_normal',
+		'lecun_normal',
+		'he_uniform',
+		'lecun_uniform'
+	];
+	
+	/*[- 初期化関数オブジェクト -]*/
+	var initializerMap = {};
+	initializerMap['he_normal'] = {
+		"class_name": "VarianceScaling",
+		"config": {
+			"distribution": "normal",
+			"scale": 2.0,
+			"seed": null,
+			"mode": "fan_in"
+		}
+	};
+	initializerMap['he_normal'] = {
+		"class_name": "VarianceScaling",
+		"config": {
+			"distribution": "uniform",
+			"scale": 2.0,
+			"seed": null,
+			"mode": "fan_in"
+		}
+	};
+	initializerMap['lecun_normal'] = {
+		"class_name": "VarianceScaling",
+		"config": {
+			"distribution": "normal",
+			"scale": 1.0,
+			"seed": null,
+			"mode": "fan_in"
+		}
+	};
+	initializerMap['lecun_uniform'] = {
+		"class_name": "VarianceScaling",
+		"config": {
+			"distribution": "uniform",
+			"scale": 1.0,
+			"seed": null,
+			"mode": "fan_in"
+		}
+	};
+	initializerMap['glorot_normal'] = {
+		"class_name": "VarianceScaling",
+		"config": {
+			"distribution": "normal",
+			"scale": 1.0,
+			"seed": null,
+			"mode": "fan_avg"
+		}
+	};
+	initializerMap['glorot_normal'] = {
+		"class_name": "VarianceScaling",
+		"config": {
+			"distribution": "uniform",
+			"scale": 1.0,
+			"seed": null,
+			"mode": "fan_avg"
+		}
+	};
+
+	/*[- Keras正規化関数 -]*/
+	var regularizerListItems = [
+		'l1',
+		'l2',
+		'l1_l2'
+	];
+	
+	/*[- Keras制約関数 -]*/
+	var constraintListItems = [
+		'max_norm',
+		'non_neg',
+		'unit_norm',
+		'min_max_norm'
+	];
+	
+	/*[- Keras損失関数 -]*/
+	var lossListItems = [
+		'mean_squared_error',
+		'mean_absolute_error',
+		'mean_absolute_percentage_error',
+		'mean_squared_logarithmic_error',
+		'squared_hinge',
+		'hinge',
+		'categorical_hinge',
+		'logcosh',
+		// TODO: 以下の条件に対する対応
+		// NOTE: categorical_crossentropyを使う場合，目的値はカテゴリカルにしなければいけません
+		'categorical_crossentropy',
+		'sparse_categorical_crossentropy',
+		'binary_crossentropy',
+		'kullback_leibler_divergence',
+		'poisson',
+		'cosine_proximity'
+	];
+	
+	/*[- Keras最適化アルゴリズム -]*/
+	var optimizerListItems = [
+		'SGD',
+		'RMSProp',
+		'Adagrad',
+		'Adadelta',
+		'Adam',
+		'Adamax',
+		'Nadam',
+		'TFOptimizer'
+	];
+	
+	/*[- Keras 訓練時callbak関数 -]*/
+	var callbackListItems = [
+		'ProgbarLogger',
+		'History',
+		'ModelCheckpoint',
+		'EarlyStopping',
+		'RemoteMonitor',
+		'LearningRateScheduler',
+		'TensorBoard',
+		'ReduceLROnPlateau',
+		'CSVLogger',
+		'LambdaCallback'
+	];
+	
+	/*[- Keras評価関数 -]*/
+	var metricsListItems = [
+		'accuracy',
+		'binary_accuracy',
+		'categorical_accuracy',
+		'sparse_categorical_accuracy',
+		'top_k_categorical_accuracy',
+		'sparse_top_k_categorical_accuracy'
+	];
+	
+	/*[- Keras Padding -]*/
+	var paddingListItems = [
+		'valid',
+		'same'
+	];
+	
+	/*[- Keras データフォーマット -]*/
+	var dataFormatListItems = [
+		'channels_last',
+		'channels_first'
+	];
+	
+	/*[- Keras型（入力バッチ指定時などに利用） -]*/
+	var dtypeListItems = [
+		'bool_',
+		'int_',
+		'intc',
+		'intp',
+		'int8',
+		'int16',
+		'int32',
+		'int64',
+		'uint8',
+		'uint16',
+		'uint32',
+		'uint64',
+		'float_',
+		'float16',
+		'float32',
+		'float64',
+		'complex_',
+		'complex64',
+		'complex128'
+	];
+
+	/*[-----------------------------
+	 * URL
+	 * -----------------------------]*/
+	/*[- ネットワーク領域展開 -]*/
+	function getUrlLoadNetworkArea() {
+		return /*[[@{/keras/loadNetworkArea}]]*/;
+	}
+
+	/*[- すべての作業領域展開 -]*/
+	function getUrlLoadAllWorkspace() {
+		return /*[[@{/keras/loadAllWorkspace}]]*/;
+	}
+
+	/*[- すべての作業領域展開 -]*/
+	function getUrlLoadAllLayerPropertyTemplates() {
+		return /*[[@{/keras/loadAllLayerPropertyTemplates}]]*/;
+	}
+	
+	/*[- 作業領域のモデルの保存 -]*/
+	function getUrlSaveModel() {
+		return /*[[@{/keras/saveModel}]]*/;
+	}
+    
+    /*[- 作業領域のモデルの削除 -]*/
+    function getUrlDeleteModel() {
+        return /*[[@{/keras/deleteModel}]]*/;
+    }
+
+	/*[- Kerasでの学習実行 -]*/
+	function getUrlRunKerasFit() {
+		return /*[[@{/keras/fit}]]*/;
+	}
+
+	/*[- ログ監視 -]*/
+	function getUrlTailLog() {
+	  return /*[[@{/keras/tailLog}]]*/;
+	}
+
+	/*[- DataMakerのテンプレート取得 -]*/
+	function getUrlGetDataMakerTemplate() {
+	  return /*[[@{/keras/getDataMakerTemplate}]]*/;
+	}
+
+	/*[- DataMakerアップロード -]*/
+	function getUrlDataMakerUpload() {
+	  return /*[[@{/keras/dataMakerUpload}]]*/;
+	}
+
+	/*[- データセット選択肢 -]*/
+	function getUrlDatasetChoices() {
+	  return /*[[@{/main/getDatasetChoices}]]*/;
+	}
+
+    /*[- Datasetダウンロード -]*/
+    function getUrlDatasetDownload() {
+      return /*[[@{/keras/datasetDownload}]]*/;
+    }
+
+    /*[- Datasetアップロード -]*/
+    function getUrlDatasetUpload() {
+      return /*[[@{/keras/datasetUpload}]]*/;
+    }
+
+	/*[-----------------------------
+	 * 起動処理
+	 * -----------------------------]*/
+	/*[- 起動時処理 -]*/
+	$(function() {
+		/*[- 全体初期レイアウト処理 -]*/
+		layoutPanelAll();
+
+		/*[- ツールバー生成 -]*/
+		setToolbarComponent();
+
+		/*[- 作業領域情報設定 -]*/
+		createMainGraphArea();
+		createDataMakerEditor();
+		setMainAreaContextMenu();
+
+		/*[- JSON領域設定 -]*/
+		layoutPanelJson();
+
+		/*[- レイヤー右クリックメニュー設定 -]*/
+		setLayerContextMenu();
+
+		/*[- ネットワーク領域情報を展開する -]*/
+		loadAllNetworkArea();
+
+		/*[- キーボードイベント処理を登録する -]*/
+		setKeyboardEvent();
+	});
+</script>
+</head>
+<body>
+	<form id="kerasForm" name="kerasForm" method="POST"
+		th:action="@{/main/getResult}" th:object="${kerasForm}">
+		<!--/* 全領域 */-->
+		<div id="layout-panel"></div>
+		<!--/* エディタ */-->
+		<div id="source-editor-parent"><div id="source-editor" style="height:100%; width:99%"></div></div>
+		<div id="monaco-editor-parent"><div id="monaco-editor" style="height:100%; width:99%"></div></div>
+	</form>
+	<form id="dataMakerUploadForm" name="dataMakerUploadForm" method="post" enctype="multipart/form-data" th:action="@{/keras/dataMakerUpload}">
+		<input type="file" id="datamaker-upload" name="datamaker-upload" style="display:none" onchange="uploadDataMakerFile();"></input>
+		<input type="hidden" id="workspace-model-name" name="workspace-model-name"></input>
+	</form>
+    <form id="datasetUploadForm" name="datasetUploadForm" method="post" enctype="multipart/form-data" th:action="@{/keras/datasetUpload}">
+        <input type="file" id="dataset-upload" name="dataset-upload" style="display:none" onchange="uploadDataset();"></input>
+        <input type="hidden" id="workspace-model-name-dataset" name="workspace-model-name-dataset"></input>
+    </form>
+</body>
+</html>

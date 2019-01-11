@@ -1,0 +1,14 @@
+{
+	"class_name": "LeakyReLU",
+	"config": {
+		"alpha": 0.1,
+		"trainable": true,
+		"name": "leaky_re_lu_template"
+	},
+	"inbound_nodes": [
+		[
+			[]
+		]
+	],
+	"name": "leaky_re_lu_template"
+}

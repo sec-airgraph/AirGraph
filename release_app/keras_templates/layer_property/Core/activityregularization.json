@@ -1,0 +1,7 @@
+{
+	"class_name": "ActivityRegularization",
+	"fields": [
+		{ "name": "l1",	"type": "float",	"required": true,	"html": { "caption": "L1",	"page": 0,	"attr": "style=\"width:50px\"" } },
+		{ "name": "l2",	"type": "float",	"required": true,	"html": { "caption": "L2",	"page": 0,	"attr": "style=\"width:50px\"" } }
+	]
+}

@@ -1,0 +1,9 @@
+{
+	"class_name": "UpSampling2D",
+	"fields": [
+		{ "name": "size",				"type": "text",	"required": true,	"html": { "caption": "Size",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "data_format",		"type": "list",	"required": true,	"html": { "caption": "Data Format",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "batch_input_shape",	"type": "text",	"required": true,	"html": { "caption": "Batch Input Shape",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "name": "dtype",				"type": "list",	"required": true,	"html": { "caption": "Dtype",				"page": 0,	"attr": "style=\"width:200px\"" } }
+	]
+}

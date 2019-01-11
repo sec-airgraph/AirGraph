@@ -1,0 +1,28 @@
+<!--
+# -*- Buildfile -*-
+# @file  build_template_java.xml
+# @brief RTComponent makefile for "template_java component"
+# @date  $Date$
+#
+# $Id$
+ -->
+<project name="template_java" default="compile">
+	<property name="source" value="src" />
+	<property name="dest" value="bin" />
+	<property environment="env" />
+
+	<target name="mkdir">
+		<mkdir dir="${dest}" />
+	</target>
+
+
+	<target name="compile" depends="mkdir">
+		<javac srcdir="${source}" destdir="${dest}">
+			<classpath>
+				<fileset dir="${env.RTM_JAVA_ROOT}/jar">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+</project>

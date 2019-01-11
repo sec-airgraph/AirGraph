@@ -1,0 +1,6 @@
+{
+	"class_name": "RepeatVector",
+	"fields": [
+		{ "name": "n",	"type": "int",	"required": true,	"html": { "caption": "N",	"page": 0,	"attr": "style=\"width:50px\"" } }
+	]
+}

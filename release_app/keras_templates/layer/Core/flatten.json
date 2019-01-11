@@ -1,0 +1,7 @@
+{
+	"config": {
+		"name": "flatten_template",
+		"trainable": true
+	},
+	"class_name": "Flatten"
+}

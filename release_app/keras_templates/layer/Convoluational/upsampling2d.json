@@ -1,0 +1,13 @@
+{
+	"class_name": "UpSampling2D",
+	"color": ["lightcyan", "cyan"],
+	"config": {
+		"trainable": true,
+		"data_format": "channels_last",
+		"name": "up_sampling2d_template",
+		"size": [
+			2,
+			2
+		]
+	}
+}
