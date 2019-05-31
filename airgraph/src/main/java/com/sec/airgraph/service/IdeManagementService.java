@@ -129,18 +129,19 @@ public class IdeManagementService {
 	 * ComponentをローカルリポジトリにCommitする
 	 * 
 	 * @param workPackageName
+	 * @param componentName
 	 * @param commitMessage
 	 */
-	public String commitComponent(String workPackageName, String gitName, String commitMessage) {
+	public String commitComponent(String workPackageName, String componentName, String commitMessage) {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String rtcDirPath = StringUtil.concatenate(File.separator, workspaceDirPath, workPackageName,
-				DIR_NAME.PACKAGE_RTC_DIR_NAME, gitName);
+				DIR_NAME.PACKAGE_RTC_DIR_NAME, componentName);
 
 		// Commitする
 		String result = GitUtil.gitCommit(rtcDirPath, commitMessage);
 				
-		logger.info("Commit Component. package[" + workPackageName + "]gitName[" + gitName + "]result[" + result + "]");
+		logger.info("Commit Component. package[" + workPackageName + "]componentName[" + componentName + "]result[" + result + "]");
 		
 		return result;
 	}
@@ -149,13 +150,15 @@ public class IdeManagementService {
 	 * ComponentをリモートリポジトリにPushする
 	 * 
 	 * @param workPackageName
-	 * @param gitName
+	 * @param componentName
+	 * @param userName
+	 * @param password
 	 */
-	public String pushComponent(String workPackageName, String gitName, String userName, String password) {
+	public String pushComponent(String workPackageName, String componentName, String userName, String password) {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String rtcDirPath = StringUtil.concatenate(File.separator, workspaceDirPath, workPackageName,
-				DIR_NAME.PACKAGE_RTC_DIR_NAME, gitName);
+				DIR_NAME.PACKAGE_RTC_DIR_NAME, componentName);
 		
 		// URLをID/Pass付きに変換する
 		String gitUrl = GitUtil.getGitUrl(rtcDirPath).trim();
@@ -177,7 +180,7 @@ public class IdeManagementService {
 		// URLを戻す
 		GitUtil.changeRemoteUrl(rtcDirPath, gitUrl);
 		
-		logger.info("Push Component. package[" + workPackageName + "]gitName[" + gitName + "]result[" + result + "]");
+		logger.info("Push Component. package[" + workPackageName + "]componentName[" + componentName + "]result[" + result + "]");
 		
 		return result;
 	}
@@ -186,13 +189,15 @@ public class IdeManagementService {
 	 * ComponentをリモートリポジトリからPullする
 	 * 
 	 * @param workPackageName
-	 * @param gitName
+	 * @param componentName
+	 * @param userName
+	 * @param password
 	 */
-	public String pullComponent(String workPackageName, String gitName, String userName, String password) {
+	public String pullComponent(String workPackageName, String componentName, String userName, String password) {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String rtcDirPath = StringUtil.concatenate(File.separator, workspaceDirPath, workPackageName,
-				DIR_NAME.PACKAGE_RTC_DIR_NAME, gitName);
+				DIR_NAME.PACKAGE_RTC_DIR_NAME, componentName);
 		
 		// URLをID/Pass付きに変換する
 		String gitUrl = GitUtil.getGitUrl(rtcDirPath).trim();
@@ -214,7 +219,7 @@ public class IdeManagementService {
 		// URLを戻す
 		GitUtil.changeRemoteUrl(rtcDirPath, gitUrl);
 		
-		logger.info("Pull Component. package[" + workPackageName + "]gitName[" + gitName + "]result[" + result + "]");
+		logger.info("Pull Component. package[" + workPackageName + "]componentName[" + componentName + "]result[" + result + "]");
 		
 		return result;
 	}

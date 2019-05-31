@@ -584,7 +584,7 @@ public class MainController {
 			@RequestParam(value = "commitMessage") String commitMessage) {
 		logger.info("Commit Component to Local Repository. component[" + componentName + "]git[" + gitName
 				+ "]workspace[" + workPackageName + "]commitMessage[" + commitMessage + "]");
-		return mainService.commitComponent(StringUtil.getPackageNameFromModelName(workPackageName), gitName, commitMessage);
+		return mainService.commitComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName, commitMessage);
 	}
 
 	/**
@@ -608,7 +608,7 @@ public class MainController {
 			@RequestParam(value = "password") String password) {
 		logger.info("Push Component to Local Repository. component[" + componentName + "]git[" + gitName
 				+ "]workspace[" + workPackageName + "]commitMessage[" + commitMessage + "]userName[" + userName + "]");
-		return mainService.pushComponent(StringUtil.getPackageNameFromModelName(workPackageName), gitName, commitMessage, userName, password);
+		return mainService.pushComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName, commitMessage, userName, password);
 	}
 
 	/**
@@ -630,7 +630,7 @@ public class MainController {
 			@RequestParam(value = "password") String password) {
 		logger.info("Pull Component from Local Repository. component[" + componentName + "]git[" + gitName
 				+ "]workspace[" + workPackageName + "]userName[" + userName + "]");
-		return mainService.pullComponent(StringUtil.getPackageNameFromModelName(workPackageName), gitName, userName, password);
+		return mainService.pullComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName, userName, password);
 	}
 	
 	/**

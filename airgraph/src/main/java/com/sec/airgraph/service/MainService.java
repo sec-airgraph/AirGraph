@@ -472,28 +472,28 @@ public class MainService {
 	 * RTCをローカルリポジトリにCommitする
 	 * 
 	 * @param workPackageName
-	 * @param gitName
+	 * @param componentName
 	 * @param commitMessage
 	 */
-	public String commitComponent(String workPackageName, String gitName, String commitMessage) {
-		return ideManagementService.commitComponent(workPackageName, gitName, commitMessage);
+	public String commitComponent(String workPackageName, String componentName, String commitMessage) {
+		return ideManagementService.commitComponent(workPackageName, componentName, commitMessage);
 	}
 	
 	/**
 	 * RTCをリモートリポジトリにPushする
 	 * 
 	 * @param workPackageName
-	 * @param gitName
+	 * @param componentName
 	 * @param commitMessage
 	 * @param userName
 	 * @param password
 	 * @return
 	 */
-	public String pushComponent(String workPackageName, String gitName, String commitMessage, String userName, String password) {
+	public String pushComponent(String workPackageName, String componentName, String commitMessage, String userName, String password) {
 		StringBuilder sb = new StringBuilder();
 		
-		String rsltCommit = ideManagementService.commitComponent(workPackageName, gitName, commitMessage);
-		String rsltPush = ideManagementService.pushComponent(workPackageName, gitName, userName, password);
+		String rsltCommit = ideManagementService.commitComponent(workPackageName, componentName, commitMessage);
+		String rsltPush = ideManagementService.pushComponent(workPackageName, componentName, userName, password);
 		
 		if (StringUtil.isNotEmpty(rsltCommit)) {
 			sb.append(rsltCommit);
@@ -511,13 +511,13 @@ public class MainService {
 	 * RTCをリモートリポジトリからPullする
 	 * 
 	 * @param workPackageName
-	 * @param gitName
+	 * @param componentName
 	 * @param userName
 	 * @param password
 	 * @return
 	 */
-	public String pullComponent(String workPackageName, String gitName, String userName, String password) {
-		return ideManagementService.pullComponent(workPackageName, gitName, userName, password);
+	public String pullComponent(String workPackageName, String componentName, String userName, String password) {
+		return ideManagementService.pullComponent(workPackageName, componentName, userName, password);
 	}
 	
 	/**
