@@ -825,4 +825,50 @@ public class MainController {
 		
 		RtmEditorUtil.saveIdlFile(StringUtil.getPackageNameFromModelName(workPackageName), componentName, file);
 	}
+
+	/**
+	 * 指定されたDNNモデルを更新する
+	 * 
+	 * @param dnnModelName
+	 * @return
+	 */
+	@RequestMapping(value = "updateDnnModels", method = RequestMethod.GET)
+	@ResponseBody
+	public String updateDnnModels(@RequestParam(value = "dnnModelName") String dnnModelName) throws IOException {
+		logger.info("updateDnnModels. DNN Model Name[" + dnnModelName + "]");
+		if (mainService.downloadDnnFiles(dnnModelName)) {
+			return "{\"response\" : \"OK\"}";
+		} else {
+			return "{\"response\" : \"ERROR\"}";
+		}
+	}
+
+	/**
+	 * 指定されたDNNファイルをダウンロードする
+	 * 
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "getDnnFiles", method = RequestMethod.POST)
+	public String getDnnFiles(HttpServletResponse response, @RequestParam(value = "dnnModelName") String dnnModelName,
+		@RequestParam(value = "fileExtentions") String fileExtentions) throws IOException {
+		logger.info("Get DNN Files. file Name[" + dnnModelName + "][" + fileExtentions + "]");
+
+		// Keras-Editorの作業領域パス
+		String workspaceDirPath = PropUtil.getValue("workspace.local.keras.directory.path");
+		// ダウンロードするDNNファイルパス（JSON or hdf5)
+		String dnnFilePath = workspaceDirPath + dnnModelName + "/" + dnnModelName + "." + fileExtentions;
+
+		File file = new File(dnnFilePath);
+		response.addHeader("Content-Type", "application/octet-stream");
+		response.addHeader("Content-Disposition",
+				"attachment; filename*=UTF-8''" + URLEncoder.encode(file.getName(), StandardCharsets.UTF_8.name()));
+
+		// ファイルが存在する場合は格納
+		if (com.sec.airgraph.util.FileUtil.exists(file)) {
+			Files.copy(file.toPath(), response.getOutputStream());
+		}
+		return null;
+	}
 }

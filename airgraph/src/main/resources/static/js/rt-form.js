@@ -31,7 +31,7 @@ function openNewPackageProfileSetting(orgModelId) {
     body: '<div id="rts-profile-div" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px;"></div>',
     onOpen: function(event) {
       event.onComplete = function() {
-        $('#w2ui-popup #rts-profile-div').w2form(createRtsProfileSettingForm(rtsProfile, modelProfile, false));
+        $('#w2ui-popup #rts-profile-div').w2form(createRtsProfileSettingForm(rtsProfile, modelProfile, false, false));
         // 釦を変更する
         $($('.w2ui-buttons').children()[0]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('font-size', '1.2em');
       }
@@ -62,7 +62,7 @@ function openPackageProfileSetting() {
     body: '<div id="rts-profile-div" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px;"></div>',
     onOpen: function(event) {
       event.onComplete = function() {
-        $('#w2ui-popup #rts-profile-div').w2form(createRtsProfileSettingForm(mainRtsMap[curWorkspaceName].rtsProfile, mainRtsMap[curWorkspaceName].modelProfile, true));
+        $('#w2ui-popup #rts-profile-div').w2form(createRtsProfileSettingForm(mainRtsMap[curWorkspaceName].rtsProfile, mainRtsMap[curWorkspaceName].modelProfile, false, true));
         // 釦を変更する
         $($('.w2ui-buttons').children()[0]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('font-size', '1.2em');
       }
@@ -78,7 +78,7 @@ function openPackageProfileSetting() {
       }
     },
     onClose : function(event) {
-      $('#property-panel').w2form(createRtsProfileSettingForm(mainRtsMap[curWorkspaceName].rtsProfile, mainRtsMap[curWorkspaceName].modelProfile, true));
+      $('#property-panel').w2form(createRtsProfileSettingForm(mainRtsMap[curWorkspaceName].rtsProfile, mainRtsMap[curWorkspaceName].modelProfile, true, true));
     }
   });
 }
@@ -90,7 +90,7 @@ function openPackageProfileSetting() {
  * @param updateFlg
  * @returns
  */
-function createRtsProfileSettingForm(rtsProfile, modelProfile, updateFlg) {
+function createRtsProfileSettingForm(rtsProfile, modelProfile, propertyAreaFlg,  updateFlg) {
   destroySettingForm();
     
   var form = {
@@ -127,6 +127,9 @@ function createRtsProfileSettingForm(rtsProfile, modelProfile, updateFlg) {
           mainRtsMap[curWorkspaceName].rtsProfile.version = $('#package_ver').val();
           mainRtsMap[curWorkspaceName].modelProfile.remoteUrl = $('#package_remoteUrl').val();
           // 保存
+          if(propertyAreaFlg === false) {
+            w2popup.close();
+          }
           updatePackage(true);
         }
       }
@@ -210,7 +213,8 @@ function openRtcSettingPopup(form, title, width, height) {
       event.onComplete = function() {
         $('#w2ui-popup #rtc-profile-div').w2form(form); 
         // 釦を変更する
-        $($('.w2ui-buttons').children()[0]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('font-size', '1.2em');
+        $($('.w2ui-buttons').children()[0]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('width', '120px').css('font-size', '1.2em');
+        $($('.w2ui-buttons').children()[1]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('width', '140px').css('font-size', '1.2em');
       }
     },
     onMax : function(event) {
@@ -264,7 +268,7 @@ function createRtcProfileSettingForm(rtc, rtcIndex, propertyAreaFlg, updateFlg) 
     form['fields'][0]['html']['attr'] = form['fields'][0]['html']['attr'] + 'disabled=disabled';
     // 更新時のアクション
     form['actions'] = {
-      'Update': function () {
+      'Update Profile': function () {
         if(curState !== STATE.EDIT) {
           w2alert('初期化中・実行中は編集できません');
         } else if(this.validate().length === 0) {
@@ -275,6 +279,29 @@ function createRtcProfileSettingForm(rtc, rtcIndex, propertyAreaFlg, updateFlg) 
             w2popup.close();
           }
           updatePackage(true);
+        }
+      },
+      'Update DNN Model': function () {
+        if(curState !== STATE.EDIT) {
+          w2alert('初期化中・実行中は編集できません');
+        } else if(this.validate().length === 0) {
+          // 編集した情報を格納する
+          var updated = setEditComponentInfo(rtc, componentKindFields);
+          if(updated.rtcProfile.neuralNetworkInfo.modelName) {
+            w2confirm('編集内容を保存した後、DNNモデルを更新します。<br/>時間がかかる可能性もありますが、更新してよろしいですか？', function (btn) {
+              if(btn === 'Yes') {
+                // 保存
+                mainRtsMap[curWorkspaceName].rtcs[rtcIndex] = updated;
+                if(propertyAreaFlg === false) {
+                  w2popup.close();
+                }
+                // updatePackage(false);
+                updateDnnModels(updated.rtcProfile.neuralNetworkInfo.modelName, true);
+              }
+            });
+          } else {
+            w2alert('DNNモデル名が設定されていません');
+          }
         }
       }
     }

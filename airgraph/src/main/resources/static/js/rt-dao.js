@@ -35,6 +35,7 @@ function loadAllComponentArea() {
       // 作業領域も合わせて取得する
       loadAllWorkspace();
     }
+  }).always(function() {
     // 画面ロック解除
     unlockScreen();
   });
@@ -63,6 +64,7 @@ function loadAllWorkspace() {
       // 1件も存在しない
       curWorkspaceName = 0;
     }
+  }).always(function() {
     // 画面ロック解除
     unlockScreen();
   });
@@ -116,6 +118,7 @@ function addPackage(modelId, id, sabstract, version, remoteUrl) {
     } else {
       // NOP
     }
+  }).always(function() {
     // 画面ロック解除
     unlockScreen();
   });
@@ -132,25 +135,25 @@ function updatePackage(isReload) {
 
   // 画面をロック
   lockScreen();
-  var result = $.ajax({
+  $.ajax({
     type: 'POST',
     url: getUrlUpdatePackage(),
     data: JSON.stringify(mainRtsMap[curWorkspaceName]),
     contentType: 'application/json',
     dataType: 'json',
     scriptCharset: 'utf-8',
-    async : false
-  }).responseText;
-
-  // 編集情報を削除する
-  mainRtsMap[curWorkspaceName].editSourceCode = new Object();
-  
-  if(isReload && isReload === true) {
-    // 作業領域再読み込み
-    reloadAllWorkspace();
-  }
-  // 画面ロック解除
-  unlockScreen();
+  }).done(function() {
+    // 編集情報を削除する
+    mainRtsMap[curWorkspaceName].editSourceCode = new Object();
+    
+    if(isReload && isReload === true) {
+      // 作業領域再読み込み
+      reloadAllWorkspace();
+    }
+  }).always(function() {
+    // 画面ロック解除
+    unlockScreen();
+  });
 }
 
 /**
@@ -177,6 +180,7 @@ function deletePackage(id) {
         // コンポーネント領域再描画
         setComponentAreaInfo();
     }
+  }).always(function() {
     // 画面ロック解除
     unlockScreen();
   });
@@ -215,7 +219,8 @@ function addComponent(modelId) {
   }).done(function() {
     // 作業領域再読み込み
     reloadAllWorkspace();
-    // 画面のロックを解除
+  }).always(function() {
+    // 画面ロック解除
     unlockScreen();
   });
 }
@@ -242,7 +247,8 @@ function createNewComponentAjax(componentData) {
   }).done(function() {
     // 作業領域再読み込み
     reloadAllWorkspace();
-    // 画面のロックを解除
+  }).always(function() {
+    // 画面ロック解除
     unlockScreen();
   });
 }
@@ -285,7 +291,8 @@ function deleteComponent(componentId, modelId) {
   }).done(function() {
     // 作業領域再読み込み
     reloadAllWorkspace();
-    // 画面のロックを解除
+  }).always(function() {
+    // 画面ロック解除
     unlockScreen();
   });
 }
@@ -333,7 +340,8 @@ function addLogger(componentId, modelId, portName, dataType) {
     }).done(function() {
       // 作業領域再読み込み
       reloadAllWorkspace();
-      // 画面のロックを解除
+    }).always(function() {
+      // 画面ロック解除
       unlockScreen();
     });
   });
@@ -504,6 +512,33 @@ function getDatasetChoices() {
     async : false
   }).responseJSON;
   return result;
+}
+
+/*************************************************************************
+ * DNN関連
+ *************************************************************************/
+
+/**
+ * 編集したRTSの情報をサーバに通知する
+ * 
+ * @returns
+ */
+function updateDnnModels(dnnModelName, isReload) {
+  // 画面をロック
+  lockScreen();
+  $.ajax({
+    type: 'GET',
+    url: getUrlUpdateDnnModels(),
+    data: { 'dnnModelName' : dnnModelName }
+  }).done(function(resData){
+    if(resData && isReload && isReload === true) {
+      // 作業領域再読み込み
+      reloadAllWorkspace();
+    }
+  }).always(function() {
+    // 画面ロック解除
+    unlockScreen();
+  });
 }
 
 /*************************************************************************

@@ -63,6 +63,17 @@ public class FileUtil {
 	}
 
 	/**
+	 * ファイルが存在するかを判定する
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static boolean exists(String path) {
+		File file = new File(path);
+		return exists(file);
+	}
+
+	/**
 	 * ファイルが存在しないかを判定する
 	 * 
 	 * @param file
@@ -73,6 +84,17 @@ public class FileUtil {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * ファイルが存在しないかを判定する
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static boolean notExists(String path) {
+		File file = new File(path);
+		return notExists(file);
 	}
 
 	/**
@@ -147,7 +169,7 @@ public class FileUtil {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * ディレクトリを作成する
 	 * 
@@ -156,7 +178,21 @@ public class FileUtil {
 	 */
 	public static Boolean createDirectory(File dir) {
 		logger.debug("createDirectory. dir[" + dir.getPath() + "]");
-		return dir.mkdir();
+		if (notExists(dir)) {
+			return dir.mkdir();
+		}
+		return true;
+	}
+
+	/**
+	 * ディレクトリを作成する
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static Boolean createDirectory(String path) {
+		File dir = new File(path);
+		return createDirectory(dir);
 	}
 
 	/**
@@ -217,11 +253,28 @@ public class FileUtil {
 	 * @return
 	 */
 	public static void saveUploadFile(MultipartFile srcFile, File destFile) {
-		logger.debug("File Upload. file[" + srcFile.getName() + "]dir[" + destFile.getPath() + "]");
+		logger.debug("File Upload. src[" + srcFile.getName() + "]dest[" + destFile.getPath() + "]");
 		try {
 			BufferedInputStream in = new BufferedInputStream(srcFile.getInputStream());
 			BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(destFile.getPath()));
 			FileCopyUtils.copy(in, out);
+		} catch (IOException e) {
+			throw new RuntimeException("Error uploading file.", e);
+		}
+	}
+
+	/**
+	 * InputStreamを保存する
+	 * 
+	 * @param inputStream
+	 * @param destFile
+	 * @return
+	 */
+	public static void saveInputStream(InputStream inputStream, File destFile) {
+		logger.debug("File Upload. dest[" + destFile.getPath() + "]");
+		try {
+			BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(destFile.getPath()));
+			FileCopyUtils.copy(inputStream, out);
 		} catch (IOException e) {
 			throw new RuntimeException("Error uploading file.", e);
 		}

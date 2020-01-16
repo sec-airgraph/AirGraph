@@ -1,6 +1,8 @@
 package com.sec.airgraph.service;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +10,16 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sec.keras.entity.field.KerasTabInfo;
@@ -165,7 +176,7 @@ public class KerasManagementService {
 				logger.error("Failed to compress dataset Directory.");
 				result = "";
 			}
-		}		
+		}
 		return result;
 	}
 	
@@ -202,5 +213,58 @@ public class KerasManagementService {
 			// 解凍失敗
 			logger.error("Failed to unzip dataset file.");
 		}
+	}
+
+	/**
+	 * 指定されたDNNファイルをダウンロードする
+	 * 
+	 * @param dnnModelName DNNモデル名
+	 * @param fileExtention 拡張子
+	 */
+	public boolean downloadDnnFiles(String dnnModelName, String fileExtention) {
+		boolean downloadResult = false;
+		// KerasEditorのURL
+		String url = PropUtil.getValue("airgraph.keras_editor.server.uri");
+		if (StringUtil.equals(url, "localhost:8080")) {
+			// 単一マシンで実行している場合は除外
+			return true;
+		}
+		String downloadDnnUrl = "http://" + url + "main/getDnnFiles";
+
+		// モデルファイルの取得
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		map.add("dnnModelName", dnnModelName);
+		map.add("fileExtentions", fileExtention);
+
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+
+		//ここでPOSTリクエスト実行
+		RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Resource> result = restTemplate.postForEntity(downloadDnnUrl, request, Resource.class);
+		HttpStatus responseHttpStatus = result.getStatusCode();
+		try {
+			if (responseHttpStatus.equals(HttpStatus.OK) && result.getBody() != null && result.getBody().getInputStream() != null) { // 200
+				InputStream inputStream = result.getBody().getInputStream();
+				InputStreamReader reader = new InputStreamReader(inputStream);
+
+				if (reader.ready()) {
+					// 保存する
+					String kerasDirPath = PropUtil.getValue("workspace.local.keras.directory.path") + dnnModelName;
+					// ディレクトリの作成
+					FileUtil.createDirectory(kerasDirPath);
+					// ファイルの保存
+					String filePath = kerasDirPath + "/" + dnnModelName + "." + fileExtention;
+					FileUtil.deleteFile(filePath);
+					File file = new File(filePath);
+					FileUtil.saveInputStream(inputStream, file);
+					downloadResult = true;
+				}
+			}
+		} catch (Exception e) {
+			logger.error("例外発生:", e);
+		}
+		return downloadResult;
 	}
 }

@@ -67,7 +67,9 @@ public class MainService {
 	@Autowired
 	private KerasManagementService kerasManagementService;
 	
-	
+	/**
+	 * IDE管理サービス
+	 */
 	@Autowired
 	private IdeManagementService ideManagementService;
 
@@ -527,7 +529,7 @@ public class MainService {
 	public Map<String, String> getKerasModelChoices() {
 		Map<String, String> ret = new HashMap<>();
 		// モデル情報保存先パス
-		String modelDirPath = PropUtil.getValue("models.keras.directory.path");
+		String modelDirPath = PropUtil.getValue("workspace.local.keras.directory.path");
 		
 		// Kerasのモデル一覧を取得する
 		List<KerasModel> models = kerasManagementService.loadAllKerasModels(modelDirPath, false);
@@ -547,5 +549,18 @@ public class MainService {
 	 */
 	public Map<String, String> getDatasetChoices() {
 		return kerasManagementService.loadDatasetList();
+	}
+
+	/**
+	 * 指定されたDNNモデル名に関連するファイルをダウンロードする
+	 * 
+	 * @param dnnModelName DNNモデル名
+	 */
+	public boolean downloadDnnFiles(String dnnModelName) {
+		boolean result = kerasManagementService.downloadDnnFiles(dnnModelName, "json");
+		if (result) {
+			result = kerasManagementService.downloadDnnFiles(dnnModelName, "hdf5");
+		}
+		return result;
 	}
 }

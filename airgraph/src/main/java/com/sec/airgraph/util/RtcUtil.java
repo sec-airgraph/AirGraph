@@ -2420,10 +2420,7 @@ public class RtcUtil {
 		// 存在しない場合は探してコピーしてくる
 		if (targetFile == null) {
 			// OpenRTMのフォルダを調べる
-			String openRtmDir = PropUtil.getValue("openrtm.rtm.dir");
-			if (!(new File(openRtmDir).exists())) {
-				openRtmDir = PropUtil.getValue("openrtm.rtm.local.dir");
-			}
+			String openRtmDir = RtcUtil.getOpenRtmDir();
 			targetFile = FileUtil.searchFileWithSubDir(openRtmDir, idlFileName, "idl");
 
 			if (targetFile != null) {
@@ -2663,5 +2660,20 @@ public class RtcUtil {
 		}
 	}
 
-
+	/**
+	 * RTMのディレクトリを取得する
+	 * @return
+	 */
+	public static String getOpenRtmDir() {
+		// OpenRTMのフォルダを調べる
+		String openRtmDir = PropUtil.getValue("openrtm.rtm.dir");
+		if (!(new File(openRtmDir).exists())) {
+			openRtmDir = openRtmDir.replace("1.1", "1.2");
+		} else if (!(new File(openRtmDir).exists())) {
+			openRtmDir = PropUtil.getValue("openrtm.rtm.local.dir");
+		} else if (!(new File(openRtmDir).exists())) {
+			openRtmDir = openRtmDir.replace("1.1", "1.2");
+		} 
+		return openRtmDir;
+	}
 }

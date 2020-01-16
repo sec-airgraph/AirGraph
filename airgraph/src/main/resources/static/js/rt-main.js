@@ -1245,14 +1245,7 @@ function unHighLightAll(){
  */
 function lockScreen() {
   if(lockCnt === 0) {
-    if ($('#w2ui-popup').length > 0) {
-      // すでに立ち上がっている場合
-      w2popup.clear();
-      w2popup.lock('Loading...', true);
-    } else {
-      w2popup.open({width:180, height:70});
-      w2popup.lock('Loading...', true);
-    }
+    w2utils.lock($('#main-joint-area'), "Loading...", false);
   }
   lockCnt++;
 }
@@ -1264,8 +1257,9 @@ function lockScreen() {
  */
 function unlockScreen() {
   lockCnt--;
-  if(lockCnt == 0) {
-    w2popup.close();
+  if(lockCnt <= 0) {
+    w2utils.unlock($('#main-joint-area'));
+    lockCnt = 0;
   }
 }
 
@@ -1277,7 +1271,7 @@ function unlockScreen() {
 function setPropertyAreaRtsProfile() {
   if(curWorkspaceName && mainRtsMap) {
     // RtsProfile設定Formを設定する
-    $('#property-panel').w2form(createRtsProfileSettingForm(mainRtsMap[curWorkspaceName].rtsProfile, mainRtsMap[curWorkspaceName].modelProfile, true));
+    $('#property-panel').w2form(createRtsProfileSettingForm(mainRtsMap[curWorkspaceName].rtsProfile, mainRtsMap[curWorkspaceName].modelProfile, true, true));
     // 釦を変更する
     $($('.w2ui-buttons').children()[0]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('font-size', '1.2em');
   }
@@ -1304,7 +1298,8 @@ function setPropertyAreaRtcProfile(componentId) {
   }
   $('#property-panel').w2form(createRtcProfileSettingForm(rtc, rtcIndex, true, true));
   // 釦を変更する
-  $($('.w2ui-buttons').children()[0]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('font-size', '1.2em');
+  $($('.w2ui-buttons').children()[0]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('width', '120px').css('font-size', '1.2em');
+  $($('.w2ui-buttons').children()[1]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('width', '140px').css('font-size', '1.2em');
 }
 
 /*******************************************************************************

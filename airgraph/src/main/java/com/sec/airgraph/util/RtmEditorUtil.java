@@ -514,10 +514,7 @@ public class RtmEditorUtil {
 
 		// openRTMのフォルダからIDLのファイルを探す
 		// 作業領域パス
-		String openRtmDir = PropUtil.getValue("openrtm.rtm.dir");
-		if (!(new File(openRtmDir).exists())) {
-			openRtmDir = PropUtil.getValue("openrtm.rtm.local.dir");
-		}
+		String openRtmDir = RtcUtil.getOpenRtmDir();
 
 		File directoryOpenRtm = new File(openRtmDir);
 		// 後方一致で"idl"
@@ -559,10 +556,7 @@ public class RtmEditorUtil {
 			targetFileList.addAll(componentList);
 		}
 
-		String openRtmDir = PropUtil.getValue("openrtm.rtm.dir");
-		if (!(new File(openRtmDir).exists())) {
-			openRtmDir = PropUtil.getValue("openrtm.rtm.local.dir");
-		}
+		String openRtmDir = RtcUtil.getOpenRtmDir();
 		List<File> openRtmList = FileUtil.searchFileListWithSubDir(openRtmDir, "idl");
 		if (CollectionUtil.isNotEmpty(openRtmList)) {
 			targetFileList.addAll(openRtmList);
@@ -628,10 +622,7 @@ public class RtmEditorUtil {
 		targetFile = FileUtil.searchFileWithSubDir(idlDirPath, idlFileName, "idl");
 		if (targetFile == null) {
 			// ファイルが見つかっていない場合は、openRTMのフォルダからIDLのファイルを探す
-			String openRtmDir = PropUtil.getValue("openrtm.rtm.dir");
-			if (!(new File(openRtmDir).exists())) {
-				openRtmDir = PropUtil.getValue("openrtm.rtm.local.dir");
-			}
+			String openRtmDir = RtcUtil.getOpenRtmDir();
 			targetFile = FileUtil.searchFileWithSubDir(openRtmDir, idlFileName, "idl");
 		}
 		
