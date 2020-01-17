@@ -190,56 +190,53 @@ function setToolbarComponent() {
       },
       { type: 'menu', id: 'setting-menu', caption: 'Dataset', icon: 'fa fa-book',
         items: [
+          { type: 'menu', id: 'dataset-menu', caption: 'Open Dataset Viewer',  icon: 'fa fa-television' },
           { type: 'menu', id: 'upload-menu', caption: 'Upload Dataset',    icon: 'fa fa-upload' },
           { type: 'menu', id: 'download-menu', caption: 'Download Dataset',  icon: 'fa fa-download' }
         ]
       },
-//      { type: 'menu', id: 'setting-menu', caption: 'Input Data', icon: 'fa fa-book',
-//        items: [
-//          { type: 'menu', id: 'upload-menu', caption: 'Upload data',    icon: 'fa fa-upload' },
-//          { type: 'menu', id: 'download-menu', caption: 'Download Template',  icon: 'fa fa-download' }
-//        ]
-//      },
-//      { type: 'spacer'},
-//      { type: 'button', id: 'current-state', caption: 'Mode : Edit', icon:'fa fa-info-circle' }
-      ],
-      onClick: function(event) {
-        // クリックされた時のイベント
-        if(event.subItem) {
-          switch(event.subItem.id) {
-          case 'save-menu':
-            //  保存
-            saveModel();
-            break;
-          case 'learn-menu':
-            runKerasFit();
-            break;
-          case 'upload-menu':
-            w2confirm('ZIPファイルの上位ディレクトリをデータセット名として利用します。</br>すでに存在するデータセットは削除されますがよろしいですか？', function (btn) {
-              if(btn === 'Yes') {
-                $('#dataset-upload').val("");
-                $('#workspace-model-name-dataset').val(curWorkspaceName);
-                // ファイルアップロード画面を開く
-                $('#dataset-upload').click();
-              }
-            });
-            break;
-          case 'download-menu':
-            if (!modelMap[curWorkspaceName].dataset) {
-              // データセットが設定されていない
-              w2alert('データセットが選択されていません');
-            } else {
+    ],
+    onClick: function(event) {
+      // クリックされた時のイベント
+      if(event.subItem) {
+        switch(event.subItem.id) {
+        case 'save-menu':
+          //  保存
+          saveModel();
+          break;
+        case 'learn-menu':
+          runKerasFit();
+          break;
+        case 'dataset-menu' :
+          // データセットビューワ表示
+          openDatasetListViewer();
+          break;
+        case 'upload-menu':
+          w2confirm('ZIPファイルの上位ディレクトリをデータセット名として利用します。</br>すでに存在するデータセットは削除されますがよろしいですか？', function (btn) {
+            if(btn === 'Yes') {
+              $('#dataset-upload').val("");
               $('#workspace-model-name-dataset').val(curWorkspaceName);
-              $('#datasetUploadForm').attr('action', getUrlDatasetDownload());
-              $('#datasetUploadForm').submit();
+              // ファイルアップロード画面を開く
+              $('#dataset-upload').click();
             }
-            break;
-          default:
-            // NOP
-            break;
+          });
+          break;
+        case 'download-menu':
+          if (!modelMap[curWorkspaceName].dataset) {
+            // データセットが設定されていない
+            w2alert('データセットが選択されていません');
+          } else {
+            $('#workspace-model-name-dataset').val(curWorkspaceName);
+            $('#datasetUploadForm').attr('action', getUrlDatasetDownload());
+            $('#datasetUploadForm').submit();
           }
+          break;
+        default:
+          // NOP
+          break;
         }
       }
+    }
   })
 }
 

@@ -192,7 +192,7 @@ function setToolbarComponent() {
       { type: 'menu', id: 'tool-menu', caption: 'Tools', icon: 'fa fa-tasks',
         items: [
           { type: 'menu', id: 'console-menu',       caption: 'Open Console',           icon: 'fa fa-television' },
-          { type: 'menu', id: 'dataset-menu',       caption: 'Open Dataset Viewer',    icon: 'fa fa-television' },
+          { type: 'menu', id: 'dataset-menu',       caption: 'Open Dataset Monitor',   icon: 'fa fa-television' },
           { type: 'menu', id: 'rtsprofile-setting', caption: 'Package Setting',        icon: 'fa fa-cog'        }
         ]
       },
@@ -259,8 +259,8 @@ function setToolbarComponent() {
           openConsoleLog();
           break;
         case 'dataset-menu':
-          // データセットビューワ表示
-          openMonitorDataset();
+          // データセットモニタ
+          openDatasetMonitor();
           break;
         case 'keras-menu':
           // Keras表示
@@ -358,106 +358,6 @@ function openConsoleLog() {
       if (event.originalEvent.keyCode == 27) {
           event.preventDefault()
       }
-    }
-  });
-}
-
-/**
- * モニタを表示する
- * 
- * @param componentId
- * @param portName
- * @returns
- */
-function openMonitorImage(componentId, portName) {
-  // インスタンス名を取得
-  var instanceName = getInstanceNameInPackage(componentId);
-  
-  // ID,インスタンス名,ポート名からコネクタ名とloggerのIDを取得
-  var portInstanceName = instanceName + '.' + portName;
-  var connectorName = getConnectorNameInPackage(componentId, portInstanceName);
-  var loggerId = getLoggerIdInPackage(componentId, portInstanceName);
-
-  // 対象のコネクタのモニタが存在する場合は何もしない
-  if($(document.getElementById('div-' + connectorName)).length > 0) {
-    return ;
-  }
-  
-  // loggerのIDから画像出力ディレクトリを取得
-  var activeConfigurationSet = getActiveConfigInPackage(loggerId);
-  var directoryPath = getActiveConfigDataInPackage(loggerId, activeConfigurationSet, 'LogImageDirectoryPath');
-  
-  // イメージ取得先のURLを生成
-  var imgDirectoryPath = directoryPath + connectorName;
-  
-  var div = $('<div>');
-  div.attr('id', 'div-' + connectorName).attr('title', instanceName + '.' + portName);
-  div.css('width', '400px').css('height', '300px');
-  var img = $('<img>');
-  img.attr('id', 'img-' + connectorName);
-  img.css('width', '100%').css('height', '98%');
-  div.append(img);
-  $('body').append(div);
-  
-  // 画像取得開始
-  var imgTimerID = startTailImage(imgDirectoryPath, $(document.getElementById('img-' + connectorName)));
-  
-  $(div).dialog({
-    resizable : false,
-    height: 400,
-    width: 400,
-    modal: false,
-    close :function() {
-      // 追加したタグを削除
-      $(document.getElementById('div-' + connectorName)).remove();
-      stopTailImage(imgTimerID);
-    }
-  });
-}
-
-/**
- * データセットモニタを表示する
- * @returns
- */
-function openMonitorDataset() {
-  // 対象のコネクタのモニタが存在する場合は何もしない
-  if($(document.getElementById('div-datasetviewer')).length > 0) {
-    return ;
-  }
-  
-  var div = $('<div>');
-  div.attr('id', 'div-datasetviewer').attr('title', 'Dataset Viewer');
-  div.css('width', '400px').css('height', '300px');
-  var img = $('<img>');
-  img.attr('id', 'img-datasetViewer');
-  img.css('width', '100%').css('height', '90%');
-  div.append(img);
-  
-  var select = $('<select>');
-  select.attr('id', 'tailimage-dataset-select');
-  var datasets = getDatasetChoices();
-  for (key in datasets) {
-    var opt = $('<option>');
-    opt.val(datasets[key]);
-    opt.text(datasets[key]);
-    select.append(opt);  
-  }
-  div.append(select);
-  
-  $('body').append(div);
-  
-  // 画像取得開始
-  var datasetTimerID = startTailDataset($(document.getElementById('img-datasetViewer')));
-  
-  $(div).dialog({
-    resizable : false,
-    height: 400,
-    width: 400,
-    modal: false,
-    close :function() {
-      // 追加したタグを削除
-      $(document.getElementById('div-datasetviewer')).remove();
-      stopTailImage(datasetTimerID);
     }
   });
 }

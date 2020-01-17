@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sec.rtc.entity.rtc.CodeDirectory;
 import com.sec.keras.entity.field.KerasFieldInfo;
 import com.sec.keras.entity.field.KerasTabInfo;
 import com.sec.keras.entity.model.KerasModel;
@@ -37,8 +38,17 @@ public class KerasService {
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(KerasService.class);
 
+	/**
+	 * Keras管理サービス
+	 */
 	@Autowired
 	private KerasManagementService kerasManagementService;
+
+	/**
+	 * RTC管理サービス
+	 */
+	@Autowired
+	private RtcManagementService rtcManagementService;
 
 	/**
 	 * Kerasネットワーク情報を全て取得する
@@ -284,5 +294,18 @@ public class KerasService {
 	 */
 	public void uploadDataset(MultipartFile datasetFile) {
 		kerasManagementService.uploadDataset(datasetFile);
+	}
+
+	/**
+	 * 指定されたデータセットのデータの一覧を取得する
+	 * 
+	 * @param datasetName
+	 * @return
+	 */
+	public CodeDirectory getDatasetDataList(String datasetName) {
+		// データセット領域のパス
+		String dataSetDirPath = PropUtil.getValue("dataset.directory.path") + datasetName;
+		// データセット以下のファイルの一覧を取得する
+		return rtcManagementService.getCodeFile(dataSetDirPath, null, null, null, null);
 	}
 }

@@ -178,10 +178,6 @@ function setDataOutPortContextMenu() {
         // reloadPackageWorkspace(100, 100, mainRtsMap[curWorkspaceName]);
         options.isRemove = true;
         updatePackage(true);
-      } else if(key === 'openMonitor') {
-        // モニタ表示
-        var $this = this;
-        openMonitorImage($this.data().id, $this.data().portName);
       }
     },
     items: {
@@ -196,8 +192,6 @@ function setDataOutPortContextMenu() {
       //  // ロガー表示
       //  loggerVisible: { name: 'show Logger', type: 'checkbox', disabled: function(key, opt) { return !this.data('logging') || curState !== STATE.EDIT } },
       // }},
-      // // モニタ表示
-      // openMonitor:   { name: 'open Monitor', icon: 'fa-desktop', disabled: function(key, opt) { return !canLogging(this.data('dataType')) }}
     }, 
     events: {
       show: function(opt) {

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sec.rtc.entity.rtc.CodeDirectory;
 import com.sec.keras.entity.field.KerasFieldInfo;
 import com.sec.keras.entity.model.KerasModel;
 import com.sec.airgraph.form.KerasForm;
@@ -139,7 +140,8 @@ public class KerasController {
 	 */
 	@RequestMapping(value = "saveModel", method = RequestMethod.POST)
 	@ResponseBody
-	public String saveModel(@RequestParam(value = "dirName") String dirName, @RequestParam(value = "json") String json) {
+	public String saveModel(@RequestParam(value = "dirName") String dirName,
+			@RequestParam(value = "json") String json) {
 		logger.info("Save model in workspace.");
 		if (StringUtil.isNotEmpty(json)) {
 			kerasService.saveModel(dirName, json);
@@ -283,5 +285,17 @@ public class KerasController {
 	@ResponseBody
 	public Map<String, String> getDatasetChoices() {
 		return kerasService.getDatasetChoices();
+	}
+
+	/**
+	 * 指定されたデータセットのデータ一覧取得
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "getDatasetDataList", method = RequestMethod.POST)
+	@ResponseBody
+	public CodeDirectory getDatasetDataList(@RequestParam(value = "datasetName") String datasetName) {
+		logger.info("Get Dataset Data. datasetName[" + datasetName + "]");
+		return kerasService.getDatasetDataList(datasetName);
 	}
 }

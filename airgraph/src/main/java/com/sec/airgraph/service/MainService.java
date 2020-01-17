@@ -381,28 +381,62 @@ public class MainService {
 	}
 
 	/**
-	 * 対象のディレクトリにある一番新しいjpgファイルを取得する
+	 * 対象のディレクトリにある一番新しい画像ファイルを取得する
 	 * 
 	 * @param imageDirectoryPath
+	 * @param targetExtension
 	 * @return
 	 */
-	public byte[] tailImage(String imageDirectoryPath) {
+	public byte[] tailImage(String imageDirectoryPath, List<String> targetExtension) {
+		// 対象とする拡張子
+		List<String> extensions = new ArrayList<>();
+		extensions.add("png");
+		extensions.add("jpg");
+		extensions.add("jpeg");
+
+		File imageFile = FileUtil.getLatestUpdateFile(imageDirectoryPath, extensions);
+		if (FileUtil.exists(imageFile)) {
+			return getImage(imageFile, targetExtension);
+		} else {
+			logger.warn("対象の画像ファイルが存在しない.imageFilePath[" + imageDirectoryPath + "]");
+		}
+		return null;
+	}
+
+	/**
+	 * 対象のディレクトリにある一番新しい画像ファイルを取得する
+	 * 
+	 * @param imageFile
+	 * @param targetExtension
+	 * @return
+	 */
+	public byte[] getImage(File imageFile, List<String> targetExtension) {
 		byte[] result = null;
-		File imageFile = FileUtil.getLatestUpdateFile(imageDirectoryPath, "jpg");
+
+		// 対象とする拡張子
+		List<String> extensions = new ArrayList<>();
+		extensions.add("png");
+		extensions.add("jpg");
+		extensions.add("jpeg");
+
+		if (!extensions.contains(FileUtil.getFileExtension(imageFile.getPath()).toLowerCase())) {
+			return null;
+		}
+
 		if (FileUtil.exists(imageFile)) {
 			// BufferedImageへ設定
 			BufferedImage bufferedImage = null;
 			try {
+				String extension = FileUtil.getFileExtension(imageFile.getPath().toLowerCase());
+				targetExtension.add(extension);
 				bufferedImage = ImageIO.read(imageFile);
 				// byteに変換
 				ByteArrayOutputStream bout = new ByteArrayOutputStream();
-				ImageIO.write(bufferedImage, "jpg", bout);
+				ImageIO.write(bufferedImage, extension, bout);
 				result = bout.toByteArray();
 			} catch (Exception ex) {
 				logger.error("例外発生. :", ex);
 			}
-		} else {
-			logger.warn("対象の画像ファイルが存在しない.imageDirectoryPath[" + imageDirectoryPath + "]");
 		}
 		return result;
 	}

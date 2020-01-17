@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -770,14 +771,49 @@ public class MainController {
 	@RequestMapping(value = "tailImage", method = RequestMethod.GET)
 	@ResponseBody
 	public HttpEntity<byte[]> tailImage(@RequestParam(value = "imageDirectoryPath") String imageDirectoryPath,
-			@RequestParam(value = "date") Long date, @RequestParam(value = "workPackageName") String workPackageName) {
+			@RequestParam(value = "date") Long date) {
 		logger.info("Tailing Image. image directiry path[" + imageDirectoryPath + "]");
 
-		byte[] image = mainService.tailImage(imageDirectoryPath);
+		List<String> targetExtension = new ArrayList<>();
+		byte[] image = mainService.tailImage(imageDirectoryPath, targetExtension);
 
 		if (image != null) {
 			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.IMAGE_JPEG);
+			if (targetExtension.contains("png")) {
+				headers.setContentType(MediaType.IMAGE_PNG);
+			} else if (targetExtension.contains("jpg") || targetExtension.contains("jpeg")) {
+				headers.setContentType(MediaType.IMAGE_JPEG);
+			}
+			headers.setContentLength(image.length);
+			return new HttpEntity<byte[]>(image, headers);
+		}
+		return null;
+	}
+
+	/**
+	 * 画像ファイルを読み込む
+	 * 
+	 * @param imageDirectoryPath
+	 * @param date
+	 * @param workPackageName
+	 * @return
+	 */
+	@RequestMapping(value = "getImage", method = RequestMethod.GET)
+	@ResponseBody
+	public HttpEntity<byte[]> getImage(@RequestParam(value = "imageFilePath") String imageFilePath) {
+		logger.info("Get Image. image directiry path[" + imageFilePath + "]");
+
+		List<String> targetExtension = new ArrayList<>();
+		File imageFile = new File(imageFilePath);
+		byte[] image = mainService.getImage(imageFile, targetExtension);
+
+		if (image != null) {
+			HttpHeaders headers = new HttpHeaders();
+			if (targetExtension.contains("png")) {
+				headers.setContentType(MediaType.IMAGE_PNG);
+			} else if (targetExtension.contains("jpg") || targetExtension.contains("jpeg")) {
+				headers.setContentType(MediaType.IMAGE_JPEG);
+			}
 			headers.setContentLength(image.length);
 			return new HttpEntity<byte[]>(image, headers);
 		}

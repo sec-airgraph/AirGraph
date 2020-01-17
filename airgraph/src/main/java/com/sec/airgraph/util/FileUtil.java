@@ -648,7 +648,7 @@ public class FileUtil {
 	 * @param fileName
 	 * @return
 	 */
-	public static String getFileSuffix(String fileName) {
+	public static String getFileExtension(String fileName) {
 		if (StringUtil.isEmpty(fileName)) {
 			return null;
 		}
@@ -663,10 +663,10 @@ public class FileUtil {
 	 * 対象のディレクトリにある一番更新時刻が新しい指定拡張子のファイルを取得する
 	 * 
 	 * @param dirPath
-	 * @param suffix
+	 * @param extensions
 	 * @return
 	 */
-	public static File getLatestUpdateFile(String dirPath, String suffix) {
+	public static File getLatestUpdateFile(String dirPath, List<String> extensions) {
 		File result = null;
 		// 対象のディレクトリのファイル一覧を取得
 		File dir = new File(dirPath);
@@ -674,7 +674,7 @@ public class FileUtil {
 		if (CollectionUtil.isNotEmpty(files)) {
 			// 更新時刻の降順でソートする
 			List<File> fileList = CollectionUtil.filter(CollectionUtil.toList(files),
-					file -> suffix.equals(getFileSuffix(file.getName())));
+					file -> extensions.contains(getFileExtension(file.getName())));
 			if (CollectionUtil.isNotEmpty(fileList)) {
 				List<File> sortedList = CollectionUtil.reversedSort(fileList, File::lastModified);
 				result = sortedList.get(0);

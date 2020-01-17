@@ -13,6 +13,7 @@
 <script type="text/javascript" th:src="@{/js/rt-contextmenu.js}"     src="/js/rt-contextmenu.js"></script>
 <script type="text/javascript" th:src="@{/js/rt-dao.js}"             src="/js/rt-dao.js"></script>
 <script type="text/javascript" th:src="@{/js/rt-form.js}"            src="/js/rt-form.js"></script>
+<script type="text/javascript" th:src="@{/js/dataset-main.js}"       src="/js/dataset-main.js"></script>
 
 <script th:inline="javascript">
 /*[-----------------------------
@@ -242,6 +243,11 @@ function getUrlTailImage() {
   return /*[[@{/main/tailImage}]]*/;
 }
 
+/*[- 画像監視 -]*/
+function getUrlGetImage() {
+  return /*[[@{/main/getImage}]]*/;
+}
+
 /*[- 結果取得 -]*/
 function getUrlGetResult() {
   return /*[[@{/main/getResult}]]*/;
@@ -300,6 +306,11 @@ function getUrlDatasetChoices() {
 /*[- DNNモデル更新 -]*/
 function getUrlUpdateDnnModels() {
   return /*[[@{/main/updateDnnModels}]]*/;
+}
+
+/*[- Datasetのデータ一覧取得 -]*/
+function getUrlGetDatasetDataList() {
+  return /*[[@{/keras/getDatasetDataList}]]*/;
 }
 
 /*[-----------------------------
