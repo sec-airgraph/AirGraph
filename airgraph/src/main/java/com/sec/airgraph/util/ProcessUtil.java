@@ -38,10 +38,12 @@ public class ProcessUtil {
 			Process process = pb.start();
 			process.waitFor();
 		} catch (IOException e) {
-			String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
 			logger.error("In Function " + methodName + ", process builder 例外発生:" + e);
 		} catch (InterruptedException e) {
-			String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
 			logger.error("In Function " + methodName + ", process builder 例外発生:" + e);
 		}
 	}
@@ -65,10 +67,12 @@ public class ProcessUtil {
 			Process process = pb.start();
 			process.waitFor();
 		} catch (IOException e) {
-			String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
 			logger.error("In Function " + methodName + ", process builder 例外発生:" + e);
 		} catch (InterruptedException e) {
-			String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
 			logger.error("In Function " + methodName + ", process builder 例外発生:" + e);
 		}
 	}
@@ -96,10 +100,12 @@ public class ProcessUtil {
 			Process process = pb.start();
 			process.waitFor();
 		} catch (IOException e) {
-			String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
 			logger.error("In Function " + methodName + ", process builder 例外発生:" + e);
 		} catch (InterruptedException e) {
-			String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
 			logger.error("In Function " + methodName + ", process builder 例外発生:" + e);
 		}
 	}
@@ -131,10 +137,12 @@ public class ProcessUtil {
 
 			}
 		} catch (IOException e) {
-			String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
 			logger.error("In Function " + methodName + ", 例外発生:" + e);
 		} catch (InterruptedException e) {
-			String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
 			logger.error("In Function " + methodName + ", 例外発生:" + e);
 		}
 		return result;
@@ -169,10 +177,12 @@ public class ProcessUtil {
 
 			}
 		} catch (IOException e) {
-			String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
 			logger.error("In Function " + methodName + ", 例外発生:" + e);
 		} catch (InterruptedException e) {
-			String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+			String methodName = new Object() {
+			}.getClass().getEnclosingMethod().getName();
 			logger.error("In Function " + methodName + ", 例外発生:" + e);
 		}
 		return result;

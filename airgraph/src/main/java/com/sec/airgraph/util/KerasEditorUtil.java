@@ -35,36 +35,27 @@ public class KerasEditorUtil {
 		// Tensorboard用のディレクトリがない場合は作成
 		File tensorBoardDir = new File(tensorBoardDirPath);
 		tensorBoardDir.mkdirs();
-		
+
 		// ログファイル
 		String logFilePath = PropUtil.getValue("workspace.local.keras_ide_util.logfile.path");
 		File logFile = new File(logFilePath);
-		
+
 		// data_makerがない場合は実行せずメッセージだけ表示
 		File dataMakerFile = new File(dataMakerPath);
-		if(dataMakerFile.exists() == false) {
-			ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(
-					modelDirPath, 
-					logFile,
-					"echo",
+		if (dataMakerFile.exists() == false) {
+			ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(modelDirPath, logFile, "echo",
 					"You must create a data_maker.py for this model.");
 			return;
 		}
 
 		// keras.fitを実行する
-		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(
-				modelDirPath, 
-				logFile,
-				"python",
-				dataMakerPath,
-				modelJsonFilePath,
-				resultPath,
-				tensorBoardDirPath,
-				datasetDirPath);
+		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(modelDirPath, logFile, "python", dataMakerPath,
+				modelJsonFilePath, resultPath, tensorBoardDirPath, datasetDirPath);
 	}
 
 	/**
 	 * アップロードしたdata_makerファイルを保存する
+	 * 
 	 * @param wprkspaceModelName
 	 * @param dataMakerFile
 	 */
@@ -80,7 +71,7 @@ public class KerasEditorUtil {
 		// 指定されたフォルダからdata_makerのファイルを探す
 		File orginalFile = new File(dataMakerFile.getOriginalFilename());
 		File savedFile = FileUtil.concatenateFilePath(dataDir.getPath(), orginalFile.getName());
-		
+
 		FileUtil.saveUploadFile(dataMakerFile, savedFile);
 
 		// Zipファイル展開

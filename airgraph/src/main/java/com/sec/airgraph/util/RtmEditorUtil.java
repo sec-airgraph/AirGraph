@@ -40,7 +40,7 @@ public class RtmEditorUtil {
 	 * logger
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(RtmEditorUtil.class);
-	
+
 	/************************************************************
 	 * 選択肢用Map作成処理関連
 	 ************************************************************/
@@ -451,10 +451,10 @@ public class RtmEditorUtil {
 			pythonConstructor = "RTC.Waypoint3D(RTC.Pose3D(RTC.Point3D(0.0,0.0,0.0), RTC.Orientation3D(0.0,0.0,0.0)), 0.0,0.0, RTC.Time(0,0), RTC.Velocity3D(*([0.0]*6)))";
 			break;
 		}
-		
+
 		return pythonConstructor;
 	}
-	
+
 	/**
 	 * ポート表示位置Mapを生成する
 	 * 
@@ -468,7 +468,7 @@ public class RtmEditorUtil {
 
 		return map;
 	}
-	
+
 	/**
 	 * インタフェースの向きMapを生成する
 	 * 
@@ -482,7 +482,7 @@ public class RtmEditorUtil {
 
 		return map;
 	}
-	
+
 	/**
 	 * 指定されたRTCに設定しているIDLファイルを含めて、IDLファイルの一覧を取得する
 	 * 
@@ -497,7 +497,7 @@ public class RtmEditorUtil {
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		File rtcDir = FileUtil.concatenateFilePath(workspaceDirPath + workPackageName, DIR_NAME.PACKAGE_RTC_DIR_NAME,
 				componentName);
-		
+
 		// 指定されたフォルダからIDLのファイルを探す
 		File directoryRtc = new File(rtcDir.getPath() + File.separator + "idl/");
 		// 後方一致で"idl"
@@ -514,7 +514,7 @@ public class RtmEditorUtil {
 
 		// openRTMのフォルダからIDLのファイルを探す
 		// 作業領域パス
-		String openRtmDir = RtcUtil.getOpenRtmDir();
+		String openRtmDir = getOpenRtmDir();
 
 		File directoryOpenRtm = new File(openRtmDir);
 		// 後方一致で"idl"
@@ -523,15 +523,15 @@ public class RtmEditorUtil {
 		IOFileFilter dirFilterOpenRtm = FileFilterUtils.trueFileFilter();
 		// 検索開始
 		Collection<File> OpenRtmList = FileUtils.listFiles(directoryOpenRtm, fileFilterOpenRtm, dirFilterOpenRtm);
-		if(CollectionUtil.isNotEmpty(OpenRtmList)) {
+		if (CollectionUtil.isNotEmpty(OpenRtmList)) {
 			for (File file : OpenRtmList) {
 				map.put(file.getName(), file.getName());
 			}
 		}
-		
+
 		return map;
 	}
-	
+
 	/**
 	 * 指定されたRTCに設定しているIDLファイルを含めて、全てのIDLファイルのDataType型を取得する
 	 * 
@@ -539,7 +539,8 @@ public class RtmEditorUtil {
 	 * @param componentName
 	 * @return
 	 */
-	public static Map<String, String> createDataTypeMap(String workPackageName, String componentName, boolean isDataType) {
+	public static Map<String, String> createDataTypeMap(String workPackageName, String componentName,
+			boolean isDataType) {
 		Map<String, String> map = new LinkedHashMap<>();
 
 		// 作業領域パス
@@ -556,7 +557,7 @@ public class RtmEditorUtil {
 			targetFileList.addAll(componentList);
 		}
 
-		String openRtmDir = RtcUtil.getOpenRtmDir();
+		String openRtmDir = getOpenRtmDir();
 		List<File> openRtmList = FileUtil.searchFileListWithSubDir(openRtmDir, "idl");
 		if (CollectionUtil.isNotEmpty(openRtmList)) {
 			targetFileList.addAll(openRtmList);
@@ -597,7 +598,7 @@ public class RtmEditorUtil {
 		}
 		return map;
 	}
-	
+
 	/**
 	 * 指定されたRTCに設定しているIDLファイルを含めて、指定されたIDLファイルのinterface型を取得する
 	 * 
@@ -611,21 +612,21 @@ public class RtmEditorUtil {
 		Map<String, String> map = new LinkedHashMap<>();
 
 		File targetFile = null;
-		
+
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		File rtcDir = FileUtil.concatenateFilePath(workspaceDirPath + workPackageName, DIR_NAME.PACKAGE_RTC_DIR_NAME,
 				componentName);
-		
+
 		// まずrtcのIDLフォルダから探す
 		String idlDirPath = rtcDir.getPath() + File.separator + "idl/";
 		targetFile = FileUtil.searchFileWithSubDir(idlDirPath, idlFileName, "idl");
 		if (targetFile == null) {
 			// ファイルが見つかっていない場合は、openRTMのフォルダからIDLのファイルを探す
-			String openRtmDir = RtcUtil.getOpenRtmDir();
+			String openRtmDir = getOpenRtmDir();
 			targetFile = FileUtil.searchFileWithSubDir(openRtmDir, idlFileName, "idl");
 		}
-		
+
 		// ファイルが見つかった場合、interface定義の行をファイルから取得する
 		if (targetFile != null) {
 			List<String> ifList = FileUtil.readAndSearchStr(targetFile.getPath(), "interface");
@@ -651,7 +652,7 @@ public class RtmEditorUtil {
 		}
 		return map;
 	}
-	
+
 	/**
 	 * アップロードしたIDLファイルを保存する
 	 * 
@@ -664,11 +665,11 @@ public class RtmEditorUtil {
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		File rtcDir = FileUtil.concatenateFilePath(workspaceDirPath + workPackageName, DIR_NAME.PACKAGE_RTC_DIR_NAME,
 				componentName);
-		
+
 		// 指定されたフォルダからIDLのファイルを探す
 		File orgFile = new File(idlFile.getOriginalFilename());
 		File saveIdlFile = FileUtil.concatenateFilePath(rtcDir.getPath(), "idl", orgFile.getName());
-		
+
 		FileUtil.saveUploadFile(idlFile, saveIdlFile);
 	}
 
@@ -679,9 +680,10 @@ public class RtmEditorUtil {
 	 * @param oldNN
 	 * @param rtcProfile
 	 */
-	public static void updateNeuralNetworkInfo(NeuralNetworkInfo newNN, NeuralNetworkInfo oldNN, RtcProfile rtcProfile) {
+	public static void updateNeuralNetworkInfo(NeuralNetworkInfo newNN, NeuralNetworkInfo oldNN,
+			RtcProfile rtcProfile) {
 		int dnnModelPathIndex = -1;
-		
+
 		if (CollectionUtil.isNotEmpty(rtcProfile.getConfigurationSet().getConfigurations())) {
 			for (int i = 0; i < rtcProfile.getConfigurationSet().getConfigurations().size(); i++) {
 				Configuration configuration = rtcProfile.getConfigurationSet().getConfigurations().get(i);
@@ -690,15 +692,16 @@ public class RtmEditorUtil {
 				}
 			}
 		}
-		
+
 		// DNNモデル名をコンフィギュレーションに反映する
 		if (StringUtil.isNotEmpty(newNN.getModelName())) {
 			// モデル名が設定されている
-			String kerasModelDirPath = PropUtil.getValue("models.keras.directory.path")
-					+ newNN.getModelName() + "/" + newNN.getModelName() + ".json";
+			String kerasModelDirPath = PropUtil.getValue("models.keras.directory.path") + newNN.getModelName() + "/"
+					+ newNN.getModelName() + ".json";
 			if (dnnModelPathIndex >= 0) {
 				// パスを更新
-				rtcProfile.getConfigurationSet().getConfigurations().get(dnnModelPathIndex).setDefaultValue(kerasModelDirPath);
+				rtcProfile.getConfigurationSet().getConfigurations().get(dnnModelPathIndex)
+						.setDefaultValue(kerasModelDirPath);
 			} else {
 				// 追加
 				Configuration configuration = new Configuration();
@@ -714,7 +717,7 @@ public class RtmEditorUtil {
 			}
 		}
 
-		int datasetPathIndex = -1;		
+		int datasetPathIndex = -1;
 		if (CollectionUtil.isNotEmpty(rtcProfile.getConfigurationSet().getConfigurations())) {
 			for (int i = 0; i < rtcProfile.getConfigurationSet().getConfigurations().size(); i++) {
 				Configuration configuration = rtcProfile.getConfigurationSet().getConfigurations().get(i);
@@ -723,14 +726,15 @@ public class RtmEditorUtil {
 				}
 			}
 		}
-		
+
 		// データセット名をコンフィギュレーションに反映する
 		if (StringUtil.isNotEmpty(newNN.getDatasetName())) {
 			// データセット名が設定されている
 			String dataSetDirPath = PropUtil.getValue("dataset.directory.path") + newNN.getDatasetName() + "/";
 			if (datasetPathIndex >= 0) {
 				// パスを更新
-				rtcProfile.getConfigurationSet().getConfigurations().get(datasetPathIndex).setDefaultValue(dataSetDirPath);
+				rtcProfile.getConfigurationSet().getConfigurations().get(datasetPathIndex)
+						.setDefaultValue(dataSetDirPath);
 			} else {
 				// 追加
 				Configuration configuration = new Configuration();
@@ -745,11 +749,11 @@ public class RtmEditorUtil {
 				rtcProfile.getConfigurationSet().getConfigurations().remove(datasetPathIndex);
 			}
 		}
-		
+
 		// データセットのディレクトリを生成する
 		updateDatasetDirectory(newNN.getDatasetName(), oldNN == null ? null : oldNN.getDatasetName());
 	}
-	
+
 	/**
 	 * データセットディレクトリを更新する
 	 * 
@@ -759,7 +763,7 @@ public class RtmEditorUtil {
 	private static void updateDatasetDirectory(String newDatasetName, String oldDatasetName) {
 		String newDirectoryPath = PropUtil.getValue("dataset.directory.path") + newDatasetName;
 		String oldDirectoryPath = PropUtil.getValue("dataset.directory.path") + oldDatasetName;
-		
+
 		if (StringUtil.isEmpty(newDatasetName) && StringUtil.isEmpty(oldDatasetName)) {
 			// 新旧データセット名が空の場合は何もしない
 			return;
@@ -779,5 +783,23 @@ public class RtmEditorUtil {
 				FileUtil.directoryCopy(oldDatasetDir, newDatasetDir);
 			}
 		}
+	}
+
+	/**
+	 * RTMのディレクトリを取得する
+	 * 
+	 * @return
+	 */
+	public static String getOpenRtmDir() {
+		// OpenRTMのフォルダを調べる
+		String openRtmDir = PropUtil.getValue("openrtm.rtm.dir");
+		if (!(new File(openRtmDir).exists())) {
+			openRtmDir = openRtmDir.replace("1.1", "1.2");
+		} else if (!(new File(openRtmDir).exists())) {
+			openRtmDir = PropUtil.getValue("openrtm.rtm.local.dir");
+		} else if (!(new File(openRtmDir).exists())) {
+			openRtmDir = openRtmDir.replace("1.1", "1.2");
+		}
+		return openRtmDir;
 	}
 }

@@ -279,7 +279,7 @@ public class FileUtil {
 			throw new RuntimeException("Error uploading file.", e);
 		}
 	}
-	
+
 	/**
 	 * ディレクトリの中身も含めて全て削除する
 	 * 
@@ -300,7 +300,7 @@ public class FileUtil {
 			dir.delete();
 		}
 	}
-	
+
 	/**
 	 * ファイルを削除する
 	 * 
@@ -434,7 +434,7 @@ public class FileUtil {
 			fileCopy(fileFrom, fileTo);
 		}
 	}
-	
+
 	/**
 	 * Zipファイルを解凍し、指定されたディレクトリ以下に展開する
 	 * 
@@ -446,11 +446,11 @@ public class FileUtil {
 		try {
 			File file = new File(filePath);
 			ZipFile zip = new ZipFile(file);
-			for(Enumeration<?> e = zip.getEntries(); e.hasMoreElements();) {
+			for (Enumeration<?> e = zip.getEntries(); e.hasMoreElements();) {
 				ZipEntry entry = (ZipEntry) e.nextElement();
-				if(entry.isDirectory()) {
+				if (entry.isDirectory()) {
 					new File(targetDirPath + "/" + entry.getName()).mkdirs();
-				}else{
+				} else {
 					File parent = new File(targetDirPath + "/" + entry.getName()).getParentFile();
 					if (parent != null) {
 						parent.mkdirs();
@@ -467,7 +467,7 @@ public class FileUtil {
 
 				}
 			}
-		}catch(IOException e) {
+		} catch (IOException e) {
 			logger.error(e.getMessage());
 			return false;
 		}
@@ -477,10 +477,8 @@ public class FileUtil {
 	/**
 	 * 指定されたディレクトリ内のファイルを ZIP アーカイブし、指定されたパスに作成する。
 	 *
-	 * @param fullPath
-	 *            圧縮後の出力ファイル名をフルパスで指定 ( 例: C:/sample.zip )
-	 * @param directory
-	 *            圧縮するディレクトリ ( 例; C:/sample )
+	 * @param fullPath  圧縮後の出力ファイル名をフルパスで指定 ( 例: C:/sample.zip )
+	 * @param directory 圧縮するディレクトリ ( 例; C:/sample )
 	 * @return 処理結果 true:圧縮成功 false:圧縮失敗
 	 */
 	public static boolean compressDirectory(String filePath, String directory) {
@@ -496,8 +494,10 @@ public class FileUtil {
 			try {
 				// ZIPファイル出力オブジェクト作成
 				outZip = new ZipOutputStream(new FileOutputStream(baseFile));
-				outZip.putNextEntry(new ZipEntry(file.getAbsolutePath().replace(file.getParent() + File.separator, "") + File.separator));
-				outZip.putNextEntry(new ZipEntry(file.getAbsolutePath().replace(file.getParent() + File.separator, "") + File.separator + "dummy"));
+				outZip.putNextEntry(new ZipEntry(
+						file.getAbsolutePath().replace(file.getParent() + File.separator, "") + File.separator));
+				outZip.putNextEntry(new ZipEntry(file.getAbsolutePath().replace(file.getParent() + File.separator, "")
+						+ File.separator + "dummy"));
 				// ZIPエントリクローズ
 				outZip.closeEntry();
 			} catch (Exception e) {
@@ -553,12 +553,9 @@ public class FileUtil {
 	/**
 	 * ディレクトリ圧縮のための再帰処理
 	 *
-	 * @param outZip
-	 *            ZipOutputStream
-	 * @param baseFile
-	 *            File 保存先ファイル
-	 * @param file
-	 *            File 圧縮したいファイル
+	 * @param outZip   ZipOutputStream
+	 * @param baseFile File 保存先ファイル
+	 * @param file     File 圧縮したいファイル
 	 */
 	private static void archive(ZipOutputStream outZip, File baseFile, File targetFile) {
 		if (targetFile.isDirectory()) {
@@ -569,8 +566,8 @@ public class FileUtil {
 				} else {
 					if (!f.getAbsoluteFile().equals(baseFile)) {
 						// 圧縮処理
-						archive(outZip, baseFile, f, f.getAbsolutePath().replace(targetFile.getParent(), "").substring(1),
-								"UTF-8");
+						archive(outZip, baseFile, f,
+								f.getAbsolutePath().replace(targetFile.getParent(), "").substring(1), "UTF-8");
 					}
 				}
 			}
@@ -580,15 +577,11 @@ public class FileUtil {
 	/**
 	 * 圧縮処理
 	 *
-	 * @param outZip
-	 *            ZipOutputStream
-	 * @param baseFile
-	 *            File 保存先ファイル
-	 * @param targetFile
-	 *            File 圧縮したいファイル
+	 * @param outZip     ZipOutputStream
+	 * @param baseFile   File 保存先ファイル
+	 * @param targetFile File 圧縮したいファイル
 	 * @parma entryName 保存ファイル名
-	 * @param enc
-	 *            文字コード
+	 * @param enc 文字コード
 	 */
 	private static boolean archive(ZipOutputStream outZip, File baseFile, File targetFile, String entryName,
 			String enc) {
@@ -648,7 +641,7 @@ public class FileUtil {
 		}
 		return result[0];
 	}
-	
+
 	/**
 	 * ファイル名から拡張子を取得する
 	 * 
@@ -689,7 +682,7 @@ public class FileUtil {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * サブディレクトリも含めて指定されたファイルを検索し取得する
 	 * 
@@ -719,7 +712,7 @@ public class FileUtil {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * サブディレクトリも含めて指定された拡張子に該当するファイルを検索し取得する
 	 * 
@@ -802,7 +795,7 @@ public class FileUtil {
 		ProcessUtil.startProcessNoReturnWithWorkingDerectory(targetDirPath, "bash", scriptPath, targetDirPath, oldName,
 				newName);
 	}
-	
+
 	/**
 	 * データセットのシンボリックリンクを作成する
 	 * 
@@ -810,15 +803,15 @@ public class FileUtil {
 	 * @param datasetName
 	 */
 	public static void createDatasetLink(String modelDirPath, String datasetName) {
-		
+
 		// シンボリックリンクを作成するパス
 		String linkedDatasetDirPath = modelDirPath + "/dataset";
 		File linkedDatasetDir = new File(linkedDatasetDirPath);
-		
+
 		// リンク先のデータセットパス
 		String datasetDirPath = PropUtil.getValue("dataset.directory.path") + datasetName;
 		File datasetDir = new File(datasetDirPath);
-		
+
 		// 現在のデータセット設定
 		String targetDatasetDirPath = "";
 		if (linkedDatasetDir.exists()) {
@@ -834,7 +827,7 @@ public class FileUtil {
 				}
 			}
 		}
-		
+
 		if (StringUtil.isNotEmpty(datasetName) && !linkedDatasetDir.exists()) {
 			// データセットリンク新規作成
 			try {
@@ -843,7 +836,8 @@ public class FileUtil {
 				logger.error("exception handled.", e);
 				return;
 			}
-		} else if (StringUtil.isNotEmpty(datasetName) && linkedDatasetDir.exists() && !datasetDirPath.equals(targetDatasetDirPath)) {
+		} else if (StringUtil.isNotEmpty(datasetName) && linkedDatasetDir.exists()
+				&& !datasetDirPath.equals(targetDatasetDirPath)) {
 			// データセットリンク変更
 			try {
 				Files.delete(linkedDatasetDir.toPath());
@@ -862,7 +856,7 @@ public class FileUtil {
 			}
 		}
 	}
-	
+
 	/**
 	 * データセットのシンボリックリンクからデータセット名を取得する
 	 * 
@@ -871,11 +865,11 @@ public class FileUtil {
 	 */
 	public static String getDatasetLink(String modelDirPath) {
 		String targetDatasetDirPath = "";
-		
+
 		// シンボリックリンクが作成されているパス
 		String linkedDatasetDirPath = modelDirPath + "/dataset";
 		File linkedDatasetDir = new File(linkedDatasetDirPath);
-		
+
 		if (linkedDatasetDir.exists()) {
 			if (!Files.isSymbolicLink(linkedDatasetDir.toPath())) {
 				logger.error("Can't craete symbolicLink. dataset dir is exist.");
@@ -887,7 +881,7 @@ public class FileUtil {
 				}
 			}
 		}
-		
+
 		return targetDatasetDirPath;
 	}
 }

@@ -18,11 +18,11 @@ public class Const {
 		public interface FLAG {
 			/** TRUE */
 			static final String TRUE = "1";
-			
+
 			/** FALSE */
 			static final String FALSE = "0";
 		}
-		
+
 		/**
 		 * ファイル名定義
 		 */
@@ -57,7 +57,7 @@ public class Const {
 			static final String PACKAGE_RTC_DIR_NAME = "rtc";
 			/** パッケージログディレクトリ名 */
 			static final String PACKAGE_LOG_DIR_NAME = "log";
-			/** パッケージコンフィグディレクトリ名*/
+			/** パッケージコンフィグディレクトリ名 */
 			static final String PACKAGE_CONF_DIR_NAME = "conf";
 			/** コンポーネントCMAKEディレクトリ名 */
 			static final String COMP_CMAKE_DIR_NAME = "cmake";
@@ -68,7 +68,7 @@ public class Const {
 			/** コンポーネントidlディレクトリ名 */
 			static final String COMP_IDL_DIR_NAME = "idl";
 		}
-		
+
 		/**
 		 * ファイル拡張子
 		 *
@@ -88,19 +88,19 @@ public class Const {
 			static final String SUFFIX_CONFIG = ".conf";
 		}
 	}
-	
+
 	/**
 	 * RTコンポーネント定義
 	 */
 	public interface RT_COMPONENT {
-		
+
 		public interface PACKAGE_NAME {
 			/** 新規 */
 			static final String NEW = "New Pkg.";
 			/** 新規 */
 			static final String NEW_ID = "rts_blank";
 		}
-		
+
 		/**
 		 * モジュール名
 		 */
@@ -124,7 +124,7 @@ public class Const {
 			/** 新規(Java) */
 			static final String NEW_JAVA_TEMPLATE_NAME = "template_java";
 		}
-		
+
 		/**
 		 * コンポーネント型
 		 */
@@ -136,7 +136,7 @@ public class Const {
 			/** COMMUTATIVE */
 			static final String COMMUTATIVE = "COMMUTATIVE";
 		}
-		
+
 		/**
 		 * アクティビティ型
 		 */
@@ -148,7 +148,7 @@ public class Const {
 			/** EVENTDRIVEN */
 			static final String EVENTDRIVEN = "EVENTDRIVEN";
 		}
-		
+
 		/**
 		 * コンポーネント種類
 		 */
@@ -160,7 +160,7 @@ public class Const {
 			/** MultiMode */
 			static final String MULTI_MODE = "MultiMode";
 		}
-		
+
 		/**
 		 * 実行型
 		 */
@@ -170,7 +170,7 @@ public class Const {
 			/** ExtTrigExecutionContext */
 			static final String EXT_TRIG_EXECUTION_CONTEXT = "ExtTrigExecutionContext";
 		}
-		
+
 		/**
 		 * ドキュメント種別
 		 */
@@ -188,7 +188,7 @@ public class Const {
 			/** コンフィギュレーション設定 */
 			static final int CONFIGURATION_VAL = 5;
 		}
-		
+
 		/**
 		 * ポート種別
 		 */
@@ -198,7 +198,7 @@ public class Const {
 			/** ドキュメント生成 */
 			static final String OUT = "DataOutPort";
 		}
-		
+
 		/**
 		 * ポートデータ型
 		 */
@@ -227,6 +227,7 @@ public class Const {
 				static final String RETURN_ID = "RETURN_ID";
 				static final String TIMED_JOINT_POS = "TimedJointPos";
 			}
+
 			/**
 			 * RTC関連
 			 */
@@ -355,7 +356,7 @@ public class Const {
 				static final String TIMED_VELOCITY_2D = "TimedVelocity2D";
 				static final String TIMED_VELOCITY_3D = "TimedVelocity3D";
 				static final String TIMED_WCHRR = "TimedWChar";
-				static final String TIMED_WCHAR_SEQ= "TimedWCharSeq";
+				static final String TIMED_WCHAR_SEQ = "TimedWCharSeq";
 				static final String TIMED_WSTRING = "TimedWString";
 				static final String TIMED_WSTRING_SEQ = "TimedWStringSeq";
 				static final String VECTOR_2D = "Vector2D";
@@ -367,7 +368,7 @@ public class Const {
 				static final String MANAGER_PROFILE = "ManagerProfile";
 				static final String MODULE_PROFILE = "ModuleProfile";
 			}
-			
+
 			/**
 			 * SDPPackage関連
 			 */
@@ -383,7 +384,7 @@ public class Const {
 				static final String SERVICE_PROFILE = "ServiceProfile";
 			}
 		}
-		
+
 		/**
 		 * 表示位置
 		 */
@@ -397,7 +398,7 @@ public class Const {
 			/** 下 */
 			static final String BOTTOM = "BOTTOM";
 		}
-		
+
 		/**
 		 * インタフェース方向
 		 */
@@ -407,16 +408,16 @@ public class Const {
 			/** Required */
 			static final String REQUIRED = "Required";
 		}
-		
+
 		/**
 		 * インタフェース種別
 		 */
 		public interface INTERFACE_TYPE {
 			/** corba_cdr */
 			static final String CORBA_CDR = "corba_cdr";
-			
+
 		}
-		
+
 		/**
 		 * データフロー種別
 		 */
@@ -426,7 +427,7 @@ public class Const {
 			/** pull */
 			static final String PULL = "pull";
 		}
-		
+
 		/**
 		 * サブスクリプション種別
 		 */
@@ -438,7 +439,7 @@ public class Const {
 			/** periodic */
 			static final String PERIODIC = "periodic";
 		}
-		
+
 		/**
 		 * コンフィギュレーション種別
 		 */
@@ -456,7 +457,7 @@ public class Const {
 			/** string */
 			static final String STRING = "string";
 		}
-		
+
 		/**
 		 * Widget種別
 		 */
@@ -474,7 +475,7 @@ public class Const {
 			/** ordered_list */
 			static final String ORDERED_LIST = "ordered_list";
 		}
-		
+
 		/**
 		 * 言語区分
 		 */
@@ -488,7 +489,7 @@ public class Const {
 			/** Ruby */
 			static final String RUBY = "Ruby";
 		}
-		
+
 		/**
 		 * コンポーネント・ロガー種別
 		 */
@@ -501,12 +502,12 @@ public class Const {
 			static final String LOGGER = "logger";
 		}
 	}
-	
+
 	/**
 	 * コンポーネント領域定義
 	 */
 	public interface COMPONENT_FIELD {
-		
+
 		/**
 		 * タブ名
 		 */
