@@ -20,6 +20,7 @@ import com.sec.keras.entity.field.KerasTabInfo;
 import com.sec.keras.entity.model.KerasModel;
 import com.sec.airgraph.util.FileUtil;
 import com.sec.airgraph.util.PropUtil;
+import com.sec.airgraph.util.StringUtil;
 import com.sec.airgraph.util.KerasEditorUtil;
 
 /**
@@ -157,13 +158,12 @@ public class KerasService {
 	/**
 	 * モデルを作業領域フォルダに保存する
 	 * 
+	 * @param dirName
 	 * @param modelString
 	 */
-	public void saveModel(String modelString) {
+	public void saveModel(String dirName, String modelString) {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.keras.directory.path");
-		// 保存先パス
-		String modelDirPath = PropUtil.getValue("models.keras.directory.path");
 
 		ObjectMapper mapper = new ObjectMapper();
 		KerasModel savingModel = null;
@@ -171,32 +171,29 @@ public class KerasService {
 			// デシリアライズ
 			savingModel = mapper.readValue(modelString, KerasModel.class);
 
-			// 作業ディレクトリが存在しなければ作成
-			String sourceDirPath = workspaceDirPath + savingModel.getModelName();
-			File sourceDir = new File(sourceDirPath);
-			if (sourceDir.exists() == false) {
-				sourceDir.mkdirs();
-			}
+			// 保存先ディレクトリが存在しなければ作成
+			String targetDirPath = workspaceDirPath + savingModel.getModelName();
+			File targetDir = new File(targetDirPath);
+			FileUtil.createDirectory(targetDir);
+
 			// 作業ディレクトリに作業内容を保存
 			// JSONファイルを保存
-			String sourceFilePath = sourceDirPath + "/" + savingModel.getModelName() + ".json";
-			FileUtil.writeAll(sourceFilePath, savingModel.getJsonString());
+			String modelFilePath = targetDirPath + "/" + savingModel.getModelName() + ".json";
+			FileUtil.writeAll(modelFilePath, savingModel.getJsonString());
 
 			// data_maker.pyを保存
-			String dataMakerFilePath = sourceDirPath + "/" + "data_maker.py";
+			String dataMakerFilePath = targetDirPath + "/" + "data_maker.py";
 			FileUtil.writeAll(dataMakerFilePath, savingModel.getDataMakerStr());
 
 			// データ・セット連携
 			String datasetName = savingModel.getDataset();
-			FileUtil.createDatasetLink(sourceDirPath, datasetName);
+			FileUtil.createDatasetLink(targetDirPath, datasetName);
 
-			// 保存先がすでに存在する場合はフォルダ内を再帰的に削除
-			String targetDirPath = modelDirPath + savingModel.getModelName();
-			FileUtil.deleteDirectory(new File(targetDirPath));
-
-			// // ディレクトリごとコピー
-			// FileUtil.directoryCopy(new File(sourceDirPath), new
-			// File(modelDirPath));
+			// 保存先のディレクトリ名と現在のディレクトリが異なる場合は古い方を削除する
+			if (!StringUtil.equals(savingModel.getModelName(), dirName)) {
+				File sourceDir = new File(workspaceDirPath + dirName);
+				FileUtil.deleteDirectory(sourceDir);
+			}
 
 		} catch (IOException e) {
 			logger.error("exception handled. ex:", e);

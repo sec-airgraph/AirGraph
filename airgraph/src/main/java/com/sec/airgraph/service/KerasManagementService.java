@@ -87,6 +87,9 @@ public class KerasManagementService {
 						modelName = modelName.substring(0, index);
 					}
 					model.setModelName(modelName);
+					// ディレクトリ名称も保存しておく
+					String dirName = modelDir.getName();
+					model.setDirName(dirName);
 
 					if (loadJson) {
 						// JSONファイルの読み込み

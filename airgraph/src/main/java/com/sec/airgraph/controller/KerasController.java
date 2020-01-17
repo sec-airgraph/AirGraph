@@ -137,12 +137,12 @@ public class KerasController {
 	 * @param json
 	 * @return
 	 */
-	@RequestMapping(value = "saveModel", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+	@RequestMapping(value = "saveModel", method = RequestMethod.POST)
 	@ResponseBody
-	public String saveModel(@RequestBody String json) {
+	public String saveModel(@RequestParam(value = "dirName") String dirName, @RequestParam(value = "json") String json) {
 		logger.info("Save model in workspace.");
 		if (StringUtil.isNotEmpty(json)) {
-			kerasService.saveModel(json);
+			kerasService.saveModel(dirName, json);
 		}
 		return "{\"response\" : \"OK\"}";
 	}
@@ -153,7 +153,7 @@ public class KerasController {
 	 * @param json
 	 * @return
 	 */
-	@RequestMapping(value = "deleteModel", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+	@RequestMapping(value = "deleteModel", method = RequestMethod.POST)
 	@ResponseBody
 	public String deleteModel(@RequestParam(value = "modelName") String modelName) {
 		logger.info("Delete model in workspace. modelName[" + modelName + "]");

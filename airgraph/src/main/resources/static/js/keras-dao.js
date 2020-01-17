@@ -90,18 +90,8 @@ function saveModel() {
 	$.ajax({
 		type: 'POST',
 		url: getUrlSaveModel(),
-		data: JSON.stringify(modelMap[curWorkspaceName]),
-		contentType: 'application/json',
-		dataType: 'json',
-		scriptCharset: 'utf-8'
+		data: {'dirName' : modelMap[curWorkspaceName].dirName, 'json' : JSON.stringify(modelMap[curWorkspaceName])},
 	}).done(function(){
-//		// 保存したモデルをワークエリアから削除し、モデルを切り替え
-//		delete modelMap[curWorkspaceName];
-//		if(Object.keys(modelMap).length != 0){
-//			curWorkspaceName = Object.keys(modelMap)[0];			
-//		}else{
-//			curWorkspaceName = null;
-//		}
 		// 再読み込み
 		loadAllNetworkArea();
 	});
