@@ -25,33 +25,33 @@ function createContextMenuMainPaper() {
 function setMainAreaContextMenu() {
   $.contextMenu({
     selector: '#main-joint-area',
-    callback: function(key, options) {
-      if(key === 'save') {
+    callback: function (key, options) {
+      if (key === 'save') {
         // 保存
         updatePackage(true);
-      } else if(key === 'git') {
+      } else if (key === 'git') {
         // Git連携
         openPackageGitCommitPushPopup();
-      } else if(key === 'edit') {
+      } else if (key === 'edit') {
         // Package設定
         openPackageProfileSetting();
-      } else if(key === 'delete') {
+      } else if (key === 'delete') {
         // Package削除
         w2confirm('表示中のPackageを削除します。<br/>よろしいですか？', function (btn) {
-          if(btn === 'Yes') {
+          if (btn === 'Yes') {
             deletePackage(curWorkspaceName);
           }
         });
       }
     },
     items: {
-      'save':    {name: 'Save All',             icon: 'edit',   disabled: function(key, opt) { return curState !== STATE.EDIT } },
-      'sep1':    '---------',
-      'edit':    {name: 'Edit Package Setting', icon: 'edit',   disabled: function(key, opt) { return curState !== STATE.EDIT } },
-      'sep2':    '---------',
-      'git':     {name: 'Git Repository Link',  icon: 'edit',   disabled: function(key, opt) { return curState !== STATE.EDIT } },
-      'sep3':    '---------',
-      'delete':  {name: 'Remove Package',       icon: 'delete', disabled: function(key, opt) { return curState !== STATE.EDIT } }
+      'save': { name: 'Save All', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'sep1': '---------',
+      'edit': { name: 'Edit Package Setting', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'sep2': '---------',
+      'git': { name: 'Git Repository Link', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'sep3': '---------',
+      'delete': { name: 'Remove Package', icon: 'delete', disabled: function (key, opt) { return curState !== STATE.EDIT } }
     }
   });
 }
@@ -65,53 +65,53 @@ function setMainAreaContextMenu() {
 function setComponentContextMenu() {
   $.contextMenu({
     selector: '.rtc-context-menu',
-    callback: function(key, options) {
+    callback: function (key, options) {
       // RtcID
       var componentId = $(this).attr('component-id');
       var modelId = $(this).parent().parent().attr('model-id');
 
-      if(key === 'addIn') {
+      if (key === 'addIn') {
         // 入力ポート追加
         openNewDataPortSettingPopup(componentId, true);
-      } else if(key === 'addOut') {
+      } else if (key === 'addOut') {
         // 出力ポート追加
         openNewDataPortSettingPopup(componentId, false);
-      } else if(key === 'addService') {
+      } else if (key === 'addService') {
         // サービスポート追加
         openNewServicePortSettingPopup(componentId);
-      } else if(key === 'edit') {
+      } else if (key === 'edit') {
         // RTC設定画面表示
         openEditRtcProfileSettingPopup(componentId);
-      } else if(key === 'configuration') {
+      } else if (key === 'configuration') {
         // コンフィギュレーション設定画面表示
         openConfigurationPopup(componentId);
-      } else if(key === 'delete') {
+      } else if (key === 'delete') {
         // RTC削除
         w2confirm('選択したコンポーネントを削除します。<br/>よろしいですか？', function (btn) {
-          if(btn === 'Yes') {
+          if (btn === 'Yes') {
             deleteComponent(componentId, modelId);
           }
         });
-      } else if(key === 'git') {
+      } else if (key === 'git') {
         // Git設定
         openRtcGitCommitPushPopup(componentId);
-      } else if(key === 'source') {
+      } else if (key === 'source') {
         // ソースコード編集
         openSourceCodePopup(componentId);
       }
     },
     items: {
-      'addIn':         {name: 'Add Input Port',                icon: 'add',    disabled: function(key, opt) { return curState !== STATE.EDIT } },
-      'addOut':        {name: 'Add Output Port',               icon: 'add',    disabled: function(key, opt) { return curState !== STATE.EDIT } },
-      'addService':    {name: 'Add Service Port',              icon: 'add',    disabled: function(key, opt) { return curState !== STATE.EDIT } },
-      'sep1':          '---------',
-      'edit':          {name: 'Edit Component Setting',        icon: 'edit',   disabled: function(key, opt) { return curState !== STATE.EDIT } },
-      'configuration': {name: 'Edit Configuration Parameters', icon: 'edit',   disabled: function(key, opt) { return curState !== STATE.EDIT } },
-      'source':        {name: 'Edit Source Code',              icon: 'edit',   disabled: function(key, opt) { return curState !== STATE.EDIT } },
-      'sep2':          '---------',
-      'git':           {name: 'Git Repository Link',           icon: 'edit',   disabled: function(key, opt) { return curState !== STATE.EDIT } },
-      'sep3':          '---------',
-      'delete':        {name: 'Remove Component',              icon: 'delete', disabled: function(key, opt) { return curState !== STATE.EDIT } },
+      'addIn': { name: 'Add Input Port', icon: 'add', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'addOut': { name: 'Add Output Port', icon: 'add', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'addService': { name: 'Add Service Port', icon: 'add', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'sep1': '---------',
+      'edit': { name: 'Edit Component Setting', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'configuration': { name: 'Edit Configuration Parameters', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'source': { name: 'Edit Source Code', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'sep2': '---------',
+      'git': { name: 'Git Repository Link', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'sep3': '---------',
+      'delete': { name: 'Remove Component', icon: 'delete', disabled: function (key, opt) { return curState !== STATE.EDIT } },
     }
   });
 }
@@ -124,12 +124,12 @@ function setComponentContextMenu() {
 function setDataInPortContextMenu() {
   $.contextMenu({
     selector: '.rtc-data-inport-menu',
-    callback: function(key, options) {
-      if(key === 'editPort') {
+    callback: function (key, options) {
+      if (key === 'editPort') {
         // ポート編集
         openEditDataPortSettingPopup(this.data());
         options.isRemove = false;
-      } else if(key === 'deletePort') {
+      } else if (key === 'deletePort') {
         // ポート削除
         deleteDataPort(this.data().id, this.data().index);
         // 作業領域再読み込み
@@ -140,16 +140,16 @@ function setDataInPortContextMenu() {
     },
     items: {
       // ポート編集
-      editPort:    { name: 'edit Port', icon: 'edit', disabled: function(key, opt) { return curState !== STATE.EDIT } },
+      editPort: { name: 'edit Port', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
       // ポート削除
-      deletePort:    { name: 'remove Port', icon: 'delete', disabled: function(key, opt) { return isPortConnected(this.data().id, this.data().modelId, this.data().portName) || curState !== STATE.EDIT } },
-    }, 
+      deletePort: { name: 'remove Port', icon: 'delete', disabled: function (key, opt) { return isPortConnected(this.data().id, this.data().modelId, this.data().portName) || curState !== STATE.EDIT } },
+    },
     events: {
-      show: function(opt) {
+      show: function (opt) {
         var $this = this;
         $.contextMenu.setInputValues(opt, $this.data());
-      }, 
-      hide: function(opt) {
+      },
+      hide: function (opt) {
         if (opt.isRemove && opt.isRemove === true) {
           // NOP
         } else {
@@ -166,12 +166,12 @@ function setDataInPortContextMenu() {
 function setDataOutPortContextMenu() {
   $.contextMenu({
     selector: '.rtc-data-outport-menu',
-    callback: function(key, options) {
-      if(key === 'editPort') {
+    callback: function (key, options) {
+      if (key === 'editPort') {
         // ポート編集
         openEditDataPortSettingPopup(this.data());
         options.isRemove = false;
-      } else if(key === 'deletePort') {
+      } else if (key === 'deletePort') {
         // ポート削除
         deleteDataPort(this.data().id, this.data().index);
         // 作業領域再読み込み
@@ -182,9 +182,9 @@ function setDataOutPortContextMenu() {
     },
     items: {
       // ポート編集
-      editPort:    { name: 'edit Port', icon: 'edit', disabled: function(key, opt) { return curState !== STATE.EDIT } },
+      editPort: { name: 'edit Port', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
       // ポート削除
-      deletePort:    { name: 'remove Port', icon: 'delete', disabled: function(key, opt) { return isPortConnected(this.data().id, this.data().modelId, this.data().portName) || curState !== STATE.EDIT } },
+      deletePort: { name: 'remove Port', icon: 'delete', disabled: function (key, opt) { return isPortConnected(this.data().id, this.data().modelId, this.data().portName) || curState !== STATE.EDIT } },
       // 'sep1':        '---------',
       // editLog: { name: 'setting Logs', icon: 'fa-pencil-square-o', items: {
       //  // ログON/OFF
@@ -192,13 +192,13 @@ function setDataOutPortContextMenu() {
       //  // ロガー表示
       //  loggerVisible: { name: 'show Logger', type: 'checkbox', disabled: function(key, opt) { return !this.data('logging') || curState !== STATE.EDIT } },
       // }},
-    }, 
+    },
     events: {
-      show: function(opt) {
+      show: function (opt) {
         var $this = this;
         $.contextMenu.setInputValues(opt, $this.data());
-      }, 
-      hide: function(opt) {
+      },
+      hide: function (opt) {
         if (opt.isRemove && opt.isRemove === true) {
           // NOP
         } else {
@@ -218,29 +218,29 @@ function setDataportConnectionContextMenu() {
     selector: '.rtc-link-menu',
     items: {
       // Name
-      name:             { name: 'Name:',              type: 'text', value: '' },
+      name: { name: 'Name:', type: 'text', value: '' },
       // DataType
-      dataType:         { name: 'Data Type:',         type: 'text', disabled: true },
+      dataType: { name: 'Data Type:', type: 'text', disabled: true },
       // InterfaceType
-      interfaceType:    { name: 'Interface Type:',    type: 'select', options: getConnectInterfaceTypeChoices(), disabled: false },
+      interfaceType: { name: 'Interface Type:', type: 'select', options: getConnectInterfaceTypeChoices(), disabled: false },
       // DataflowType
-      dataflowType:     { name: 'Dataflow Type:',     type: 'select', options: getConnectDataflowTypeChoices(), disabled: false },
+      dataflowType: { name: 'Dataflow Type:', type: 'select', options: getConnectDataflowTypeChoices(), disabled: false },
       // SubscriptionType
       subscriptionType: { name: 'Subscription Type:', type: 'select', options: getConnectSubscriptionTypeChoices(), disabled: false },
-    }, 
+    },
     events: {
-      show: function(opt) {
-          var $this = this;
-          $.contextMenu.setInputValues(opt, $this.data());
-      }, 
-      hide: function(opt) {
-          var $this = this;
-          var oldInfo = new Object();
-          oldInfo.interfaceType = $this.data().interfaceType;
-          oldInfo.dataflowType = $this.data().dataflowType;
-          oldInfo.subscriptionType = $this.data().subscriptionType;
-          $.contextMenu.getInputValues(opt, $this.data());
-          updateDataportConnectorInfo(oldInfo, $this.data())
+      show: function (opt) {
+        var $this = this;
+        $.contextMenu.setInputValues(opt, $this.data());
+      },
+      hide: function (opt) {
+        var $this = this;
+        var oldInfo = new Object();
+        oldInfo.interfaceType = $this.data().interfaceType;
+        oldInfo.dataflowType = $this.data().dataflowType;
+        oldInfo.subscriptionType = $this.data().subscriptionType;
+        $.contextMenu.getInputValues(opt, $this.data());
+        updateDataportConnectorInfo(oldInfo, $this.data())
       }
     }
   });
@@ -261,28 +261,28 @@ function updateDataportChanged(opt, elm) {
   $.contextMenu.getInputValues(opt, $this.data());
   var newLogging = $this.data().logging;
   var newLoggerVisible = $this.data().loggerVisible;
-  
+
   var rtc = getComponentInPackage(componentId);
   var isIn = $this.data().isIn;
-  
+
   var changeFlg = false;
-  if(oldLogging === false && newLogging === true) {
+  if (oldLogging === false && newLogging === true) {
     // ログ追加
     changeFlg = true;
     addLogger($this.data().id, $this.data().modelId, $this.data().portName, $this.data().dataType);
   }
-  if(oldLogging === true && newLogging === false) {
+  if (oldLogging === true && newLogging === false) {
     // ログ削除
     changeFlg = true;
     removeLogger($this.data().id, $this.data().modelId, $this.data().portName);
   }
-  
-  if(oldLoggerVisible !== newLoggerVisible) {
+
+  if (oldLoggerVisible !== newLoggerVisible) {
     // ログ表示・非表示
     changeLoggerDisplay($this.data().id, $this.data().modelId, $this.data().portName, newLoggerVisible);
   }
-  
-  if(changeFlg === true) {
+
+  if (changeFlg === true) {
     // 接続情報再構築
     updateDataPortConnectionInfo(rtc, oldPortName, newPortName, isIn);
     // 作業領域再読み込み
@@ -302,16 +302,16 @@ function updateDataportConnectorInfo(oldInfo, newInfo) {
   if (oldInfo.interfaceType !== newInfo.interfaceType
     || oldInfo.dataflowType !== newInfo.dataflowType
     || oldInfo.subscriptionType !== newInfo.subscriptionType) {
-    
+
     var dataPortConnectors = mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors;
-    if(dataPortConnectors && dataPortConnectors.length > 0) {
+    if (dataPortConnectors && dataPortConnectors.length > 0) {
       for (var i = 0; i < dataPortConnectors.length; i++) {
         var dataPortConnector = dataPortConnectors[i];
         if (dataPortConnector.connectorId === newInfo.connectorId) {
           mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors[i].interfaceType = newInfo.interfaceType;
           mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors[i].dataflowType = newInfo.dataflowType;
           mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors[i].subscriptionType = newInfo.subscriptionType;
-          
+
           if (dataPortConnector.properties.length > 0) {
             for (var j = 0; j < dataPortConnector.properties.length; j++) {
               if (dataPortConnector.properties[j].name === 'dataport.dataflow_type') {
@@ -323,7 +323,7 @@ function updateDataportConnectorInfo(oldInfo, newInfo) {
               }
             }
           }
-          
+
           break;
         }
       }
@@ -341,11 +341,11 @@ function updateDataportConnectorInfo(oldInfo, newInfo) {
 function setServicePortContextMenu() {
   $.contextMenu({
     selector: '.rtc-serviceport-menu',
-    callback: function(key, options) {
-      if(key === 'editPort') {
+    callback: function (key, options) {
+      if (key === 'editPort') {
         // ポート編集
         openEditServicePortSettingPopup(this.data());
-      } else if(key === 'deletePort') {
+      } else if (key === 'deletePort') {
         // ポート削除
         deleteServicePort(this.data().id, this.data().index);
         // 作業領域再読み込み
@@ -355,16 +355,16 @@ function setServicePortContextMenu() {
     },
     items: {
       // ポート編集
-      editPort:    { name: 'edit Port', icon: 'edit', disabled: function(key, opt) { return curState !== STATE.EDIT } },
+      editPort: { name: 'edit Port', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
       // ポート削除
-      deletePort:    { name: 'remove Port', icon: 'delete', disabled: function(key, opt) { return curState !== STATE.EDIT } }
-    }, 
+      deletePort: { name: 'remove Port', icon: 'delete', disabled: function (key, opt) { return curState !== STATE.EDIT } }
+    },
     events: {
-      show: function(opt) {
+      show: function (opt) {
         var $this = this;
         $.contextMenu.setInputValues(opt, $this.data());
-      }, 
-      hide: function(opt) {
+      },
+      hide: function (opt) {
       }
     }
   });
@@ -380,7 +380,7 @@ function setServicePortContextMenu() {
 function setSourceEditorFolderContextMenu() {
   $.contextMenu({
     selector: '.w2ui-sidebar-div',
-    callback: function(key, options) {
+    callback: function (key, options) {
       if (key === 'add') {
         // ID
         var componentId = w2ui['soruce-editor-sidebar'].componentId;
@@ -396,8 +396,8 @@ function setSourceEditorFolderContextMenu() {
     },
     items: {
       // Name
-      'name': { name: 'class Name:', type: 'text', disabled: function(key, opt) { return curState !== STATE.EDIT }, value: '' },
-      'add' : {name: 'add Class',    icon: 'add',  disabled: function(key, opt) { return curState !== STATE.EDIT } }
+      'name': { name: 'class Name:', type: 'text', disabled: function (key, opt) { return curState !== STATE.EDIT }, value: '' },
+      'add': { name: 'add Class', icon: 'add', disabled: function (key, opt) { return curState !== STATE.EDIT } }
     }
   });
 }
@@ -405,7 +405,7 @@ function setSourceEditorFolderContextMenu() {
 function setSourceEdtiorFileContextMenu() {
   $.contextMenu({
     selector: '.rtc-source-file-menu',
-    callback: function(key, options) {
+    callback: function (key, options) {
       if (key === 'delete') {
         // ID
         var componentId = w2ui['soruce-editor-sidebar'].componentId;
@@ -413,7 +413,7 @@ function setSourceEdtiorFileContextMenu() {
         var filePath = sourceEditor['sourcePath'];
         if (filePath) {
           w2confirm('選択したファイルを削除します。<br/>よろしいですか？', function (btn) {
-            if(btn === 'Yes') {
+            if (btn === 'Yes') {
               // ファイル削除
               deleteFile(filePath);
               // ツリー再表示
@@ -424,7 +424,7 @@ function setSourceEdtiorFileContextMenu() {
       }
     },
     items: {
-      'delete': {name: 'delete File', icon: 'delete', disabled: function(key, opt) { return curState !== STATE.EDIT } }
+      'delete': { name: 'delete File', icon: 'delete', disabled: function (key, opt) { return curState !== STATE.EDIT } }
     }
   });
 }
