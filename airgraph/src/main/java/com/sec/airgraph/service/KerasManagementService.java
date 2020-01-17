@@ -58,10 +58,10 @@ public class KerasManagementService {
 		for (File modelDir : userModelDirs) {
 			if (FileUtil.exists(modelDir) && modelDir.isDirectory()) {
 				File[] modelFiles = modelDir.listFiles();
-				
+
 				File modelJson = null;
 				File dataMaker = null;
-				
+
 				if (CollectionUtil.isNotEmpty(modelFiles)) {
 					for (File file : modelFiles) {
 						if (file.isFile() && file.getPath().endsWith(".json")) {
@@ -73,7 +73,7 @@ public class KerasManagementService {
 						}
 					}
 				}
-				
+
 				if (modelJson != null && dataMaker != null) {
 					logger.debug("load model json file. path[" + modelJson.getPath() + "]");
 					logger.debug("load data maker file. path[" + dataMaker.getPath() + "]");
@@ -91,10 +91,10 @@ public class KerasManagementService {
 					if (loadJson) {
 						// JSONファイルの読み込み
 						model.setJsonString(FileUtil.readAll(modelJson.getPath()));
-						
+
 						// dataMaker.pyファイルの読み込み
 						model.setDataMakerStr(FileUtil.readAll(dataMaker.getPath()));
-						
+
 						// データ・セットリンクの取得
 						model.setDataset(FileUtil.getDatasetLink(modelDir.getPath()));
 					}
@@ -135,7 +135,7 @@ public class KerasManagementService {
 		}
 		return layerTabs;
 	}
-	
+
 	/**
 	 * datasetのリストを取得する
 	 * 
@@ -143,11 +143,11 @@ public class KerasManagementService {
 	 */
 	public Map<String, String> loadDatasetList() {
 		Map<String, String> map = new HashMap<>();
-		
+
 		// 作業領域パス
 		String datasetDirPath = PropUtil.getValue("dataset.directory.path");
 		File datasetRootDir = new File(datasetDirPath);
-		
+
 		File datasetDirs[] = datasetRootDir.listFiles();
 		for (File datasetDir : datasetDirs) {
 			if (datasetDir.isDirectory()) {
@@ -156,7 +156,7 @@ public class KerasManagementService {
 		}
 		return map;
 	}
-	
+
 	/**
 	 * データセットディレクトリを圧縮して保存先を返す
 	 * 
@@ -179,7 +179,7 @@ public class KerasManagementService {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * データセットファイルをアップロードする
 	 * 
@@ -192,7 +192,7 @@ public class KerasManagementService {
 			savedFile.delete();
 		}
 		FileUtil.saveUploadFile(datasetFile, savedFile);
-		
+
 		// ZIPファイルの上位ディレクトリを取得する
 		String datasetName = FileUtil.getRootDirNameZipFile(savedFile.getPath());
 		if (StringUtil.isEmpty(datasetName)) {
@@ -205,7 +205,7 @@ public class KerasManagementService {
 		if (FileUtil.exists(datasetDir)) {
 			FileUtil.deleteDirectory(datasetDir);
 		}
-		
+
 		// ZIPファイルを解凍する
 		logger.info("unzip dataset file file[" + savedFile.getPath() + "]datasetDir[" + datasetDirPath + "]");
 		boolean result = FileUtil.unzipFile(savedFile.getPath(), PropUtil.getValue("dataset.directory.path"));
@@ -218,7 +218,7 @@ public class KerasManagementService {
 	/**
 	 * 指定されたDNNファイルをダウンロードする
 	 * 
-	 * @param dnnModelName DNNモデル名
+	 * @param dnnModelName  DNNモデル名
 	 * @param fileExtention 拡張子
 	 */
 	public boolean downloadDnnFiles(String dnnModelName, String fileExtention) {
@@ -240,12 +240,13 @@ public class KerasManagementService {
 
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
 
-		//ここでPOSTリクエスト実行
+		// ここでPOSTリクエスト実行
 		RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Resource> result = restTemplate.postForEntity(downloadDnnUrl, request, Resource.class);
+		ResponseEntity<Resource> result = restTemplate.postForEntity(downloadDnnUrl, request, Resource.class);
 		HttpStatus responseHttpStatus = result.getStatusCode();
 		try {
-			if (responseHttpStatus.equals(HttpStatus.OK) && result.getBody() != null && result.getBody().getInputStream() != null) { // 200
+			if (responseHttpStatus.equals(HttpStatus.OK) && result.getBody() != null
+					&& result.getBody().getInputStream() != null) { // 200
 				InputStream inputStream = result.getBody().getInputStream();
 				InputStreamReader reader = new InputStreamReader(inputStream);
 

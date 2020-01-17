@@ -218,8 +218,7 @@ public class KerasService {
 	/**
 	 * Kerasの学習実行
 	 * 
-	 * @param modelString
-	 *            modelの情報が乗ったJSON文字列
+	 * @param modelString modelの情報が乗ったJSON文字列
 	 */
 	public void fit(String modelString) {
 		// 作業領域パス
@@ -270,7 +269,7 @@ public class KerasService {
 	public Map<String, String> getDatasetChoices() {
 		return kerasManagementService.loadDatasetList();
 	}
-	
+
 	/**
 	 * データセットディレクトリを圧縮して保存先を返す
 	 * 
@@ -280,7 +279,7 @@ public class KerasService {
 	public String downloadDataset(String workspaceModelName) {
 		return kerasManagementService.downloadDataset(workspaceModelName);
 	}
-	
+
 	/**
 	 * データセットファイルをアップロードする
 	 * 

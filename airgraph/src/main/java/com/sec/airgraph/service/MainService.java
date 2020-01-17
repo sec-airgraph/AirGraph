@@ -29,8 +29,7 @@ import com.sec.airgraph.util.Const.COMMON.DIR_NAME;
 import com.sec.airgraph.util.Const.COMMON.FILE_NAME;
 
 /**
- * AirGraphメインサービス
- * RTM-Editor
+ * AirGraphメインサービス RTM-Editor
  * 
  * @author Tsuyoshi Hirose
  *
@@ -60,13 +59,13 @@ public class MainService {
 	 */
 	@Autowired
 	private RtcManagementService rtcManagementService;
-	
+
 	/**
 	 * Keras管理サービス
 	 */
 	@Autowired
 	private KerasManagementService kerasManagementService;
-	
+
 	/**
 	 * IDE管理サービス
 	 */
@@ -89,7 +88,7 @@ public class MainService {
 	 * Binder定義を元にすべてのリポジトリを展開する
 	 */
 	private void cloneWasanbonRepositry() {
-		
+
 		// Binderの一覧を取得する
 		Map<String, Map<String, String>> binderMap = wasanbonManagementService.getBinderList();
 
@@ -132,9 +131,10 @@ public class MainService {
 		}
 
 		// 履歴タブ
-		// ComponentTabInfo recentTab = fieldManagementService.createRecentRtcComponentTab();
+		// ComponentTabInfo recentTab =
+		// fieldManagementService.createRecentRtcComponentTab();
 		// if (recentTab != null) {
-		// 	componentTabs.add(recentTab);
+		// componentTabs.add(recentTab);
 		// }
 
 		componentFieldInfo.setComponentTabs(componentTabs);
@@ -261,7 +261,7 @@ public class MainService {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * パッケージ名が競合していないかを調べる
 	 * 
@@ -336,6 +336,7 @@ public class MainService {
 		// 指定されたPackageを停止する
 		wasanbonManagementService.terminatePackage(packageRepositoryName);
 	}
+
 	/**
 	 * Packageの実行状況を確認する
 	 * 
@@ -420,7 +421,7 @@ public class MainService {
 
 		return FileUtil.compressDirectory(resultFilePath, resultDirPath);
 	}
-	
+
 	/**
 	 * RTSをローカルリポジトリにCommitする
 	 * 
@@ -430,7 +431,7 @@ public class MainService {
 	public String commitPackage(String workPackageName, String commitMessage) {
 		return ideManagementService.commitPackage(workPackageName, commitMessage);
 	}
-	
+
 	/**
 	 * RTSをリモートリポジトリにPushする
 	 * 
@@ -442,10 +443,10 @@ public class MainService {
 	 */
 	public String pushPackage(String workPackageName, String commitMessage, String userName, String password) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		String rsltCommit = ideManagementService.commitPackage(workPackageName, commitMessage);
 		String rsltPush = ideManagementService.pushPackage(workPackageName, userName, password);
-		
+
 		if (StringUtil.isNotEmpty(rsltCommit)) {
 			sb.append(rsltCommit);
 		}
@@ -457,7 +458,7 @@ public class MainService {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * RTSをリモートリポジトリからPullする
 	 * 
@@ -469,7 +470,7 @@ public class MainService {
 	public String pullPackage(String workPackageName, String userName, String password) {
 		return ideManagementService.pullPackage(workPackageName, userName, password);
 	}
-	
+
 	/**
 	 * RTCをローカルリポジトリにCommitする
 	 * 
@@ -480,7 +481,7 @@ public class MainService {
 	public String commitComponent(String workPackageName, String componentName, String commitMessage) {
 		return ideManagementService.commitComponent(workPackageName, componentName, commitMessage);
 	}
-	
+
 	/**
 	 * RTCをリモートリポジトリにPushする
 	 * 
@@ -491,12 +492,13 @@ public class MainService {
 	 * @param password
 	 * @return
 	 */
-	public String pushComponent(String workPackageName, String componentName, String commitMessage, String userName, String password) {
+	public String pushComponent(String workPackageName, String componentName, String commitMessage, String userName,
+			String password) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		String rsltCommit = ideManagementService.commitComponent(workPackageName, componentName, commitMessage);
 		String rsltPush = ideManagementService.pushComponent(workPackageName, componentName, userName, password);
-		
+
 		if (StringUtil.isNotEmpty(rsltCommit)) {
 			sb.append(rsltCommit);
 		}
@@ -508,7 +510,7 @@ public class MainService {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * RTCをリモートリポジトリからPullする
 	 * 
@@ -521,16 +523,17 @@ public class MainService {
 	public String pullComponent(String workPackageName, String componentName, String userName, String password) {
 		return ideManagementService.pullComponent(workPackageName, componentName, userName, password);
 	}
-	
+
 	/**
 	 * Kerasの選択肢を取得する
+	 * 
 	 * @return
 	 */
 	public Map<String, String> getKerasModelChoices() {
 		Map<String, String> ret = new HashMap<>();
 		// モデル情報保存先パス
 		String modelDirPath = PropUtil.getValue("workspace.local.keras.directory.path");
-		
+
 		// Kerasのモデル一覧を取得する
 		List<KerasModel> models = kerasManagementService.loadAllKerasModels(modelDirPath, false);
 		if (CollectionUtil.isNotEmpty(models)) {
@@ -538,7 +541,7 @@ public class MainService {
 				ret.put(model.getModelName(), model.getModelName());
 			}
 		}
-		
+
 		return ret;
 	}
 

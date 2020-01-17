@@ -209,7 +209,7 @@ public class MainController {
 		map.put(WIDGET_TYPE.TEXT, WIDGET_TYPE.TEXT);
 		return map;
 	}
-	
+
 	/***********************************************
 	 * リクエスト処理
 	 ***********************************************/
@@ -235,7 +235,7 @@ public class MainController {
 
 		return "rtsystem/main";
 	}
-	
+
 	/**
 	 * コンポーネント領域情報を取得する
 	 * 
@@ -344,9 +344,10 @@ public class MainController {
 			@RequestParam(value = "componentName") String componentName,
 			@RequestParam(value = "gitName") String gitName,
 			@RequestParam(value = "clonedDirectory") String clonedDirectory) {
-		logger.info("Add component to workspace. component[" + componentName + "]git[" + gitName + "]clonedDirectory[" + clonedDirectory
-				+ "]workspace[" + workPackageName + "]");
-		mainService.addComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName, gitName, clonedDirectory);
+		logger.info("Add component to workspace. component[" + componentName + "]git[" + gitName + "]clonedDirectory["
+				+ clonedDirectory + "]workspace[" + workPackageName + "]");
+		mainService.addComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName, gitName,
+				clonedDirectory);
 		return null;
 	}
 
@@ -448,7 +449,7 @@ public class MainController {
 		return mainService.checkAvailableComponentName(StringUtil.getPackageNameFromModelName(workPackageName),
 				componentName) ? "OK" : "NG";
 	}
-	
+
 	/**
 	 * 指定されたComponentに設定しているIDLファイルを含めて、IDLファイルの一覧を取得する
 	 * 
@@ -476,9 +477,9 @@ public class MainController {
 	@ResponseBody
 	public Map<String, String> dataTypeChoices(@RequestParam(value = "workPackageName") String workPackageName,
 			@RequestParam(value = "componentName") String componentName) {
-		logger.info("Get Interface Type Choices. component[" + componentName + "]workspace["
-				+ workPackageName + "]");
-		return RtmEditorUtil.createDataTypeMap(StringUtil.getPackageNameFromModelName(workPackageName), componentName, true);
+		logger.info("Get Interface Type Choices. component[" + componentName + "]workspace[" + workPackageName + "]");
+		return RtmEditorUtil.createDataTypeMap(StringUtil.getPackageNameFromModelName(workPackageName), componentName,
+				true);
 	}
 
 	/**
@@ -493,9 +494,9 @@ public class MainController {
 	@ResponseBody
 	public Map<String, String> connectorDataTypeChoices(@RequestParam(value = "workPackageName") String workPackageName,
 			@RequestParam(value = "componentName") String componentName) {
-		logger.info("Get Interface Type Choices. component[" + componentName + "]workspace["
-				+ workPackageName + "]");
-		return RtmEditorUtil.createDataTypeMap(StringUtil.getPackageNameFromModelName(workPackageName), componentName, false);
+		logger.info("Get Interface Type Choices. component[" + componentName + "]workspace[" + workPackageName + "]");
+		return RtmEditorUtil.createDataTypeMap(StringUtil.getPackageNameFromModelName(workPackageName), componentName,
+				false);
 	}
 
 	/**
@@ -513,8 +514,8 @@ public class MainController {
 			@RequestParam(value = "idlFileName") String idlFileName) {
 		logger.info("Get Interface Type Choices. component[" + componentName + "]idlFile[" + idlFileName + "]workspace["
 				+ workPackageName + "]");
-		return RtmEditorUtil.createInterfaceTypeMap(StringUtil.getPackageNameFromModelName(workPackageName), componentName,
-				idlFileName);
+		return RtmEditorUtil.createInterfaceTypeMap(StringUtil.getPackageNameFromModelName(workPackageName),
+				componentName, idlFileName);
 	}
 
 	/**
@@ -528,7 +529,8 @@ public class MainController {
 	@ResponseBody
 	public String commitPackage(@RequestParam(value = "workPackageName") String workPackageName,
 			@RequestParam(value = "commitMessage") String commitMessage) {
-		logger.info("Commit Package to Local Repository. workspace[" + workPackageName + "]commitMessage[" + commitMessage + "]");
+		logger.info("Commit Package to Local Repository. workspace[" + workPackageName + "]commitMessage["
+				+ commitMessage + "]");
 		return mainService.commitPackage(StringUtil.getPackageNameFromModelName(workPackageName), commitMessage);
 	}
 
@@ -545,10 +547,11 @@ public class MainController {
 	@ResponseBody
 	public String pushPackage(@RequestParam(value = "workPackageName") String workPackageName,
 			@RequestParam(value = "commitMessage") String commitMessage,
-			@RequestParam(value = "userName") String userName,
-			@RequestParam(value = "password") String password) {
-		logger.info("Push Package to Local Repository. workspace[" + workPackageName + "]commitMessage[" + commitMessage + "]userName[" + userName + "]");
-		return mainService.pushPackage(StringUtil.getPackageNameFromModelName(workPackageName), commitMessage, userName, password);
+			@RequestParam(value = "userName") String userName, @RequestParam(value = "password") String password) {
+		logger.info("Push Package to Local Repository. workspace[" + workPackageName + "]commitMessage[" + commitMessage
+				+ "]userName[" + userName + "]");
+		return mainService.pushPackage(StringUtil.getPackageNameFromModelName(workPackageName), commitMessage, userName,
+				password);
 	}
 
 	/**
@@ -561,8 +564,7 @@ public class MainController {
 	@RequestMapping(value = "pullPackage", method = RequestMethod.POST)
 	@ResponseBody
 	public String pullPackage(@RequestParam(value = "workPackageName") String workPackageName,
-			@RequestParam(value = "userName") String userName,
-			@RequestParam(value = "password") String password) {
+			@RequestParam(value = "userName") String userName, @RequestParam(value = "password") String password) {
 		logger.info("Pull Package from Local Repository. workspace[" + workPackageName + "]userName[" + userName + "]");
 		return mainService.pullPackage(StringUtil.getPackageNameFromModelName(workPackageName), userName, password);
 	}
@@ -584,7 +586,8 @@ public class MainController {
 			@RequestParam(value = "commitMessage") String commitMessage) {
 		logger.info("Commit Component to Local Repository. component[" + componentName + "]git[" + gitName
 				+ "]workspace[" + workPackageName + "]commitMessage[" + commitMessage + "]");
-		return mainService.commitComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName, commitMessage);
+		return mainService.commitComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName,
+				commitMessage);
 	}
 
 	/**
@@ -604,11 +607,11 @@ public class MainController {
 			@RequestParam(value = "componentName") String componentName,
 			@RequestParam(value = "gitName") String gitName,
 			@RequestParam(value = "commitMessage") String commitMessage,
-			@RequestParam(value = "userName") String userName,
-			@RequestParam(value = "password") String password) {
-		logger.info("Push Component to Local Repository. component[" + componentName + "]git[" + gitName
-				+ "]workspace[" + workPackageName + "]commitMessage[" + commitMessage + "]userName[" + userName + "]");
-		return mainService.pushComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName, commitMessage, userName, password);
+			@RequestParam(value = "userName") String userName, @RequestParam(value = "password") String password) {
+		logger.info("Push Component to Local Repository. component[" + componentName + "]git[" + gitName + "]workspace["
+				+ workPackageName + "]commitMessage[" + commitMessage + "]userName[" + userName + "]");
+		return mainService.pushComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName,
+				commitMessage, userName, password);
 	}
 
 	/**
@@ -625,14 +628,14 @@ public class MainController {
 	@ResponseBody
 	public String pullComponent(@RequestParam(value = "workPackageName") String workPackageName,
 			@RequestParam(value = "componentName") String componentName,
-			@RequestParam(value = "gitName") String gitName,
-			@RequestParam(value = "userName") String userName,
+			@RequestParam(value = "gitName") String gitName, @RequestParam(value = "userName") String userName,
 			@RequestParam(value = "password") String password) {
 		logger.info("Pull Component from Local Repository. component[" + componentName + "]git[" + gitName
 				+ "]workspace[" + workPackageName + "]userName[" + userName + "]");
-		return mainService.pullComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName, userName, password);
+		return mainService.pullComponent(StringUtil.getPackageNameFromModelName(workPackageName), componentName,
+				userName, password);
 	}
-	
+
 	/**
 	 * Kerasのモデル一覧の選択肢取得
 	 * 
@@ -724,7 +727,7 @@ public class MainController {
 
 		return mainService.createResultFile();
 	}
-	
+
 	/**
 	 * 指定されたPackageの実行状況を確認する
 	 * 
@@ -766,10 +769,8 @@ public class MainController {
 	 */
 	@RequestMapping(value = "tailImage", method = RequestMethod.GET)
 	@ResponseBody
-	public HttpEntity<byte[]> tailImage(
-			@RequestParam(value = "imageDirectoryPath") String imageDirectoryPath,
-			@RequestParam(value = "date") Long date,
-			@RequestParam(value = "workPackageName") String workPackageName) {
+	public HttpEntity<byte[]> tailImage(@RequestParam(value = "imageDirectoryPath") String imageDirectoryPath,
+			@RequestParam(value = "date") Long date, @RequestParam(value = "workPackageName") String workPackageName) {
 		logger.info("Tailing Image. image directiry path[" + imageDirectoryPath + "]");
 
 		byte[] image = mainService.tailImage(imageDirectoryPath);
@@ -813,8 +814,10 @@ public class MainController {
 	 * @param file
 	 */
 	@RequestMapping(value = "idlUpload", method = RequestMethod.POST)
-	public void idlUpload(HttpServletResponse response, @RequestParam(value = "idl-package-name") String workPackageName,
-			@RequestParam(value = "idl-component-name") String componentName, @RequestParam(value = "idl-upload") MultipartFile file) {
+	public void idlUpload(HttpServletResponse response,
+			@RequestParam(value = "idl-package-name") String workPackageName,
+			@RequestParam(value = "idl-component-name") String componentName,
+			@RequestParam(value = "idl-upload") MultipartFile file) {
 
 		// ファイルが空の場合は HTTP 400 を返す。
 		if (file.isEmpty()) {
@@ -822,7 +825,7 @@ public class MainController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
-		
+
 		RtmEditorUtil.saveIdlFile(StringUtil.getPackageNameFromModelName(workPackageName), componentName, file);
 	}
 
@@ -852,7 +855,7 @@ public class MainController {
 	 */
 	@RequestMapping(value = "getDnnFiles", method = RequestMethod.POST)
 	public String getDnnFiles(HttpServletResponse response, @RequestParam(value = "dnnModelName") String dnnModelName,
-		@RequestParam(value = "fileExtentions") String fileExtentions) throws IOException {
+			@RequestParam(value = "fileExtentions") String fileExtentions) throws IOException {
 		logger.info("Get DNN Files. file Name[" + dnnModelName + "][" + fileExtentions + "]");
 
 		// Keras-Editorの作業領域パス

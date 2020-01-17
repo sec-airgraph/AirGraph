@@ -337,11 +337,12 @@ public class RtcManagementService {
 						// RTCの変更をRtsProfileに反映する
 						refrectRtcChangeToRtsProfile(updated, rtcProfile, oldRtc.getRtcProfile());
 					}
-					
+
 					// GitURLが変更されている場合は変更する
 					String oldRemoteUrl = GitUtil.getGitUrl(rtcDir.getPath());
 					if (!StringUtil.equals(updated.getRtcs().get(i).getModelProfile().getRemoteUrl(), oldRemoteUrl)) {
-						GitUtil.changeRemoteUrl(rtcDir.getPath(), updated.getRtcs().get(i).getModelProfile().getRemoteUrl());
+						GitUtil.changeRemoteUrl(rtcDir.getPath(),
+								updated.getRtcs().get(i).getModelProfile().getRemoteUrl());
 					}
 				}
 			}
@@ -355,7 +356,7 @@ public class RtcManagementService {
 			} else {
 				logger.info("Not Changed RtsProfile. id[" + updated.getRtsProfile().getId() + "]");
 			}
-			
+
 			// GitURLが変更されている場合は変更する
 			String oldRemoteUrl = GitUtil.getGitUrl(destPackageDir.getPath());
 			if (!StringUtil.equals(updated.getModelProfile().getRemoteUrl(), oldRemoteUrl)) {
@@ -527,7 +528,7 @@ public class RtcManagementService {
 		rtc.getRtcProfile().getActions().getOnActivated().setImplemented(true);
 		rtc.getRtcProfile().getActions().getOnDeactivated().setImplemented(true);
 		rtc.getRtcProfile().getActions().getOnExecute().setImplemented(true);
-		
+
 		// git初期値
 		rtc.getModelProfile().setRemoteUrl(PropUtil.getValue("default.git.url.base") + "new_component.git");
 
@@ -687,7 +688,8 @@ public class RtcManagementService {
 						if (LANGUAGE_KIND.CPP.equals(rtc.getRtcProfile().getLanguage().getKind())) {
 							// C++
 							targetCodeDir = new String[] { DIR_NAME.COMP_INCLUDE_DIR_NAME, DIR_NAME.COMP_SRC_DIR_NAME,
-									DIR_NAME.COMP_IDL_DIR_NAME, rtc.getRtcProfile().getBasicInfo().getModuleName().toLowerCase() };
+									DIR_NAME.COMP_IDL_DIR_NAME,
+									rtc.getRtcProfile().getBasicInfo().getModuleName().toLowerCase() };
 						} else if (LANGUAGE_KIND.PYTHON.equals(rtc.getRtcProfile().getLanguage().getKind())) {
 							// Python
 							targetCodeDir = new String[] { DIR_NAME.COMP_IDL_DIR_NAME };
@@ -1193,7 +1195,8 @@ public class RtcManagementService {
 
 				// ExecutionRateの自動反映
 				logger.info("Change Config File Exec Rate. target directory[" + rtcDirPath + "]");
-				RtcUtil.updateExecutionRateRtcConfig(configFile.getPath(), rtcProfile.getBasicInfo().getExecutionRate());
+				RtcUtil.updateExecutionRateRtcConfig(configFile.getPath(),
+						rtcProfile.getBasicInfo().getExecutionRate());
 			}
 		}
 	}
