@@ -15,6 +15,11 @@ function openDatasetListViewer() {
   var selectedDataset = '';
   var codeDirectory = '';
 
+  // ロボットの一覧を取得
+  var robots = getRobotChoices();
+  var selectedRobot = '';
+  var robotDatasets = '';
+
   // 本体
   var div = $('<div>');
   div.attr('id', 'div-datasetlistviewer').attr('title', 'Dataset Viewer');
@@ -27,18 +32,18 @@ function openDatasetListViewer() {
     name: 'layout-panel-dataset-listviewer',
     padding: 0,
     panels: [
-      { type: 'top', size: 55, resizable: false, style: pstyle, content: $().w2form(createDatasetMonitorTop(datasets, selectedDataset)) },
+      { type: 'top', size: 85, resizable: false, style: pstyle, content: $().w2form(createDatasetMonitorTop(datasets, selectedDataset)) },
       { type: 'left', size: 200, resizable: false, style: pstyle, content: $().w2sidebar(createDatasetMonitorLeft(selectedDataset, codeDirectory)) },
       { type: 'main', style: pstyle, content: $().w2grid(createDatasetMonitorMain()) },
       { type: 'right', size: 310, resizable: false, style: pstyle, content: "<div id = 'dataset-monitor-right'>" },
-      { type: 'bottom', size: 150, resizable: false, style: pstyle, content: '' }
+      { type: 'bottom', size: 210, resizable: false, style: pstyle, content: $().w2form(createDatasetMonitorBottom(robots, selectedRobot, robotDatasets)) }
     ]
   });
 
   // 本体をモーダル表示
   $(div).dialog({
     resizable: false,
-    height: 560,
+    height: 650,
     width: 1100,
     modal: false,
     close: function () {
@@ -50,11 +55,13 @@ function openDatasetListViewer() {
         w2ui['dataset-data-grid'].destroy();
       }
       w2ui['dataset-monitor-top'].destroy();
+      w2ui['dataset-monitor-bottom'].destroy();
       w2ui['layout-panel-dataset-listviewer'].destroy();
       $(document.getElementById('div-datasetlistviewer')).remove();
     }
   });
 }
+
 /**
  * データセット名選択部分を表示
  * 
@@ -65,6 +72,7 @@ function createDatasetMonitorTop(datasets, selectedDataset) {
   // データセット選択部分を生成
   var form = {
     name: 'dataset-monitor-top',
+    header: 'Dataset Viewer',
     padding: 0,
     record: {
       dataset_name: selectedDataset,
@@ -240,7 +248,59 @@ function setDatasetMonitorGridData(selectedIds) {
   }
 }
 
+/**
+ * ロボットからの転送部分を作成
+ * 
+ * @param robots
+ * @param selectedRobot
+ * @param datasets
+ */
+function createDatasetMonitorBottom(robots, selectedRobot, datasets) {
+  // データセット選択部分を生成
+  var form = {
+    name: 'dataset-monitor-bottom',
+    header: 'Dataset Downloader',
+    padding: 0,
+    record: {
+      robot_name: selectedRobot
+    },
+    fields: [
+      { name: 'robot_name', type: 'list', required: true, html: { caption: 'Robot Name', attr: 'style="width:200px"' }, options: { items: robots } },
+      { name: 'robot_dataset_name', type: 'list', required: true, html: { caption: 'Dataset Name', attr: 'style="width:200px"' }, options: { items: datasets } },
+      // { name: 'robot_start_date', type: 'text', html: { caption: 'Target Date', attr: 'style="width:200px"' }}
+    ],
+    actions: {
+      'Download': function () {
+        if (this.validate().length === 0) {
+          getRobotDatasets($('#robot_name').val(), $('#robot_dataset_name').val(), '');
+        }
+      }
+    },
+    onChange: function (event) {
+      if (event.target === 'robot_name') {
+        updateDatasetMonitorBottom(robots, $('#robot_name').val());
+      }
+    }
+  };
+  return form;
+}
 
+/**
+ * ロボットからの転送部分を更新
+ * 
+ * @param robots 
+ * @param selectedRobot 
+ */
+function updateDatasetMonitorBottom(robots, selectedRobot) {
+  // 対象のロボットのデータセット選択肢を取得
+  var datasets = '';
+  if (selectedRobot) {
+    datasets = getRobotDatasetChoices(selectedRobot);
+  }
+  w2ui['dataset-monitor-bottom'].fields[1].options.items = datasets;
+  w2ui['dataset-monitor-bottom'].refresh();
+  $('#robot_name').val(selectedRobot);
+}
 
 /**
  * データセットデータ一覧取得
@@ -285,7 +345,7 @@ function openDatasetMonitor() {
     name: 'layout-panel-dataset-listviewer',
     padding: 0,
     panels: [
-      { type: 'top', size: 55, resizable: false, style: pstyle, content: $().w2form(createDatasetMonitorTop(datasets, selectedDataset)) },
+      { type: 'top', size: 85, resizable: false, style: pstyle, content: $().w2form(createDatasetMonitorTop(datasets, selectedDataset)) },
       { type: 'left', size: 200, resizable: false, style: pstyle, content: $().w2sidebar(createDatasetMonitorLeft(selectedDataset, codeDirectory)) },
       {
         type: 'right', size: 310, resizable: false, style: pstyle,
@@ -299,7 +359,7 @@ function openDatasetMonitor() {
 
   $(div).dialog({
     resizable: false,
-    height: 410,
+    height: 440,
     width: 540,
     modal: false,
     close: function () {

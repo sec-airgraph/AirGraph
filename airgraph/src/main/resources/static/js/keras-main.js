@@ -2000,9 +2000,11 @@ function toggleNetworkPanel(id, field) {
  * 
  * @returns
  */
-function lockScreen(message = 'Loading...') {
-  w2popup.open({ width: 180, height: 70 });
-  w2popup.lock(message, true);
+function lockScreen() {
+  if (lockCnt === 0) {
+    w2utils.lock($('#main-joint-area'), "Loading...", false);
+  }
+  lockCnt++;
 }
 
 /**
@@ -2011,7 +2013,11 @@ function lockScreen(message = 'Loading...') {
  * @returns
  */
 function unlockScreen() {
-  w2popup.close();
+  lockCnt--;
+  if (lockCnt <= 0) {
+    w2utils.unlock($('#main-joint-area'));
+    lockCnt = 0;
+  }
 }
 
 /**

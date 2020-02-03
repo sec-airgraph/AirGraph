@@ -308,4 +308,44 @@ public class KerasService {
 		// データセット以下のファイルの一覧を取得する
 		return rtcManagementService.getCodeFile(dataSetDirPath, null, null, null, null);
 	}
+
+	/**
+	 * ロボットの選択肢を取得する
+	 * 
+	 * @return
+	 */
+	public Map<String, String> getRobotChoices() {
+		return kerasManagementService.getRobotChoices();
+	}
+
+	/**
+	 * 指定されたロボットのデータセットの一覧を取得する
+	 * @param robotHostName
+	 * @return
+	 */
+	public Map<String, String> getRobotDatasetChoices(String robotHostName) {
+		return kerasManagementService.getRobotDatasetChoices(robotHostName);
+	}
+
+	/**
+	 * 指定されたデータセットディレクトリのデータを取得する
+	 * 
+	 * @param datasetName
+	 * @param targetDate
+	 * @return
+	 */
+	public boolean compressDatasets(String datasetName, String targetDate) {
+		return kerasManagementService.compressDatasets(datasetName, targetDate);
+	}
+
+	/**
+	 * 指定されたデータセットをダウンロードする
+	 * 
+	 * @param robotHostName
+	 * @param datasetName
+	 * @param targetDate
+	 */
+	public boolean downloadDatasets(String robotHostName, String datasetName, String targetDate) {
+		return kerasManagementService.downloadDatasets(robotHostName, datasetName, targetDate);
+	}
 }

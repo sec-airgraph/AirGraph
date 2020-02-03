@@ -271,4 +271,116 @@ public class KerasManagementService {
 		}
 		return downloadResult;
 	}
+
+	/**
+	 * ロボットの選択肢を取得する
+	 * 
+	 * @return
+	 */
+	public Map<String, String> getRobotChoices() {
+		Map<String, String> result = new HashMap<>();
+
+		String robotHostStr = PropUtil.getValue("airgraph.rtm_editor.server.uri");
+		String[] robotHosts = robotHostStr.split(",");
+		for (String host : robotHosts) {
+			result.put(host, host);
+		}
+		return result;
+	}
+
+	/**
+	 * 指定されたロボットのデータセットの一覧を取得する
+	 * @param robotHostName
+	 * @return
+	 */
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public Map<String, String> getRobotDatasetChoices(String robotHostName) {
+		// KerasEditorのURL
+		String url = robotHostName;
+		if (StringUtil.equals(url, "localhost:8080")) {
+			// 単一マシンで実行している場合は除外
+			return loadDatasetList();
+		}
+		String getDatasetChoicesUrl = "http://" + url + "main/getDatasetChoices";
+
+		// モデルファイルの取得
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		map.add("robotHostName", robotHostName);
+
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+
+		// ここでPOSTリクエスト実行
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<Map> result = restTemplate.postForEntity(getDatasetChoicesUrl, request, Map.class);
+		return result.getBody();
+	}
+
+	/**
+	 * 指定されたデータセットディレクトリのデータを取得する
+	 * 
+	 * @param datasetName
+	 * @param targetDate
+	 * @return
+	 */
+	public boolean compressDatasets(String datasetName, String targetDate) {
+		// データセットのディレクトリ
+		String datasetDir = PropUtil.getValue("dataset.directory.path") + datasetName;
+		FileUtil.deleteFile("/tmp/dataset.zip");
+		return FileUtil.compressDirectory("/tmp/dataset.zip", datasetDir);
+	}
+
+	/**
+	 * 指定されたデータセットをダウンロードする
+	 * 
+	 * @param robotHostName
+	 * @param datasetName
+	 * @param targetDate
+	 */
+	public boolean downloadDatasets(String robotHostName, String datasetName, String targetDate) {
+		boolean downloadResult = false;
+		// RtmEditorのURL
+		// if (StringUtil.equals(robotHostName, "localhost:8080")) {
+		// 	// 単一マシンで実行している場合は除外
+		// 	return true;
+		// }
+		String downloadDnnUrl = "http://" + robotHostName + "/keras/downloadDatasets";
+
+		// モデルファイルの取得
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+		map.add("datasetName", datasetName);
+		map.add("targetDate", targetDate);
+
+		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+
+		// ここでPOSTリクエスト実行
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<Resource> result = restTemplate.postForEntity(downloadDnnUrl, request, Resource.class);
+		HttpStatus responseHttpStatus = result.getStatusCode();
+		try {
+			if (responseHttpStatus.equals(HttpStatus.OK) && result.getBody() != null
+					&& result.getBody().getInputStream() != null) { // 200
+				InputStream inputStream = result.getBody().getInputStream();
+				InputStreamReader reader = new InputStreamReader(inputStream);
+
+				if (reader.ready()) {
+					// 保存する
+					String datasetDirPath = PropUtil.getValue("dataset.directory.path");
+					String filePath = "/tmp/tmp.zip";
+					FileUtil.deleteFile(filePath);
+					File file = new File(filePath);
+					FileUtil.saveInputStream(inputStream, file);
+					// 解答する
+					FileUtil.unzip(filePath, datasetDirPath);
+					downloadResult = true;
+				}
+			}
+		} catch (Exception e) {
+			logger.error("例外発生:", e);
+		}
+		return downloadResult;
+	}
 }

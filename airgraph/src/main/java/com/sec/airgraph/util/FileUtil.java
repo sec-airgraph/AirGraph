@@ -616,6 +616,65 @@ public class FileUtil {
 	}
 
 	/**
+	 * 解凍処理
+	 * @param zipFilePath
+	 * @return
+	 */
+	public static boolean unzip(String zipFilePath, String targetDirPath) {
+		ZipFile zipFile = null;
+		try {
+			zipFile = new ZipFile(zipFilePath);
+			Enumeration enumeration = zipFile.getEntries();
+			while (enumeration.hasMoreElements()) {
+				// ZIP内のエントリを取得
+				ZipEntry zipEntry = (ZipEntry) enumeration.nextElement();
+
+				//出力ファイル取得
+				File outFile = new File(targetDirPath, zipEntry.getName());
+
+				if (zipEntry.isDirectory()){
+					outFile.mkdir();
+				} else {
+					// 圧縮ファイル入力ストリーム作成
+					BufferedInputStream in = new BufferedInputStream(zipFile.getInputStream(zipEntry));
+
+					// 親ディレクトリがない場合、ディレクトリ作成
+					if (!outFile.getParentFile().exists()) {
+						outFile.getParentFile().mkdirs();
+					}
+
+					// 出力オブジェクト取得
+					BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(outFile));
+
+					// 読み込みバッファ作成
+					byte[] buffer = new byte[1024];
+
+					// 解凍ファイル出力
+					int readSize = 0;
+					while ((readSize = in.read(buffer)) != -1 ) {
+						out.write(buffer, 0, readSize);
+					}
+					// クローズ
+					try {
+						out.close();
+					} catch (Exception e) {
+
+					}
+					try {
+						in.close();
+					} catch (Exception e) {
+
+					}
+				}
+			}
+		} catch (Exception e) {
+			// ZIP解凍失敗
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * ZIPファイルの先頭ディレクトリ名を取得する
 	 * 
 	 * @param filePath

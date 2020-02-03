@@ -55,6 +55,8 @@ function loadAllLayerPropertyTemplates() {
         templateLayerPropertyMap[prop.class_name] = prop;
       });
     }
+    // 画面ロック解除
+    unlockScreen();
   });
 }
 
@@ -131,6 +133,60 @@ function getDatasetChoices() {
     async: false
   }).responseJSON;
   return result;
+}
+
+/**
+ * ロボットの一覧を取得する
+ * 
+ * @returns
+ */
+function getRobotChoices() {
+  var result = $.ajax({
+    type: 'POST',
+    url: getUrlRobotChoices(),
+    async: false
+  }).responseJSON;
+  return result;
+}
+
+/**
+ * 指定されたロボットのデータセットの一覧を取得する
+ * 
+ * @returns
+ */
+function getRobotDatasetChoices(robotHostName) {
+  var result = $.ajax({
+    type: 'POST',
+    url: getUrlRobotDatasetChoices(),
+    data: {"robotHostName" : robotHostName},
+    async: false
+  }).responseJSON;
+  return result;
+}
+
+/**
+ * 指定されたロボットのデータセットを取得する
+ * 
+ * @returns
+ */
+function getRobotDatasets(robotHostName, datasetName, targetDate) {
+  lockScreen();
+  $.ajax({
+    type: 'POST',
+    url: getUrlRobotDatasets(),
+    data: {
+      "robotHostName" : robotHostName,
+      "datasetName" : datasetName,
+      "targetDate" : targetDate
+    }
+  }).done(function () {
+    // データセット名の一覧を取得
+    var datasets = getDatasetChoices();
+    w2ui['dataset-monitor-top'].fields[0].options.items = datasets;
+    w2ui['dataset-monitor-top'].refresh();
+
+    unlockScreen();
+  });
 }
 
 /*************************************************************************

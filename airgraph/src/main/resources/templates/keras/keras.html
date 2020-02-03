@@ -264,6 +264,9 @@ var dtypeListItems = [
   'complex128'
 ];
 
+/*[- ロック数 -]*/
+var lockCnt = 0;
+
 /*[-----------------------------
   * URL
   * -----------------------------]*/
@@ -340,6 +343,21 @@ function getUrlDatasetUpload() {
 /*[- Datasetのデータ一覧取得 -]*/
 function getUrlGetDatasetDataList() {
   return /*[[@{/keras/getDatasetDataList}]]*/;
+}
+
+/*[- 指定されたロボットのデータセット選択肢 -]*/
+function getUrlRobotChoices() {
+  return /*[[@{/keras/getRobotChoices}]]*/;
+}
+
+/*[- 指定されたロボットのデータセット選択肢 -]*/
+function getUrlRobotDatasetChoices() {
+  return /*[[@{/keras/getRobotDatasetChoices}]]*/;
+}
+
+/*[- 指定されたロボットのデータセット取得 -]*/
+function getUrlRobotDatasets() {
+  return /*[[@{/keras/getRobotDatasets}]]*/;
 }
 
 function getDatasetDirectoryPath() {

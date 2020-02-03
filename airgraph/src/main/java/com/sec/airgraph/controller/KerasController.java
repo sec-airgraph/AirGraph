@@ -298,4 +298,69 @@ public class KerasController {
 		logger.info("Get Dataset Data. datasetName[" + datasetName + "]");
 		return kerasService.getDatasetDataList(datasetName);
 	}
+
+	/**
+	 * ロボットの選択肢取得
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "getRobotChoices", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, String> getRobotChoices() {
+		logger.info("Get Robot Choices.");
+		return kerasService.getRobotChoices();
+	}
+
+	/**
+	 * 指定されたロボットのAirGraphのデータセット選択肢取得
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "getRobotDatasetChoices", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, String> getRobotDatasetChoices(@RequestParam(value = "robotHostName") String robotHostName) {
+		logger.info("Get Dataset Choices. target robot[" + robotHostName + "]");
+		return kerasService.getRobotDatasetChoices(robotHostName);
+	}
+
+	/**
+	 * 対象のロボットから指定されたデータセットを取得する
+	 * 
+	 * @param 
+	 */
+	@RequestMapping(value = "getRobotDatasets", method = RequestMethod.POST)
+	@ResponseBody
+	public String getRobotDatasets(HttpServletResponse response,
+	    @RequestParam(value = "robotHostName") String robotHostName, @RequestParam(value = "datasetName") String datasetName,
+		@RequestParam(value = "targetDate") String targetDate) throws IOException {
+		logger.info("Get Robot Dataset. target robot[" + robotHostName +  "]dataset name[" + datasetName + "]target date[" + targetDate + "]");
+
+		kerasService.downloadDatasets(robotHostName, datasetName, targetDate);
+		return "{\"response\" : \"OK\"}";
+	}
+
+	/**
+	 * 指定されたデータセットをダウンロードする
+	 * 
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "downloadDatasets", method = RequestMethod.POST)
+	public String downloadDatasets(HttpServletResponse response,
+		@RequestParam(value = "datasetName") String datasetName, @RequestParam(value = "targetDate") String targetDate) throws IOException {
+		logger.info("Get Dataset. dataset name[" + datasetName + "]target date[" + targetDate + "]");
+
+		// データセットを圧縮する
+		File tmpFile = new File("/tmp/dataset.zip");
+		kerasService.compressDatasets(datasetName, targetDate);
+
+		// 結果格納ファイル
+		response.addHeader("Content-Type", "application/octet-stream");
+		response.addHeader("Content-Disposition",
+				"attachment; filename*=UTF-8''" + URLEncoder.encode(tmpFile.getName(), StandardCharsets.UTF_8.name()));
+
+		Files.copy(tmpFile.toPath(), response.getOutputStream());
+		return null;
+	}
 }
