@@ -320,7 +320,7 @@ function createRtcProfileSettingForm(rtc, rtcIndex, propertyAreaFlg, updateFlg) 
               newRtc['rtcProfile'] = setEditComponentInfo(rtc, componentKindFields).rtcProfile;
               newRtc['modelProfile'] = new Object();
               newRtc['modelProfile']['remoteUrl'] = setEditComponentInfo(rtc, componentKindFields).modelProfile.remoteUrl;
-              // w2popup.close();
+              w2popup.close();
               createNewComponentAjax(newRtc);
             } else {
               w2alert('コンポーネントの名称が重複しています。')
