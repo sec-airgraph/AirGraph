@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sec.rtc.entity.rtc.CodeDirectory;
 import com.sec.keras.entity.field.KerasFieldInfo;
 import com.sec.keras.entity.model.KerasModel;
 import com.sec.airgraph.form.KerasForm;
@@ -119,54 +120,59 @@ public class KerasController {
 		logger.info("Load all workspace data.");
 		return kerasService.loadAllPackagesWorkspace();
 	}
-	
+
 	/**
 	 * 全てのレイヤープロパティ設定用テンプレートを読み込む
+	 * 
 	 * @return
 	 */
 	@RequestMapping(value = "loadAllLayerPropertyTemplates", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> loadAllLayerPropertyTemplates(){
+	public List<String> loadAllLayerPropertyTemplates() {
 		return kerasService.getAllLayerPropertyTemplates();
 	}
-	
+
 	/**
 	 * 指定されたモデルを作業領域フォルダに保存する
+	 * 
 	 * @param json
 	 * @return
 	 */
-	@RequestMapping(value = "saveModel", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+	@RequestMapping(value = "saveModel", method = RequestMethod.POST)
 	@ResponseBody
-	public String saveModel(@RequestBody String json){
+	public String saveModel(@RequestParam(value = "dirName") String dirName,
+			@RequestParam(value = "json") String json) {
 		logger.info("Save model in workspace.");
 		if (StringUtil.isNotEmpty(json)) {
-			kerasService.saveModel(json);
+			kerasService.saveModel(dirName, json);
 		}
 		return "{\"response\" : \"OK\"}";
 	}
-	
+
 	/**
 	 * 指定されたモデルを削除する
+	 * 
 	 * @param json
 	 * @return
 	 */
-	@RequestMapping(value = "deleteModel", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+	@RequestMapping(value = "deleteModel", method = RequestMethod.POST)
 	@ResponseBody
-	public String deleteModel(@RequestParam(value = "modelName") String modelName){
+	public String deleteModel(@RequestParam(value = "modelName") String modelName) {
 		logger.info("Delete model in workspace. modelName[" + modelName + "]");
 		if (StringUtil.isNotEmpty(modelName)) {
 			kerasService.deleteModel(modelName);
 		}
 		return "{\"response\" : \"OK\"}";
 	}
-	
+
 	/**
 	 * 指定されたモデルの学習を実行
+	 * 
 	 * @param json
 	 */
 	@RequestMapping(value = "fit", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
 	@ResponseBody
-	public String fit(@RequestBody String json){
+	public String fit(@RequestBody String json) {
 		logger.info("Run Keras Fit in workspace.");
 		if (StringUtil.isNotEmpty(json)) {
 			kerasService.fit(json);
@@ -217,8 +223,7 @@ public class KerasController {
 	 * @param file
 	 */
 	@RequestMapping(value = "dataMakerUpload", method = RequestMethod.POST)
-	public void dataMakerUpload(
-			HttpServletResponse response,
+	public void dataMakerUpload(HttpServletResponse response,
 			@RequestParam(value = "workspace-model-name") String workspaceModelName,
 			@RequestParam(value = "datamaker-upload") MultipartFile file) {
 
@@ -231,7 +236,6 @@ public class KerasController {
 		KerasEditorUtil.saveDataMakerFile(workspaceModelName, file);
 	}
 
-
 	/**
 	 * Datasetをダウンロードする
 	 * 
@@ -242,7 +246,7 @@ public class KerasController {
 	 */
 	@RequestMapping(value = "datasetDownload", method = RequestMethod.POST)
 	public String datasetDownload(HttpServletResponse response,
-			@RequestParam(value = "workspace-model-name-dataset") String workspaceModelName) throws IOException  {
+			@RequestParam(value = "workspace-model-name-dataset") String workspaceModelName) throws IOException {
 		logger.info("Download dataset. modelName[" + workspaceModelName + "]");
 		// データセットを圧縮したファイル名
 		String filePath = kerasService.downloadDataset(workspaceModelName);
@@ -251,7 +255,7 @@ public class KerasController {
 			response.addHeader("Content-Type", "application/octet-stream");
 			response.addHeader("Content-Disposition",
 					"attachment; filename*=UTF-8''" + URLEncoder.encode(file.getName(), StandardCharsets.UTF_8.name()));
-	
+
 			Files.copy(file.toPath(), response.getOutputStream());
 		}
 		return null;
@@ -265,8 +269,7 @@ public class KerasController {
 	 * @param file
 	 */
 	@RequestMapping(value = "datasetUpload", method = RequestMethod.POST)
-	public void datasetUpload(
-			HttpServletResponse response,
+	public void datasetUpload(HttpServletResponse response,
 			@RequestParam(value = "workspace-model-name-dataset") String workspaceModelName,
 			@RequestParam(value = "dataset-upload") MultipartFile file) {
 		logger.info("Upload dataset. modelName[" + workspaceModelName + "]");
@@ -282,5 +285,82 @@ public class KerasController {
 	@ResponseBody
 	public Map<String, String> getDatasetChoices() {
 		return kerasService.getDatasetChoices();
+	}
+
+	/**
+	 * 指定されたデータセットのデータ一覧取得
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "getDatasetDataList", method = RequestMethod.POST)
+	@ResponseBody
+	public CodeDirectory getDatasetDataList(@RequestParam(value = "datasetName") String datasetName) {
+		logger.info("Get Dataset Data. datasetName[" + datasetName + "]");
+		return kerasService.getDatasetDataList(datasetName);
+	}
+
+	/**
+	 * ロボットの選択肢取得
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "getRobotChoices", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, String> getRobotChoices() {
+		logger.info("Get Robot Choices.");
+		return kerasService.getRobotChoices();
+	}
+
+	/**
+	 * 指定されたロボットのAirGraphのデータセット選択肢取得
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "getRobotDatasetChoices", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, String> getRobotDatasetChoices(@RequestParam(value = "robotHostName") String robotHostName) {
+		logger.info("Get Dataset Choices. target robot[" + robotHostName + "]");
+		return kerasService.getRobotDatasetChoices(robotHostName);
+	}
+
+	/**
+	 * 対象のロボットから指定されたデータセットを取得する
+	 * 
+	 * @param 
+	 */
+	@RequestMapping(value = "getRobotDatasets", method = RequestMethod.POST)
+	@ResponseBody
+	public String getRobotDatasets(HttpServletResponse response,
+	    @RequestParam(value = "robotHostName") String robotHostName, @RequestParam(value = "datasetName") String datasetName,
+		@RequestParam(value = "targetDate") String targetDate) throws IOException {
+		logger.info("Get Robot Dataset. target robot[" + robotHostName +  "]dataset name[" + datasetName + "]target date[" + targetDate + "]");
+
+		kerasService.downloadDatasets(robotHostName, datasetName, targetDate);
+		return "{\"response\" : \"OK\"}";
+	}
+
+	/**
+	 * 指定されたデータセットをダウンロードする
+	 * 
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "downloadDatasets", method = RequestMethod.POST)
+	public String downloadDatasets(HttpServletResponse response,
+		@RequestParam(value = "datasetName") String datasetName, @RequestParam(value = "targetDate") String targetDate) throws IOException {
+		logger.info("Get Dataset. dataset name[" + datasetName + "]target date[" + targetDate + "]");
+
+		// データセットを圧縮する
+		File tmpFile = new File("/tmp/dataset.zip");
+		kerasService.compressDatasets(datasetName, targetDate);
+
+		// 結果格納ファイル
+		response.addHeader("Content-Type", "application/octet-stream");
+		response.addHeader("Content-Disposition",
+				"attachment; filename*=UTF-8''" + URLEncoder.encode(tmpFile.getName(), StandardCharsets.UTF_8.name()));
+
+		Files.copy(tmpFile.toPath(), response.getOutputStream());
+		return null;
 	}
 }

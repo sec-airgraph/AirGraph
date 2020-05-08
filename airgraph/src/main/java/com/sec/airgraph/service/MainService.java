@@ -29,8 +29,7 @@ import com.sec.airgraph.util.Const.COMMON.DIR_NAME;
 import com.sec.airgraph.util.Const.COMMON.FILE_NAME;
 
 /**
- * AirGraphメインサービス
- * RTM-Editor
+ * AirGraphメインサービス RTM-Editor
  * 
  * @author Tsuyoshi Hirose
  *
@@ -60,14 +59,16 @@ public class MainService {
 	 */
 	@Autowired
 	private RtcManagementService rtcManagementService;
-	
+
 	/**
 	 * Keras管理サービス
 	 */
 	@Autowired
 	private KerasManagementService kerasManagementService;
-	
-	
+
+	/**
+	 * IDE管理サービス
+	 */
 	@Autowired
 	private IdeManagementService ideManagementService;
 
@@ -87,7 +88,7 @@ public class MainService {
 	 * Binder定義を元にすべてのリポジトリを展開する
 	 */
 	private void cloneWasanbonRepositry() {
-		
+
 		// Binderの一覧を取得する
 		Map<String, Map<String, String>> binderMap = wasanbonManagementService.getBinderList();
 
@@ -130,9 +131,10 @@ public class MainService {
 		}
 
 		// 履歴タブ
-		// ComponentTabInfo recentTab = fieldManagementService.createRecentRtcComponentTab();
+		// ComponentTabInfo recentTab =
+		// fieldManagementService.createRecentRtcComponentTab();
 		// if (recentTab != null) {
-		// 	componentTabs.add(recentTab);
+		// componentTabs.add(recentTab);
 		// }
 
 		componentFieldInfo.setComponentTabs(componentTabs);
@@ -259,7 +261,7 @@ public class MainService {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * パッケージ名が競合していないかを調べる
 	 * 
@@ -334,6 +336,7 @@ public class MainService {
 		// 指定されたPackageを停止する
 		wasanbonManagementService.terminatePackage(packageRepositoryName);
 	}
+
 	/**
 	 * Packageの実行状況を確認する
 	 * 
@@ -378,28 +381,62 @@ public class MainService {
 	}
 
 	/**
-	 * 対象のディレクトリにある一番新しいjpgファイルを取得する
+	 * 対象のディレクトリにある一番新しい画像ファイルを取得する
 	 * 
 	 * @param imageDirectoryPath
+	 * @param targetExtension
 	 * @return
 	 */
-	public byte[] tailImage(String imageDirectoryPath) {
+	public byte[] tailImage(String imageDirectoryPath, List<String> targetExtension) {
+		// 対象とする拡張子
+		List<String> extensions = new ArrayList<>();
+		extensions.add("png");
+		extensions.add("jpg");
+		extensions.add("jpeg");
+
+		File imageFile = FileUtil.getLatestUpdateFile(imageDirectoryPath, extensions);
+		if (FileUtil.exists(imageFile)) {
+			return getImage(imageFile, targetExtension);
+		} else {
+			logger.warn("対象の画像ファイルが存在しない.imageFilePath[" + imageDirectoryPath + "]");
+		}
+		return null;
+	}
+
+	/**
+	 * 対象のディレクトリにある一番新しい画像ファイルを取得する
+	 * 
+	 * @param imageFile
+	 * @param targetExtension
+	 * @return
+	 */
+	public byte[] getImage(File imageFile, List<String> targetExtension) {
 		byte[] result = null;
-		File imageFile = FileUtil.getLatestUpdateFile(imageDirectoryPath, "jpg");
+
+		// 対象とする拡張子
+		List<String> extensions = new ArrayList<>();
+		extensions.add("png");
+		extensions.add("jpg");
+		extensions.add("jpeg");
+
+		if (!extensions.contains(FileUtil.getFileExtension(imageFile.getPath()).toLowerCase())) {
+			return null;
+		}
+
 		if (FileUtil.exists(imageFile)) {
 			// BufferedImageへ設定
 			BufferedImage bufferedImage = null;
 			try {
+				String extension = FileUtil.getFileExtension(imageFile.getPath().toLowerCase());
+				targetExtension.add(extension);
 				bufferedImage = ImageIO.read(imageFile);
 				// byteに変換
 				ByteArrayOutputStream bout = new ByteArrayOutputStream();
-				ImageIO.write(bufferedImage, "jpg", bout);
+				ImageIO.write(bufferedImage, extension, bout);
 				result = bout.toByteArray();
 			} catch (Exception ex) {
 				logger.error("例外発生. :", ex);
 			}
-		} else {
-			logger.warn("対象の画像ファイルが存在しない.imageDirectoryPath[" + imageDirectoryPath + "]");
 		}
 		return result;
 	}
@@ -418,7 +455,7 @@ public class MainService {
 
 		return FileUtil.compressDirectory(resultFilePath, resultDirPath);
 	}
-	
+
 	/**
 	 * RTSをローカルリポジトリにCommitする
 	 * 
@@ -428,7 +465,7 @@ public class MainService {
 	public String commitPackage(String workPackageName, String commitMessage) {
 		return ideManagementService.commitPackage(workPackageName, commitMessage);
 	}
-	
+
 	/**
 	 * RTSをリモートリポジトリにPushする
 	 * 
@@ -440,10 +477,10 @@ public class MainService {
 	 */
 	public String pushPackage(String workPackageName, String commitMessage, String userName, String password) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		String rsltCommit = ideManagementService.commitPackage(workPackageName, commitMessage);
 		String rsltPush = ideManagementService.pushPackage(workPackageName, userName, password);
-		
+
 		if (StringUtil.isNotEmpty(rsltCommit)) {
 			sb.append(rsltCommit);
 		}
@@ -455,7 +492,7 @@ public class MainService {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * RTSをリモートリポジトリからPullする
 	 * 
@@ -467,7 +504,7 @@ public class MainService {
 	public String pullPackage(String workPackageName, String userName, String password) {
 		return ideManagementService.pullPackage(workPackageName, userName, password);
 	}
-	
+
 	/**
 	 * RTCをローカルリポジトリにCommitする
 	 * 
@@ -478,7 +515,7 @@ public class MainService {
 	public String commitComponent(String workPackageName, String componentName, String commitMessage) {
 		return ideManagementService.commitComponent(workPackageName, componentName, commitMessage);
 	}
-	
+
 	/**
 	 * RTCをリモートリポジトリにPushする
 	 * 
@@ -489,12 +526,13 @@ public class MainService {
 	 * @param password
 	 * @return
 	 */
-	public String pushComponent(String workPackageName, String componentName, String commitMessage, String userName, String password) {
+	public String pushComponent(String workPackageName, String componentName, String commitMessage, String userName,
+			String password) {
 		StringBuilder sb = new StringBuilder();
-		
+
 		String rsltCommit = ideManagementService.commitComponent(workPackageName, componentName, commitMessage);
 		String rsltPush = ideManagementService.pushComponent(workPackageName, componentName, userName, password);
-		
+
 		if (StringUtil.isNotEmpty(rsltCommit)) {
 			sb.append(rsltCommit);
 		}
@@ -506,7 +544,7 @@ public class MainService {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * RTCをリモートリポジトリからPullする
 	 * 
@@ -519,16 +557,17 @@ public class MainService {
 	public String pullComponent(String workPackageName, String componentName, String userName, String password) {
 		return ideManagementService.pullComponent(workPackageName, componentName, userName, password);
 	}
-	
+
 	/**
 	 * Kerasの選択肢を取得する
+	 * 
 	 * @return
 	 */
 	public Map<String, String> getKerasModelChoices() {
 		Map<String, String> ret = new HashMap<>();
 		// モデル情報保存先パス
-		String modelDirPath = PropUtil.getValue("models.keras.directory.path");
-		
+		String modelDirPath = PropUtil.getValue("workspace.local.keras.directory.path");
+
 		// Kerasのモデル一覧を取得する
 		List<KerasModel> models = kerasManagementService.loadAllKerasModels(modelDirPath, false);
 		if (CollectionUtil.isNotEmpty(models)) {
@@ -536,7 +575,7 @@ public class MainService {
 				ret.put(model.getModelName(), model.getModelName());
 			}
 		}
-		
+
 		return ret;
 	}
 
@@ -547,5 +586,18 @@ public class MainService {
 	 */
 	public Map<String, String> getDatasetChoices() {
 		return kerasManagementService.loadDatasetList();
+	}
+
+	/**
+	 * 指定されたDNNモデル名に関連するファイルをダウンロードする
+	 * 
+	 * @param dnnModelName DNNモデル名
+	 */
+	public boolean downloadDnnFiles(String dnnModelName) {
+		boolean result = kerasManagementService.downloadDnnFiles(dnnModelName, "json");
+		if (result) {
+			result = kerasManagementService.downloadDnnFiles(dnnModelName, "hdf5");
+		}
+		return result;
 	}
 }

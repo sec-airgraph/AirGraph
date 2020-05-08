@@ -20,14 +20,14 @@ function reloadAllWorkspace() {
 function loadAllComponentArea() {
   // コンポーネント領域を空にする
   componentAreaData = new Object();
-  
+
   // 画面をロック
   lockScreen();
   $.ajax({
     type: 'GET',
     url: getUrlLoadComponentArea()
-  }).done(function(resData){
-    if(resData) {
+  }).done(function (resData) {
+    if (resData) {
       // コンポーネント領域取得
       componentAreaData = resData;
       // 表示
@@ -35,6 +35,7 @@ function loadAllComponentArea() {
       // 作業領域も合わせて取得する
       loadAllWorkspace();
     }
+  }).always(function () {
     // 画面ロック解除
     unlockScreen();
   });
@@ -48,21 +49,22 @@ function loadAllComponentArea() {
 function loadAllWorkspace() {
   // 作業領域を空にする
   mainRtsMap = new Object();
-  
+
   // 画面をロック
   lockScreen();
-  
+
   $.ajax({
     type: 'GET',
     url: getUrlLoadAllWorkspace()
-  }).done(function(resData){
-    if(resData && resData.length > 0) {
+  }).done(function (resData) {
+    if (resData && resData.length > 0) {
       workspaceCounter = 0;
       loadAllPackagesWorkspace(resData);
     } else {
       // 1件も存在しない
       curWorkspaceName = 0;
     }
+  }).always(function () {
     // 画面ロック解除
     unlockScreen();
   });
@@ -76,8 +78,8 @@ function updateWorkspaceCount() {
   $.ajax({
     type: 'GET',
     url: getUrlLoadAllWorkspace()
-  }).done(function(resData){
-    if(resData && resData.length > 0) {
+  }).done(function (resData) {
+    if (resData && resData.length > 0) {
       workspaceCounter = resData.length;
     }
   });
@@ -96,26 +98,27 @@ function updateWorkspaceCount() {
 function addPackage(modelId, id, sabstract, version, remoteUrl) {
   // 画面をロック
   lockScreen();
-  
+
   // サーバ上で作業領域に展開する
   $.ajax({
     type: 'POST',
     url: getUrlDropRts(),
     data: {
-      'workPackageName' : curWorkspaceName, // idは先頭にrts_が含まれている
-      'dropedRtsName' : modelId,
-      'newId' : id,
-      'newSAbstruct' : sabstract,
-      'newVersion' : version,
-      'newRemoteUrl' : remoteUrl,
-    } 
-  }).done(function(resData){
-    if(resData) {
+      'workPackageName': curWorkspaceName, // idは先頭にrts_が含まれている
+      'dropedRtsName': modelId,
+      'newId': id,
+      'newSAbstruct': sabstract,
+      'newVersion': version,
+      'newRemoteUrl': remoteUrl,
+    }
+  }).done(function (resData) {
+    if (resData) {
       // 作業領域再読み込み
       reloadAllWorkspace();
     } else {
       // NOP
     }
+  }).always(function () {
     // 画面ロック解除
     unlockScreen();
   });
@@ -132,25 +135,25 @@ function updatePackage(isReload) {
 
   // 画面をロック
   lockScreen();
-  var result = $.ajax({
+  $.ajax({
     type: 'POST',
     url: getUrlUpdatePackage(),
     data: JSON.stringify(mainRtsMap[curWorkspaceName]),
     contentType: 'application/json',
     dataType: 'json',
     scriptCharset: 'utf-8',
-    async : false
-  }).responseText;
+  }).done(function () {
+    // 編集情報を削除する
+    mainRtsMap[curWorkspaceName].editSourceCode = new Object();
 
-  // 編集情報を削除する
-  mainRtsMap[curWorkspaceName].editSourceCode = new Object();
-  
-  if(isReload && isReload === true) {
-    // 作業領域再読み込み
-    reloadAllWorkspace();
-  }
-  // 画面ロック解除
-  unlockScreen();
+    if (isReload && isReload === true) {
+      // 作業領域再読み込み
+      reloadAllWorkspace();
+    }
+  }).always(function () {
+    // 画面ロック解除
+    unlockScreen();
+  });
 }
 
 /**
@@ -164,19 +167,20 @@ function deletePackage(id) {
   $.ajax({
     type: 'POST',
     url: getUrlDeletePackage(),
-    data: { 'rtsName' : id } // idは先頭にrts_が含まれている
-  }).done(function(){
+    data: { 'rtsName': id } // idは先頭にrts_が含まれている
+  }).done(function () {
     // 作業領域設定
     curWorkspaceName = null;
     // 作業領域再読み込み
     reloadAllWorkspace();
-    
+
     if (Object.keys(mainRtsMap).length == 0) {
-        // 作業領域選択コンボ設定
-        setWorkspaceSelectMenu();
-        // コンポーネント領域再描画
-        setComponentAreaInfo();
+      // 作業領域選択コンボ設定
+      setWorkspaceSelectMenu();
+      // コンポーネント領域再描画
+      setComponentAreaInfo();
     }
+  }).always(function () {
     // 画面ロック解除
     unlockScreen();
   });
@@ -194,7 +198,7 @@ function deletePackage(id) {
 function addComponent(modelId) {
   // 画面をロック
   lockScreen();
-  
+
   // 一度保存する
   updatePackage(false);
 
@@ -202,20 +206,21 @@ function addComponent(modelId) {
   var componentName = getComponentNameInComponents(modelId);
   var gitName = getRepositryNameInComponents(modelId);
   var clonedDirectory = getClonedDirectory(modelId);
-  
+
   $.ajax({
     type: 'POST',
     url: getUrlAddComponent(),
     data: {
-      'workPackageName' : curWorkspaceName,
-      'componentName' : componentName,
-      'gitName' : gitName,
-      'clonedDirectory' : clonedDirectory,
+      'workPackageName': curWorkspaceName,
+      'componentName': componentName,
+      'gitName': gitName,
+      'clonedDirectory': clonedDirectory,
     }
-  }).done(function() {
+  }).done(function () {
     // 作業領域再読み込み
     reloadAllWorkspace();
-    // 画面のロックを解除
+  }).always(function () {
+    // 画面ロック解除
     unlockScreen();
   });
 }
@@ -228,10 +233,10 @@ function addComponent(modelId) {
 function createNewComponentAjax(componentData) {
   // 画面をロック
   lockScreen();
-  
+
   // 一度保存する
   updatePackage(false);
-  
+
   $.ajax({
     type: 'POST',
     url: getUrlCreateNewComponent(),
@@ -239,10 +244,11 @@ function createNewComponentAjax(componentData) {
     contentType: 'application/json',
     dataType: 'json',
     scriptCharset: 'utf-8'
-  }).done(function() {
+  }).done(function () {
     // 作業領域再読み込み
     reloadAllWorkspace();
-    // 画面のロックを解除
+  }).always(function () {
+    // 画面ロック解除
     unlockScreen();
   });
 }
@@ -257,35 +263,36 @@ function createNewComponentAjax(componentData) {
 function deleteComponent(componentId, modelId) {
   // 画面をロック
   lockScreen();
-  
+
   // 一度保存する
   updatePackage(false);
-  
+
   // コンポーネント名称を取得する
   var rtcomponent = null;
-  if(mainRtsMap[curWorkspaceName].rtcs) {
-    for(var i = 0; i < mainRtsMap[curWorkspaceName].rtcs.length; i++){
-      if(mainRtsMap[curWorkspaceName].rtcs[i].rtcProfile.id === componentId) {
+  if (mainRtsMap[curWorkspaceName].rtcs) {
+    for (var i = 0; i < mainRtsMap[curWorkspaceName].rtcs.length; i++) {
+      if (mainRtsMap[curWorkspaceName].rtcs[i].rtcProfile.id === componentId) {
         rtcomponent = mainRtsMap[curWorkspaceName].rtcs[i];
         break;
       }
     }
   }
-  
+
   var componentName = rtcomponent.modelProfile.modelName;
-  
+
   $.ajax({
     type: 'POST',
     url: getUrlDeleteComponent(),
     data: {
-      'workPackageName' : curWorkspaceName,
-      'id' : componentId,
-      'componentName' : componentName
+      'workPackageName': curWorkspaceName,
+      'id': componentId,
+      'componentName': componentName
     }
-  }).done(function() {
+  }).done(function () {
     // 作業領域再読み込み
     reloadAllWorkspace();
-    // 画面のロックを解除
+  }).always(function () {
+    // 画面ロック解除
     unlockScreen();
   });
 }
@@ -304,10 +311,10 @@ function deleteComponent(componentId, modelId) {
 function addLogger(componentId, modelId, portName, dataType) {
   // 画面をロック
   lockScreen();
-  
+
   // 一度保存する
   updatePackage(false);
-  
+
   $.ajax({
     type: 'POST',
     url: getUrlUpdatePackage(),
@@ -315,25 +322,26 @@ function addLogger(componentId, modelId, portName, dataType) {
     contentType: 'application/json',
     dataType: 'json',
     scriptCharset: 'utf-8'
-  }).done(function(){
+  }).done(function () {
     // pathUriを取得
     var pathUri = getPathUriInPackage(componentId);
-    
+
     $.ajax({
       type: 'POST',
       url: getUrlAddLogger(),
       data: {
-        'workPackageName' : curWorkspaceName,
-        'id' : componentId,
-        'instanceName' : modelId,
-        'portName' : portName,
+        'workPackageName': curWorkspaceName,
+        'id': componentId,
+        'instanceName': modelId,
+        'portName': portName,
         'pathUri': pathUri,
-        'dataType' : dataType
+        'dataType': dataType
       }
-    }).done(function() {
+    }).done(function () {
       // 作業領域再読み込み
       reloadAllWorkspace();
-      // 画面のロックを解除
+    }).always(function () {
+      // 画面ロック解除
       unlockScreen();
     });
   });
@@ -351,9 +359,9 @@ function canLogging(dataType) {
     type: 'POST',
     url: getUrlCanLogging(),
     data: {
-      'dataType' : dataType
+      'dataType': dataType
     },
-    async : false
+    async: false
   }).responseText;
   return (result === 'OK');
 }
@@ -369,9 +377,9 @@ function isAvailablePackageName(name) {
     type: 'POST',
     url: getUrlAvailablePackageName(),
     data: {
-      'name' : name
+      'name': name
     },
-    async : false
+    async: false
   }).responseText;
   return (result === 'OK');
 }
@@ -387,10 +395,10 @@ function isAvailableComponentName(componentName) {
     type: 'POST',
     url: getUrlAvailableComponentName(),
     data: {
-      'workPackageName' : curWorkspaceName,
-      'componentName' : componentName
+      'workPackageName': curWorkspaceName,
+      'componentName': componentName
     },
-    async : false
+    async: false
   }).responseText;
   return (result === 'OK');
 }
@@ -406,10 +414,10 @@ function getIdlFileChoices(componentName) {
     type: 'POST',
     url: getURLIdlFileChoices(),
     data: {
-      'workPackageName' : curWorkspaceName,
-      'componentName' : componentName
+      'workPackageName': curWorkspaceName,
+      'componentName': componentName
     },
-    async : false
+    async: false
   }).responseJSON;
   return result;
 }
@@ -422,13 +430,13 @@ function getIdlFileChoices(componentName) {
  */
 function getDataTypeChoices(componentName) {
   var result = $.ajax({
-    type : 'POST',
-    url : getURLDataTypeChoices(),
-    data : {
-      'workPackageName' : curWorkspaceName,
-      'componentName' : componentName
+    type: 'POST',
+    url: getURLDataTypeChoices(),
+    data: {
+      'workPackageName': curWorkspaceName,
+      'componentName': componentName
     },
-    async : false
+    async: false
   }).responseJSON;
   return result;
 }
@@ -442,14 +450,14 @@ function getDataTypeChoices(componentName) {
  */
 function getInterfaceTypeChoices(componentName, idlFileName) {
   var result = $.ajax({
-    type : 'POST',
-    url : getURLInterfaceTypeChoices(),
-    data : {
-      'workPackageName' : curWorkspaceName,
-      'componentName' : componentName,
-      'idlFileName' : idlFileName
+    type: 'POST',
+    url: getURLInterfaceTypeChoices(),
+    data: {
+      'workPackageName': curWorkspaceName,
+      'componentName': componentName,
+      'idlFileName': idlFileName
     },
-    async : false
+    async: false
   }).responseJSON;
   return result;
 }
@@ -463,19 +471,19 @@ function uploadIdlFile() {
   var formData = new FormData(
     $('#idlUploadForm').get()[0]
   );
-  
+
   $.ajax({
-    url:getUrlIdlUpload(),
-    method:'post',
-    data:formData,
-    processData:false,
-    contentType:false,
+    url: getUrlIdlUpload(),
+    method: 'post',
+    data: formData,
+    processData: false,
+    contentType: false,
     cache: false
-  }).done(function(data, status, jqxhr) {
-    
-  }).fail(function(data, status, jqxhr) {
-    
-  }); 
+  }).done(function (data, status, jqxhr) {
+
+  }).fail(function (data, status, jqxhr) {
+
+  });
 }
 
 /**
@@ -487,7 +495,7 @@ function getKerasModelChoices() {
   var result = $.ajax({
     type: 'POST',
     url: getUrlKerasModelChoices(),
-    async : false
+    async: false
   }).responseJSON;
   return result;
 }
@@ -501,9 +509,36 @@ function getDatasetChoices() {
   var result = $.ajax({
     type: 'POST',
     url: getUrlDatasetChoices(),
-    async : false
+    async: false
   }).responseJSON;
   return result;
+}
+
+/*************************************************************************
+ * DNN関連
+ *************************************************************************/
+
+/**
+ * 編集したRTSの情報をサーバに通知する
+ * 
+ * @returns
+ */
+function updateDnnModels(dnnModelName, isReload) {
+  // 画面をロック
+  lockScreen();
+  $.ajax({
+    type: 'GET',
+    url: getUrlUpdateDnnModels(),
+    data: { 'dnnModelName': dnnModelName }
+  }).done(function (resData) {
+    if (resData && isReload && isReload === true) {
+      // 作業領域再読み込み
+      reloadAllWorkspace();
+    }
+  }).always(function () {
+    // 画面ロック解除
+    unlockScreen();
+  });
 }
 
 /*************************************************************************
@@ -521,10 +556,10 @@ function commitPackage(commitMessage) {
     type: 'POST',
     url: getUrlCommitPackage(),
     data: {
-      'workPackageName' : curWorkspaceName,
-      'commitMessage' : commitMessage
+      'workPackageName': curWorkspaceName,
+      'commitMessage': commitMessage
     },
-    async : false
+    async: false
   }).responseText;
   return result;
 }
@@ -542,12 +577,12 @@ function pushPackage(user, pass, commitMessage) {
     type: 'POST',
     url: getUrlPushPackage(),
     data: {
-      'workPackageName' : curWorkspaceName,
-      'commitMessage' : commitMessage,
-      'userName' : user,
-      'password' : pass
+      'workPackageName': curWorkspaceName,
+      'commitMessage': commitMessage,
+      'userName': user,
+      'password': pass
     },
-    async : false
+    async: false
   }).responseText;
   return result;
 }
@@ -564,11 +599,11 @@ function pullPackage(user, pass) {
     type: 'POST',
     url: getUrlPullPackage(),
     data: {
-      'workPackageName' : curWorkspaceName,
-      'userName' : user,
-      'password' : pass
+      'workPackageName': curWorkspaceName,
+      'userName': user,
+      'password': pass
     },
-    async : false
+    async: false
   }).responseText;
   return result;
 }
@@ -583,17 +618,17 @@ function pullPackage(user, pass) {
 function commitComponent(componentId, commitMessage) {
   // コンポーネント名称とGitのリポジトリ名称を取得する
   var component = getComponentInPackage(componentId);
-  
+
   var result = $.ajax({
     type: 'POST',
     url: getUrlCommitComponent(),
     data: {
-      'workPackageName' : curWorkspaceName,
-      'componentName' : component.modelProfile.modelName,
-      'gitName' : component.modelProfile.gitName,
-      'commitMessage' : commitMessage
+      'workPackageName': curWorkspaceName,
+      'componentName': component.modelProfile.modelName,
+      'gitName': component.modelProfile.gitName,
+      'commitMessage': commitMessage
     },
-    async : false
+    async: false
   }).responseText;
   return result;
 }
@@ -610,19 +645,19 @@ function commitComponent(componentId, commitMessage) {
 function pushComponent(componentId, user, pass, commitMessage) {
   // コンポーネント名称とGitのリポジトリ名称を取得する
   var component = getComponentInPackage(componentId);
-  
+
   var result = $.ajax({
     type: 'POST',
     url: getUrlPushComponent(),
     data: {
-      'workPackageName' : curWorkspaceName,
-      'componentName' : component.modelProfile.modelName,
-      'gitName' : component.modelProfile.gitName,
-      'commitMessage' : commitMessage,
-      'userName' : user,
-      'password' : pass
+      'workPackageName': curWorkspaceName,
+      'componentName': component.modelProfile.modelName,
+      'gitName': component.modelProfile.gitName,
+      'commitMessage': commitMessage,
+      'userName': user,
+      'password': pass
     },
-    async : false
+    async: false
   }).responseText;
   return result;
 }
@@ -638,18 +673,18 @@ function pushComponent(componentId, user, pass, commitMessage) {
 function pullComponent(componentId, user, pass) {
   // コンポーネント名称とGitのリポジトリ名称を取得する
   var component = getComponentInPackage(componentId);
-  
+
   var result = $.ajax({
     type: 'POST',
     url: getUrlPullComponent(),
     data: {
-      'workPackageName' : curWorkspaceName,
-      'componentName' : component.modelProfile.modelName,
-      'gitName' : component.modelProfile.gitName,
-      'userName' : user,
-      'password' : pass
+      'workPackageName': curWorkspaceName,
+      'componentName': component.modelProfile.modelName,
+      'gitName': component.modelProfile.gitName,
+      'userName': user,
+      'password': pass
     },
-    async : false
+    async: false
   }).responseText;
   return result;
 }
@@ -670,8 +705,8 @@ function buildPackageAll(id) {
   $.ajax({
     type: 'POST',
     url: getUrlBuildAll(),
-    data: { 'rtsName' : id } // idは先頭にrts_が含まれている
-  }).done(function(){
+    data: { 'rtsName': id } // idは先頭にrts_が含まれている
+  }).done(function () {
     // 編集中に移行
     setState(STATE.EDIT);
   });
@@ -689,8 +724,8 @@ function cleanPackageAll(id) {
   $.ajax({
     type: 'POST',
     url: getUrlCleanAll(),
-    data: { 'rtsName' : id } // idは先頭にrts_が含まれている
-  }).done(function(){
+    data: { 'rtsName': id } // idは先頭にrts_が含まれている
+  }).done(function () {
     // 編集中に移行
     setState(STATE.EDIT);
   });
@@ -707,8 +742,8 @@ function runPackage(id) {
   $.ajax({
     type: 'POST',
     url: getUrlRunPackage(),
-    data: { 'rtsName' : id } // idは先頭にrts_が含まれている
-  }).done(function(){
+    data: { 'rtsName': id } // idは先頭にrts_が含まれている
+  }).done(function () {
     // NOP
   });
 
@@ -727,8 +762,8 @@ function terminatePackage(id) {
   $.ajax({
     type: 'POST',
     url: getUrlTerminatePackage(),
-    data: { 'rtsName' : id } // idは先頭にrts_が含まれている
-  }).done(function(result){
+    data: { 'rtsName': id } // idは先頭にrts_が含まれている
+  }).done(function (result) {
     // NOP
   });
 
@@ -745,8 +780,8 @@ function isRunningPackage(id) {
   var result = $.ajax({
     type: 'POST',
     url: getUrlIsRunningPackage(),
-    data: { 'rtsName' : id }, // idは先頭にrts_が含まれている
-    async : false
+    data: { 'rtsName': id }, // idは先頭にrts_が含まれている
+    async: false
   }).responseText;
   return 'true' === result;
 }
@@ -774,87 +809,33 @@ function stopTailLog() {
  * @param obj
  * @returns
  */
-function scrollBottom(obj){
-	if(obj[0]){
-		obj.scrollTop(obj[0].scrollHeight);
-	}
+function scrollBottom(obj) {
+  if (obj[0]) {
+    obj.scrollTop(obj[0].scrollHeight);
+  }
 }
 
 /**
  * ログ監視
  */
 function tailLog() {
-  if($('[name=console-scroll-check]').prop("checked") === true) {
+  if ($('[name=console-scroll-check]').prop("checked") === true) {
     $.ajax({
       type: 'GET',
       url: getUrlTailLog(),
-      data: { 'workPackageName' : curWorkspaceName }
-    }).done(function(log){
-      if(log) {
+      data: { 'workPackageName': curWorkspaceName }
+    }).done(function (log) {
+      if (log) {
         if (log['wasanbon']) {
           wasanbonLogViewer.setValue(log['wasanbon'].replace(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/g, ''));
         }
         if (log['python']) {
           pythonLogViewer.setValue(log['python']);
         }
-        
+
         wasanbonLogViewer.setScrollTop(wasanbonLogViewer.getScrollHeight())
         pythonLogViewer.setScrollTop(pythonLogViewer.getScrollHeight())
       }
     });
   }
 }
-
-/**
- * モニタ監視開始
- */
-function startTailImage(dirctoryPath, elm) {
-  return setInterval(function(){tailImage(dirctoryPath,elm)},1000);
-}
-
-/**
- * モニタ監視終了
- */
-function stopTailImage(id) {
-  clearInterval(id);
-}
-
-/**
- * モニタ監視
- */
-function tailImage(directoryPath, elm) {
-  var url = getUrlTailImage() + '?imageDirectoryPath=' + directoryPath + '&date=' + new Date().getTime() + '&workPackageName=' + curWorkspaceName;
-  $(elm).attr('src', url);
-}
-
-/**
- * データセット監視開始
- * @param elm
- * @returns
- */
-function startTailDataset(elm) {
-  return setInterval(function(){tailDataset(elm)},1000);
-}
-
-/**
- * データ・セット監視終了
- * @param id
- * @returns
- */
-function stopTailDataset(id) {
-  clearInterval(id);
-}
-
-/**
- * データセット監視
- * @param elm
- * @returns
- */
-function tailDataset(elm) {
-  var datasetName = $("#tailimage-dataset-select").val();
-  var directoryPath = getDatasetDirectoryPath() + datasetName;
-  
-  var url = getUrlTailImage() + '?imageDirectoryPath=' + directoryPath + '&date=' + new Date().getTime() + '&workPackageName=' + curWorkspaceName;
-  $(elm).attr('src', url);
-}
-

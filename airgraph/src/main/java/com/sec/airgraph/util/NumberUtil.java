@@ -49,7 +49,7 @@ public class NumberUtil {
 	public static boolean isNotEmpty(Long target) {
 		return target != null;
 	}
-	
+
 	/**
 	 * 指定数値が一致しているかを判定する
 	 * 
@@ -66,7 +66,7 @@ public class NumberUtil {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * 指定数値が一致しているかを判定する
 	 * 
@@ -83,7 +83,7 @@ public class NumberUtil {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * 文字列数字をint型に変換する
 	 * 
@@ -93,9 +93,10 @@ public class NumberUtil {
 	public static int toInt(String str) {
 		return NumberUtils.createInteger(str);
 	}
-	
+
 	/**
 	 * 文字列数字をlong型に変換する
+	 * 
 	 * @param str
 	 * @return
 	 */

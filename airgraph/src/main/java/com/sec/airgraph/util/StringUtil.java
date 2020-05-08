@@ -53,7 +53,7 @@ public class StringUtil {
 	public static boolean isNotEmpty(String... strings) {
 		return !ArrayUtils.isEmpty(strings);
 	}
-	
+
 	/**
 	 * 指定文字列が一致しているかを判定する<br>
 	 * null,空文字は同じものとみなす
@@ -71,7 +71,7 @@ public class StringUtil {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * 文字列を結合する
 	 * 
@@ -85,12 +85,13 @@ public class StringUtil {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * ブラウザ上のモデル名称からPackage名称を取得する
+	 * 
 	 * @param modelName
 	 */
-	public static String getPackageNameFromModelName(String modelName){
+	public static String getPackageNameFromModelName(String modelName) {
 		String packageName = modelName;
 		if (isNotEmpty(packageName)) {
 			if (packageName.contains("rts_")) {

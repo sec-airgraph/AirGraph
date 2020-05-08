@@ -15,11 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sec.rtc.entity.rtc.CodeDirectory;
 import com.sec.keras.entity.field.KerasFieldInfo;
 import com.sec.keras.entity.field.KerasTabInfo;
 import com.sec.keras.entity.model.KerasModel;
 import com.sec.airgraph.util.FileUtil;
 import com.sec.airgraph.util.PropUtil;
+import com.sec.airgraph.util.StringUtil;
 import com.sec.airgraph.util.KerasEditorUtil;
 
 /**
@@ -36,8 +38,17 @@ public class KerasService {
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(KerasService.class);
 
+	/**
+	 * Keras管理サービス
+	 */
 	@Autowired
 	private KerasManagementService kerasManagementService;
+
+	/**
+	 * RTC管理サービス
+	 */
+	@Autowired
+	private RtcManagementService rtcManagementService;
 
 	/**
 	 * Kerasネットワーク情報を全て取得する
@@ -157,13 +168,12 @@ public class KerasService {
 	/**
 	 * モデルを作業領域フォルダに保存する
 	 * 
+	 * @param dirName
 	 * @param modelString
 	 */
-	public void saveModel(String modelString) {
+	public void saveModel(String dirName, String modelString) {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.keras.directory.path");
-		// 保存先パス
-		String modelDirPath = PropUtil.getValue("models.keras.directory.path");
 
 		ObjectMapper mapper = new ObjectMapper();
 		KerasModel savingModel = null;
@@ -171,32 +181,29 @@ public class KerasService {
 			// デシリアライズ
 			savingModel = mapper.readValue(modelString, KerasModel.class);
 
-			// 作業ディレクトリが存在しなければ作成
-			String sourceDirPath = workspaceDirPath + savingModel.getModelName();
-			File sourceDir = new File(sourceDirPath);
-			if (sourceDir.exists() == false) {
-				sourceDir.mkdirs();
-			}
+			// 保存先ディレクトリが存在しなければ作成
+			String targetDirPath = workspaceDirPath + savingModel.getModelName();
+			File targetDir = new File(targetDirPath);
+			FileUtil.createDirectory(targetDir);
+
 			// 作業ディレクトリに作業内容を保存
 			// JSONファイルを保存
-			String sourceFilePath = sourceDirPath + "/" + savingModel.getModelName() + ".json";
-			FileUtil.writeAll(sourceFilePath, savingModel.getJsonString());
+			String modelFilePath = targetDirPath + "/" + savingModel.getModelName() + ".json";
+			FileUtil.writeAll(modelFilePath, savingModel.getJsonString());
 
 			// data_maker.pyを保存
-			String dataMakerFilePath = sourceDirPath + "/" + "data_maker.py";
+			String dataMakerFilePath = targetDirPath + "/" + "data_maker.py";
 			FileUtil.writeAll(dataMakerFilePath, savingModel.getDataMakerStr());
 
 			// データ・セット連携
 			String datasetName = savingModel.getDataset();
-			FileUtil.createDatasetLink(sourceDirPath, datasetName);
+			FileUtil.createDatasetLink(targetDirPath, datasetName);
 
-			// 保存先がすでに存在する場合はフォルダ内を再帰的に削除
-			String targetDirPath = modelDirPath + savingModel.getModelName();
-			FileUtil.deleteDirectory(new File(targetDirPath));
-
-			// // ディレクトリごとコピー
-			// FileUtil.directoryCopy(new File(sourceDirPath), new
-			// File(modelDirPath));
+			// 保存先のディレクトリ名と現在のディレクトリが異なる場合は古い方を削除する
+			if (!StringUtil.equals(savingModel.getModelName(), dirName)) {
+				File sourceDir = new File(workspaceDirPath + dirName);
+				FileUtil.deleteDirectory(sourceDir);
+			}
 
 		} catch (IOException e) {
 			logger.error("exception handled. ex:", e);
@@ -218,8 +225,7 @@ public class KerasService {
 	/**
 	 * Kerasの学習実行
 	 * 
-	 * @param modelString
-	 *            modelの情報が乗ったJSON文字列
+	 * @param modelString modelの情報が乗ったJSON文字列
 	 */
 	public void fit(String modelString) {
 		// 作業領域パス
@@ -270,7 +276,7 @@ public class KerasService {
 	public Map<String, String> getDatasetChoices() {
 		return kerasManagementService.loadDatasetList();
 	}
-	
+
 	/**
 	 * データセットディレクトリを圧縮して保存先を返す
 	 * 
@@ -280,7 +286,7 @@ public class KerasService {
 	public String downloadDataset(String workspaceModelName) {
 		return kerasManagementService.downloadDataset(workspaceModelName);
 	}
-	
+
 	/**
 	 * データセットファイルをアップロードする
 	 * 
@@ -288,5 +294,58 @@ public class KerasService {
 	 */
 	public void uploadDataset(MultipartFile datasetFile) {
 		kerasManagementService.uploadDataset(datasetFile);
+	}
+
+	/**
+	 * 指定されたデータセットのデータの一覧を取得する
+	 * 
+	 * @param datasetName
+	 * @return
+	 */
+	public CodeDirectory getDatasetDataList(String datasetName) {
+		// データセット領域のパス
+		String dataSetDirPath = PropUtil.getValue("dataset.directory.path") + datasetName;
+		// データセット以下のファイルの一覧を取得する
+		return rtcManagementService.getCodeFile(dataSetDirPath, null, null, null, null);
+	}
+
+	/**
+	 * ロボットの選択肢を取得する
+	 * 
+	 * @return
+	 */
+	public Map<String, String> getRobotChoices() {
+		return kerasManagementService.getRobotChoices();
+	}
+
+	/**
+	 * 指定されたロボットのデータセットの一覧を取得する
+	 * @param robotHostName
+	 * @return
+	 */
+	public Map<String, String> getRobotDatasetChoices(String robotHostName) {
+		return kerasManagementService.getRobotDatasetChoices(robotHostName);
+	}
+
+	/**
+	 * 指定されたデータセットディレクトリのデータを取得する
+	 * 
+	 * @param datasetName
+	 * @param targetDate
+	 * @return
+	 */
+	public boolean compressDatasets(String datasetName, String targetDate) {
+		return kerasManagementService.compressDatasets(datasetName, targetDate);
+	}
+
+	/**
+	 * 指定されたデータセットをダウンロードする
+	 * 
+	 * @param robotHostName
+	 * @param datasetName
+	 * @param targetDate
+	 */
+	public boolean downloadDatasets(String robotHostName, String datasetName, String targetDate) {
+		return kerasManagementService.downloadDatasets(robotHostName, datasetName, targetDate);
 	}
 }

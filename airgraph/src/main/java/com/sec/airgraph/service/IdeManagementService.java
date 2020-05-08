@@ -28,11 +28,11 @@ public class IdeManagementService {
 	 * logger
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(IdeManagementService.class);
-	
+
 	/************************************************************
 	 * Git関連
 	 ************************************************************/
-	
+
 	/**
 	 * PackageをローカルリポジトリにCommitする
 	 * 
@@ -43,18 +43,18 @@ public class IdeManagementService {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String workPackageDirPath = workspaceDirPath + File.separator + workPackageName;
-		
+
 		// コンポーネントをパッケージにリンクする
 		WasanbonUtil.syncRtcToPackage(workPackageDirPath);
-		
+
 		// Commitする
 		String result = GitUtil.gitCommit(workPackageDirPath, commitMessage);
-		
+
 		logger.info("Commit Package. package[" + workPackageName + "]result[" + result + "]");
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * PackageをリモートリポジトリにPushする
 	 * 
@@ -64,32 +64,34 @@ public class IdeManagementService {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String workPackageDirPath = workspaceDirPath + File.separator + workPackageName;
-		
+
 		// URLをID/Pass付きに変換する
 		String gitUrl = GitUtil.getGitUrl(workPackageDirPath).trim();
 		String newGitUrl = gitUrl;
-		
+
 		if (StringUtil.isNotEmpty(userName) && StringUtil.isNotEmpty(password)) {
 			try {
-				newGitUrl = gitUrl.replace("://", "://" + URLEncoder.encode(userName, "UTF-8") + ":" + URLEncoder.encode(password, "UTF-8") + "@").trim();
+				newGitUrl = gitUrl.replace("://",
+						"://" + URLEncoder.encode(userName, "UTF-8") + ":" + URLEncoder.encode(password, "UTF-8") + "@")
+						.trim();
 				GitUtil.changeRemoteUrl(workPackageDirPath, newGitUrl);
 			} catch (UnsupportedEncodingException e) {
 				logger.error("Exception Handled. ", e);
 				newGitUrl = gitUrl;
 			}
 		}
-		
+
 		// Pushする
 		String result = GitUtil.gitPush(workPackageDirPath);
-		
+
 		// URLを戻す
 		GitUtil.changeRemoteUrl(workPackageDirPath, gitUrl);
-		
+
 		logger.info("Push Package. package[" + workPackageName + "]result[" + result + "]");
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * PackageをリモートリポジトリからPullする
 	 * 
@@ -99,32 +101,34 @@ public class IdeManagementService {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String workPackageDirPath = workspaceDirPath + File.separator + workPackageName;
-		
+
 		// URLをID/Pass付きに変換する
 		String gitUrl = GitUtil.getGitUrl(workPackageDirPath).trim();
 		String newGitUrl = gitUrl;
-		
+
 		if (StringUtil.isNotEmpty(userName) && StringUtil.isNotEmpty(password)) {
 			try {
-				newGitUrl = gitUrl.replace("://", "://" + URLEncoder.encode(userName, "UTF-8") + ":" + URLEncoder.encode(password, "UTF-8") + "@").trim();
+				newGitUrl = gitUrl.replace("://",
+						"://" + URLEncoder.encode(userName, "UTF-8") + ":" + URLEncoder.encode(password, "UTF-8") + "@")
+						.trim();
 				GitUtil.changeRemoteUrl(workPackageDirPath, newGitUrl);
 			} catch (UnsupportedEncodingException e) {
 				logger.error("Exception Handled. ", e);
 				newGitUrl = gitUrl;
 			}
 		}
-		
+
 		// Pushする
 		String result = GitUtil.gitPull(workPackageDirPath);
-		
+
 		// URLを戻す
 		GitUtil.changeRemoteUrl(workPackageDirPath, gitUrl);
-		
+
 		logger.info("Pull Package. package[" + workPackageName + "]result[" + result + "]");
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * ComponentをローカルリポジトリにCommitする
 	 * 
@@ -140,12 +144,13 @@ public class IdeManagementService {
 
 		// Commitする
 		String result = GitUtil.gitCommit(rtcDirPath, commitMessage);
-				
-		logger.info("Commit Component. package[" + workPackageName + "]componentName[" + componentName + "]result[" + result + "]");
-		
+
+		logger.info("Commit Component. package[" + workPackageName + "]componentName[" + componentName + "]result["
+				+ result + "]");
+
 		return result;
 	}
-	
+
 	/**
 	 * ComponentをリモートリポジトリにPushする
 	 * 
@@ -159,32 +164,35 @@ public class IdeManagementService {
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String rtcDirPath = StringUtil.concatenate(File.separator, workspaceDirPath, workPackageName,
 				DIR_NAME.PACKAGE_RTC_DIR_NAME, componentName);
-		
+
 		// URLをID/Pass付きに変換する
 		String gitUrl = GitUtil.getGitUrl(rtcDirPath).trim();
 		String newGitUrl = gitUrl;
-		
+
 		if (StringUtil.isNotEmpty(userName) && StringUtil.isNotEmpty(password)) {
 			try {
-				newGitUrl = gitUrl.replace("://", "://" + URLEncoder.encode(userName, "UTF-8") + ":" + URLEncoder.encode(password, "UTF-8") + "@").trim();
+				newGitUrl = gitUrl.replace("://",
+						"://" + URLEncoder.encode(userName, "UTF-8") + ":" + URLEncoder.encode(password, "UTF-8") + "@")
+						.trim();
 				GitUtil.changeRemoteUrl(rtcDirPath, newGitUrl);
 			} catch (UnsupportedEncodingException e) {
 				logger.error("Exception Handled. ", e);
 				newGitUrl = gitUrl;
 			}
 		}
-		
+
 		// Pushする
 		String result = GitUtil.gitPush(rtcDirPath);
-		
+
 		// URLを戻す
 		GitUtil.changeRemoteUrl(rtcDirPath, gitUrl);
-		
-		logger.info("Push Component. package[" + workPackageName + "]componentName[" + componentName + "]result[" + result + "]");
-		
+
+		logger.info("Push Component. package[" + workPackageName + "]componentName[" + componentName + "]result["
+				+ result + "]");
+
 		return result;
 	}
-	
+
 	/**
 	 * ComponentをリモートリポジトリからPullする
 	 * 
@@ -198,29 +206,32 @@ public class IdeManagementService {
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String rtcDirPath = StringUtil.concatenate(File.separator, workspaceDirPath, workPackageName,
 				DIR_NAME.PACKAGE_RTC_DIR_NAME, componentName);
-		
+
 		// URLをID/Pass付きに変換する
 		String gitUrl = GitUtil.getGitUrl(rtcDirPath).trim();
 		String newGitUrl = gitUrl;
-		
+
 		if (StringUtil.isNotEmpty(userName) && StringUtil.isNotEmpty(password)) {
 			try {
-				newGitUrl = gitUrl.replace("://", "://" + URLEncoder.encode(userName, "UTF-8") + ":" + URLEncoder.encode(password, "UTF-8") + "@").trim();
+				newGitUrl = gitUrl.replace("://",
+						"://" + URLEncoder.encode(userName, "UTF-8") + ":" + URLEncoder.encode(password, "UTF-8") + "@")
+						.trim();
 				GitUtil.changeRemoteUrl(rtcDirPath, newGitUrl);
 			} catch (UnsupportedEncodingException e) {
 				logger.error("Exception Handled. ", e);
 				newGitUrl = gitUrl;
 			}
 		}
-		
+
 		// Pushする
 		String result = GitUtil.gitPull(rtcDirPath);
-		
+
 		// URLを戻す
 		GitUtil.changeRemoteUrl(rtcDirPath, gitUrl);
-		
-		logger.info("Pull Component. package[" + workPackageName + "]componentName[" + componentName + "]result[" + result + "]");
-		
+
+		logger.info("Pull Component. package[" + workPackageName + "]componentName[" + componentName + "]result["
+				+ result + "]");
+
 		return result;
 	}
 }
