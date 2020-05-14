@@ -5,57 +5,59 @@
  * モデル・レイヤー情報を取得し展開する
  */
 function loadAllNetworkArea() {
-	// 画面をロック
-	lockScreen();
-	$.ajax({
-		type: 'GET',
-		url: getUrlLoadNetworkArea()
-	}).done(function(resData){
-		if(resData) {
-			// ネットワーク領域取得
-			setNetworkAreaInfo(resData);
-			// プロパティ情報取得
-			loadAllLayerPropertyTemplates();
-			// 作業領域も合わせて取得する
-			loadAllWorkspace();
-			// TODO:
-			if(curWorkspaceName == null || modelMap[curWorkspaceName] == null){
-				unlockScreen();
-				return;
-			}
-			// モデルを更新
-			var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
-			loadPackageWorkspace(model);
-			
-			// ワークスペースセレクタを更新
-			setWorkspaceSelectMenu();
-			setWorkingAccordionInfo();
-			
-			// プロパティ表示の更新
-			setPropertyAreaForModel();
-		}
-		// 画面ロック解除
-		unlockScreen();
-	});
+  // 画面をロック
+  lockScreen();
+  $.ajax({
+    type: 'GET',
+    url: getUrlLoadNetworkArea()
+  }).done(function (resData) {
+    if (resData) {
+      // ネットワーク領域取得
+      setNetworkAreaInfo(resData);
+      // プロパティ情報取得
+      loadAllLayerPropertyTemplates();
+      // 作業領域も合わせて取得する
+      loadAllWorkspace();
+      // TODO:
+      if (curWorkspaceName == null || modelMap[curWorkspaceName] == null) {
+        unlockScreen();
+        return;
+      }
+      // モデルを更新
+      var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
+      loadPackageWorkspace(model);
+
+      // ワークスペースセレクタを更新
+      setWorkspaceSelectMenu();
+      setWorkingAccordionInfo();
+
+      // プロパティ表示の更新
+      setPropertyAreaForModel();
+    }
+    // 画面ロック解除
+    unlockScreen();
+  });
 }
 
 /**
  * レイヤープロパティ設定情報を取得し展開する
  */
 function loadAllLayerPropertyTemplates() {
-	// 画面をロック
-	lockScreen();
-	$.ajax({
-		type: 'GET',
-		url: getUrlLoadAllLayerPropertyTemplates()
-	}).done(function(resData){
-		if(resData) {
-			resData.forEach(function(propJson){
-				var prop = JSON.parse(propJson);
-				templateLayerPropertyMap[prop.class_name] = prop;
-			});
-		}
-	});
+  // 画面をロック
+  lockScreen();
+  $.ajax({
+    type: 'GET',
+    url: getUrlLoadAllLayerPropertyTemplates()
+  }).done(function (resData) {
+    if (resData) {
+      resData.forEach(function (propJson) {
+        var prop = JSON.parse(propJson);
+        templateLayerPropertyMap[prop.class_name] = prop;
+      });
+    }
+    // 画面ロック解除
+    unlockScreen();
+  });
 }
 
 
@@ -64,22 +66,22 @@ function loadAllLayerPropertyTemplates() {
  * @returns
  */
 function loadAllWorkspace() {
-	$.ajax({
-		type: 'GET',
-		url: getUrlLoadAllWorkspace()
-	}).done(function(resData){
-		if(resData && resData.length > 0) {
-			workspaceCounter = 1;
-			while(templateModelMap[WORKSPACE_PREFIX + workspaceCounter] != null){
-				workspaceCounter++;
-			}
-			loadAllPackagesWorkspace(resData);
-		} else {
-			// 失敗した場合は中止
-			curWorkspaceName = null;
-			return ;
-		}
-	});
+  $.ajax({
+    type: 'GET',
+    url: getUrlLoadAllWorkspace()
+  }).done(function (resData) {
+    if (resData && resData.length > 0) {
+      workspaceCounter = 1;
+      while (templateModelMap[WORKSPACE_PREFIX + workspaceCounter] != null) {
+        workspaceCounter++;
+      }
+      loadAllPackagesWorkspace(resData);
+    } else {
+      // 失敗した場合は中止
+      curWorkspaceName = null;
+      return;
+    }
+  });
 }
 
 /**
@@ -87,24 +89,14 @@ function loadAllWorkspace() {
  * @returns
  */
 function saveModel() {
-	$.ajax({
-		type: 'POST',
-		url: getUrlSaveModel(),
-		data: JSON.stringify(modelMap[curWorkspaceName]),
-		contentType: 'application/json',
-		dataType: 'json',
-		scriptCharset: 'utf-8'
-	}).done(function(){
-//		// 保存したモデルをワークエリアから削除し、モデルを切り替え
-//		delete modelMap[curWorkspaceName];
-//		if(Object.keys(modelMap).length != 0){
-//			curWorkspaceName = Object.keys(modelMap)[0];			
-//		}else{
-//			curWorkspaceName = null;
-//		}
-		// 再読み込み
-		loadAllNetworkArea();
-	});
+  $.ajax({
+    type: 'POST',
+    url: getUrlSaveModel(),
+    data: { 'dirName': modelMap[curWorkspaceName].dirName, 'json': JSON.stringify(modelMap[curWorkspaceName]) },
+  }).done(function () {
+    // 再読み込み
+    loadAllNetworkArea();
+  });
 }
 
 /**
@@ -115,13 +107,13 @@ function deleteModel() {
   $.ajax({
     type: 'POST',
     url: getUrlDeleteModel(),
-    data: { 'modelName' : modelMap[curWorkspaceName].modelName },
-  }).done(function(){
+    data: { 'modelName': modelMap[curWorkspaceName].modelName },
+  }).done(function () {
     // 保存したモデルをワークエリアから削除し、モデルを切り替え
     delete modelMap[curWorkspaceName];
-    if(Object.keys(modelMap).length != 0){
+    if (Object.keys(modelMap).length != 0) {
       curWorkspaceName = Object.keys(modelMap)[0];
-    }else{
+    } else {
       curWorkspaceName = null;
     }
     // 再読み込み
@@ -138,9 +130,63 @@ function getDatasetChoices() {
   var result = $.ajax({
     type: 'POST',
     url: getUrlDatasetChoices(),
-    async : false
+    async: false
   }).responseJSON;
   return result;
+}
+
+/**
+ * ロボットの一覧を取得する
+ * 
+ * @returns
+ */
+function getRobotChoices() {
+  var result = $.ajax({
+    type: 'POST',
+    url: getUrlRobotChoices(),
+    async: false
+  }).responseJSON;
+  return result;
+}
+
+/**
+ * 指定されたロボットのデータセットの一覧を取得する
+ * 
+ * @returns
+ */
+function getRobotDatasetChoices(robotHostName) {
+  var result = $.ajax({
+    type: 'POST',
+    url: getUrlRobotDatasetChoices(),
+    data: {"robotHostName" : robotHostName},
+    async: false
+  }).responseJSON;
+  return result;
+}
+
+/**
+ * 指定されたロボットのデータセットを取得する
+ * 
+ * @returns
+ */
+function getRobotDatasets(robotHostName, datasetName, targetDate) {
+  lockScreen();
+  $.ajax({
+    type: 'POST',
+    url: getUrlRobotDatasets(),
+    data: {
+      "robotHostName" : robotHostName,
+      "datasetName" : datasetName,
+      "targetDate" : targetDate
+    }
+  }).done(function () {
+    // データセット名の一覧を取得
+    var datasets = getDatasetChoices();
+    w2ui['dataset-monitor-top'].fields[0].options.items = datasets;
+    w2ui['dataset-monitor-top'].refresh();
+
+    unlockScreen();
+  });
 }
 
 /*************************************************************************
@@ -150,17 +196,17 @@ function getDatasetChoices() {
  * Kerasで学習を実行する
  * @returns
  */
-function runKerasFit(){
-	openConsoleLog();
-	$.ajax({
-		type: 'POST',
-		url: getUrlRunKerasFit(),
-		data: JSON.stringify(modelMap[curWorkspaceName]),
-		contentType: 'application/json',
-		dataType: 'json',
-		scriptCharset: 'utf-8'
-	}).done(function(){
-	});
+function runKerasFit() {
+  openConsoleLog();
+  $.ajax({
+    type: 'POST',
+    url: getUrlRunKerasFit(),
+    data: JSON.stringify(modelMap[curWorkspaceName]),
+    contentType: 'application/json',
+    dataType: 'json',
+    scriptCharset: 'utf-8'
+  }).done(function () {
+  });
 }
 
 /**
@@ -172,19 +218,19 @@ function uploadDataMakerFile() {
   var formData = new FormData(
     $('#dataMakerUploadForm').get()[0]
   );
-  
+
   $.ajax({
-    url:getUrlDataMakerUpload(),
-    method:'post',
-    data:formData,
-    processData:false,
-    contentType:false,
+    url: getUrlDataMakerUpload(),
+    method: 'post',
+    data: formData,
+    processData: false,
+    contentType: false,
     cache: false
-  }).done(function(data, status, jqxhr) {
-    
-  }).fail(function(data, status, jqxhr) {
-    
-  }); 
+  }).done(function (data, status, jqxhr) {
+
+  }).fail(function (data, status, jqxhr) {
+
+  });
 }
 
 /**
@@ -195,19 +241,19 @@ function uploadDataset() {
   var formData = new FormData(
     $('#datasetUploadForm').get()[0]
   );
-  
+
   $.ajax({
-    url:getUrlDatasetUpload(),
-    method:'post',
-    data:formData,
-    processData:false,
-    contentType:false,
+    url: getUrlDatasetUpload(),
+    method: 'post',
+    data: formData,
+    processData: false,
+    contentType: false,
     cache: false
-  }).done(function(data, status, jqxhr) {
-    
-  }).fail(function(data, status, jqxhr) {
-    
-  }); 
+  }).done(function (data, status, jqxhr) {
+
+  }).fail(function (data, status, jqxhr) {
+
+  });
 }
 
 /*************************************************************************
@@ -233,10 +279,10 @@ function stopTailLog() {
  * @param obj
  * @returns
  */
-function scrollBottom(obj){
-	if(obj[0]){
-		obj.scrollTop(obj[0].scrollHeight);
-	}
+function scrollBottom(obj) {
+  if (obj[0]) {
+    obj.scrollTop(obj[0].scrollHeight);
+  }
 }
 
 /**
@@ -244,13 +290,13 @@ function scrollBottom(obj){
  * TODO: keras用に改変
  */
 function tailLog() {
-  if($('[name=console-scroll-check]').prop("checked") === true) {
+  if ($('[name=console-scroll-check]').prop("checked") === true) {
     $.ajax({
       type: 'GET',
       url: getUrlTailLog(),
-      data: { 'workPackageName' : curWorkspaceName }
-    }).done(function(log){
-      if(log) {
+      data: { 'workPackageName': curWorkspaceName }
+    }).done(function (log) {
+      if (log) {
         $('#console-text').html(log['keras']);
         scrollBottom($('#console-text'));
       }

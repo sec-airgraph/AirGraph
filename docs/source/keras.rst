@@ -10,7 +10,7 @@ AirGraph (Keras Editor)
 ---------
 AirGraph(Keras Editor)の主な機能は次の通りです．
 
-- WEBブラウザ上でKerasによるDNN開発が可能
+- WEBブラウザ上でKerasによるDeep Learning開発が可能
 - 作成したモデル単位での一覧・再利用が可能
 - 既存のKerasモデルをインポートすることが可能
 

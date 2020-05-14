@@ -128,7 +128,7 @@ public class WasanbonManagementService {
 
 		// Git初期化
 		GitUtil.gitInit(packageDir.getPath());
-		
+
 		// GitIgnore
 		GitUtil.createGitIgnoreForPackage(packageDir.getPath());
 
@@ -191,7 +191,7 @@ public class WasanbonManagementService {
 
 		// リモートリポジトリの内容をマージする
 		GitUtil.gitFetchOrigin(destPackageDir.getPath(), true);
-		
+
 		// GitIgnore
 		GitUtil.createGitIgnoreForPackage(destPackageDir.getPath());
 
@@ -396,7 +396,7 @@ public class WasanbonManagementService {
 
 		// Git初期化
 		GitUtil.gitInit(newRtcDir.getPath());
-		
+
 		// GitIgnore
 		GitUtil.createGitIgnoreForComponent(newRtcDir.getPath());
 

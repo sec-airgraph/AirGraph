@@ -184,10 +184,13 @@ public class RtcUtil {
 		stringList.add("\"activity_type\", \"" + rtcProfile.getBasicInfo().getActivityType() + "\",");
 		// kind
 		stringList.add("\"kind\", \"" + (StringUtil.isNotEmpty(rtcProfile.getBasicInfo().getComponentKind())
-				? rtcProfile.getBasicInfo().getComponentKind() : "") + "\",");
+				? rtcProfile.getBasicInfo().getComponentKind()
+				: "") + "\",");
 		// max_instance
-		stringList.add("\"max_instance\", \"" + (rtcProfile.getBasicInfo().getMaxInstances() != null
-				? rtcProfile.getBasicInfo().getMaxInstances() : "") + "\",");
+		stringList.add("\"max_instance\", \""
+				+ (rtcProfile.getBasicInfo().getMaxInstances() != null ? rtcProfile.getBasicInfo().getMaxInstances()
+						: "")
+				+ "\",");
 
 		return stringList;
 	}
@@ -974,8 +977,7 @@ public class RtcUtil {
 	 * @param moduleName
 	 * @param newComponentKind
 	 */
-	public static void updateComponentKindCppHeader(String headerFilePath, String moduleName,
-			String newComponentKind) {
+	public static void updateComponentKindCppHeader(String headerFilePath, String moduleName, String newComponentKind) {
 		try {
 			File file = new File(headerFilePath);
 			ArrayList<String> strArr = new ArrayList<String>();
@@ -991,17 +993,17 @@ public class RtcUtil {
 					if (!includeFlg && !constructFlg) {
 						strArr.add(s);
 					}
-					
+
 					if (includeFlg) {
 						strArr.add("#include <rtm/" + newComponentKind + "Base.h>");
 						includeFlg = false;
 					}
-					
+
 					if (constructFlg) {
 						strArr.add("  : public RTC::" + newComponentKind + "Base");
 						constructFlg = false;
 					}
-					
+
 					if (s.contains("#include <rtm/Manager.h>")) {
 						includeFlg = true;
 					}
@@ -2059,7 +2061,7 @@ public class RtcUtil {
 			}
 		}
 	}
-	
+
 	/**
 	 * RTC-Template用ソースコード自動生成
 	 * 
@@ -2070,7 +2072,7 @@ public class RtcUtil {
 	public static void autoGenerateRtcTemplate(String filePath, List<String> insertStr, String tagStr) {
 		autoGenerateSourceCode(filePath, insertStr, tagStr, "/rtc-template");
 	}
-	
+
 	/**
 	 * ソースコード自動生成（複数行挿入）
 	 * 
@@ -2079,7 +2081,8 @@ public class RtcUtil {
 	 * @param startStr
 	 * @param endStr
 	 */
-	public static boolean autoGenerateSourceCode(String filePath, List<String> insertStr, String startStr, String endStr) {
+	public static boolean autoGenerateSourceCode(String filePath, List<String> insertStr, String startStr,
+			String endStr) {
 		try {
 			File file = new File(filePath);
 			ArrayList<String> strArr = new ArrayList<String>();
@@ -2112,7 +2115,7 @@ public class RtcUtil {
 					br.close();
 				}
 			}
-			
+
 			if (targetFlg) {
 				return false;
 			}
@@ -2135,7 +2138,7 @@ public class RtcUtil {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Cppのヘッダファイルのアクティビティのコメント有無を切替える
 	 * 
@@ -2188,7 +2191,7 @@ public class RtcUtil {
 			logger.error("exception handled.", e);
 		}
 	}
-	
+
 	/**
 	 * Cppのソースファイルのアクティビティのコメント有無を切替える
 	 * 
@@ -2204,7 +2207,6 @@ public class RtcUtil {
 			int commentStartLine = -1;
 			int commentEndLine = -1;
 			int methodLine = -1;
-			
 
 			BufferedReader br = null;
 			try {
@@ -2219,12 +2221,12 @@ public class RtcUtil {
 						commentStartLine = line - 1;
 						targetFlg = true;
 					}
-					
+
 					if (s.startsWith("}") && targetFlg) {
 						commentEndLine = line + 1;
 						targetFlg = false;
 					}
-					
+
 					strArr.add(s);
 					line++;
 				}
@@ -2235,7 +2237,7 @@ public class RtcUtil {
 					br.close();
 				}
 			}
-			
+
 			if (commentStartLine < 0 || commentEndLine < 0 || methodLine < 0) {
 				return;
 			}
@@ -2269,7 +2271,7 @@ public class RtcUtil {
 			logger.error("exception handled.", e);
 		}
 	}
-	
+
 	/**
 	 * Pythonのソースコードのアクティビティのコメント有無を切替える
 	 * 
@@ -2285,7 +2287,6 @@ public class RtcUtil {
 			int commentStartLine = -1;
 			int commentEndLine = -1;
 			int methodLine = -1;
-			
 
 			BufferedReader br = null;
 			try {
@@ -2299,16 +2300,16 @@ public class RtcUtil {
 						methodLine = line;
 						targetFlg = true;
 					}
-					
+
 					if (s.endsWith("##") && methodLine < 0) {
 						commentStartLine = line;
 					}
-					
+
 					if (s.contains("return RTC.RTC_OK") && targetFlg) {
 						commentEndLine = line;
 						targetFlg = false;
 					}
-					
+
 					strArr.add(s);
 					line++;
 				}
@@ -2319,7 +2320,7 @@ public class RtcUtil {
 					br.close();
 				}
 			}
-			
+
 			if (commentStartLine < 0 || commentEndLine < 0 || methodLine < 0) {
 				return;
 			}
@@ -2420,10 +2421,7 @@ public class RtcUtil {
 		// 存在しない場合は探してコピーしてくる
 		if (targetFile == null) {
 			// OpenRTMのフォルダを調べる
-			String openRtmDir = PropUtil.getValue("openrtm.rtm.dir");
-			if (!(new File(openRtmDir).exists())) {
-				openRtmDir = PropUtil.getValue("openrtm.rtm.local.dir");
-			}
+			String openRtmDir = RtmEditorUtil.getOpenRtmDir();
 			targetFile = FileUtil.searchFileWithSubDir(openRtmDir, idlFileName, "idl");
 
 			if (targetFile != null) {
@@ -2609,11 +2607,11 @@ public class RtcUtil {
 		// 一時領域を削除する
 		FileUtil.deleteDirectory(tmpDir);
 	}
-	
+
 	/************************************************************
 	 * コンフィグファイル自動反映処理
 	 ************************************************************/
-	
+
 	/**
 	 * ExecutionRateを更新する
 	 * 
@@ -2662,6 +2660,4 @@ public class RtcUtil {
 			logger.error("exception handled.", e);
 		}
 	}
-
-
 }

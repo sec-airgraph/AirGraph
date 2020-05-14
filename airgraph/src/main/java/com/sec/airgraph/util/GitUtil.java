@@ -69,12 +69,13 @@ public class GitUtil {
 	public static String gitPush(String gitDirPath) {
 		StringBuilder sb = new StringBuilder();
 		String rslt = "";
-		
+
 		// リモートブランチの数を調べる
 		int remoteBranchCount = getRemoteBranchCount(gitDirPath);
 		if (remoteBranchCount <= 0) {
 			// 一度もPushしていない場合はMasterにPushする
-			rslt = ProcessUtil.startProcessReturnStringWithWorkingDerectory(gitDirPath, "git", "push", "-u", "origin", "master");
+			rslt = ProcessUtil.startProcessReturnStringWithWorkingDerectory(gitDirPath, "git", "push", "-u", "origin",
+					"master");
 		} else {
 			// ブランチを取得
 			String branch = getCurrentBranch(gitDirPath);
@@ -82,9 +83,10 @@ public class GitUtil {
 				branch = "master";
 			}
 			// Pushする
-			rslt = ProcessUtil.startProcessReturnStringWithWorkingDerectory(gitDirPath, "git", "push", "origin", branch);
+			rslt = ProcessUtil.startProcessReturnStringWithWorkingDerectory(gitDirPath, "git", "push", "origin",
+					branch);
 		}
-		
+
 		if (StringUtil.isNotEmpty(rslt)) {
 			sb.append(rslt);
 		}
@@ -93,7 +95,7 @@ public class GitUtil {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * リモートブランチの数を取得する
 	 * 
@@ -108,7 +110,7 @@ public class GitUtil {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * 現在のブランチを取得する
 	 * 
@@ -116,7 +118,8 @@ public class GitUtil {
 	 * @return
 	 */
 	public static String getCurrentBranch(String gitDirPath) {
-		String rslt = ProcessUtil.startProcessReturnStringWithWorkingDerectory(gitDirPath, "git", "branch", "--contains=HEAD");
+		String rslt = ProcessUtil.startProcessReturnStringWithWorkingDerectory(gitDirPath, "git", "branch",
+				"--contains=HEAD");
 		if (StringUtil.isNotEmpty(rslt)) {
 			rslt = rslt.trim().replace("* ", "");
 		}

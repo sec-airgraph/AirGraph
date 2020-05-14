@@ -116,11 +116,11 @@ public class WasanbonUtil {
 	 */
 	public static String cloneRtcToPackage(String packagesLocalDirPath, String rtcRepositoryName) {
 		// RTCをCloneする
-		String result = ProcessUtil.startProcessReturnStringWithWorkingDerectory(packagesLocalDirPath, "python", "mgr.py", "repository",
-				"clone", rtcRepositoryName, "-v");
+		String result = ProcessUtil.startProcessReturnStringWithWorkingDerectory(packagesLocalDirPath, "python",
+				"mgr.py", "repository", "clone", rtcRepositoryName, "-v");
 		return result;
 	}
-	
+
 	/**
 	 * 指定されたPackageにRtcに同期化する
 	 * 
@@ -128,7 +128,8 @@ public class WasanbonUtil {
 	 */
 	public static String syncRtcToPackage(String packagesLocalDirPath) {
 		// RTCをCloneする
-		String result = ProcessUtil.startProcessReturnStringWithWorkingDerectory(packagesLocalDirPath, "python", "mgr.py", "repository", "sync");
+		String result = ProcessUtil.startProcessReturnStringWithWorkingDerectory(packagesLocalDirPath, "python",
+				"mgr.py", "repository", "sync");
 		return result;
 	}
 
@@ -195,7 +196,7 @@ public class WasanbonUtil {
 		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(packageDirPath, logFile, "python", "mgr.py",
 				"system", "terminate", "-v");
 	}
-	
+
 	/**
 	 * Packageの実行状況を確認する
 	 * 

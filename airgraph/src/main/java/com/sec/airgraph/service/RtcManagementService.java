@@ -2,6 +2,7 @@ package com.sec.airgraph.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -337,11 +338,12 @@ public class RtcManagementService {
 						// RTCの変更をRtsProfileに反映する
 						refrectRtcChangeToRtsProfile(updated, rtcProfile, oldRtc.getRtcProfile());
 					}
-					
+
 					// GitURLが変更されている場合は変更する
 					String oldRemoteUrl = GitUtil.getGitUrl(rtcDir.getPath());
 					if (!StringUtil.equals(updated.getRtcs().get(i).getModelProfile().getRemoteUrl(), oldRemoteUrl)) {
-						GitUtil.changeRemoteUrl(rtcDir.getPath(), updated.getRtcs().get(i).getModelProfile().getRemoteUrl());
+						GitUtil.changeRemoteUrl(rtcDir.getPath(),
+								updated.getRtcs().get(i).getModelProfile().getRemoteUrl());
 					}
 				}
 			}
@@ -355,7 +357,7 @@ public class RtcManagementService {
 			} else {
 				logger.info("Not Changed RtsProfile. id[" + updated.getRtsProfile().getId() + "]");
 			}
-			
+
 			// GitURLが変更されている場合は変更する
 			String oldRemoteUrl = GitUtil.getGitUrl(destPackageDir.getPath());
 			if (!StringUtil.equals(updated.getModelProfile().getRemoteUrl(), oldRemoteUrl)) {
@@ -527,7 +529,7 @@ public class RtcManagementService {
 		rtc.getRtcProfile().getActions().getOnActivated().setImplemented(true);
 		rtc.getRtcProfile().getActions().getOnDeactivated().setImplemented(true);
 		rtc.getRtcProfile().getActions().getOnExecute().setImplemented(true);
-		
+
 		// git初期値
 		rtc.getModelProfile().setRemoteUrl(PropUtil.getValue("default.git.url.base") + "new_component.git");
 
@@ -681,13 +683,13 @@ public class RtcManagementService {
 						String[] targetCodeDir = new String[] { DIR_NAME.COMP_INCLUDE_DIR_NAME,
 								DIR_NAME.COMP_SRC_DIR_NAME, DIR_NAME.COMP_IDL_DIR_NAME,
 								rtc.getRtcProfile().getBasicInfo().getModuleName() };
-						String[] targetCodeSuffix = { "c", "cpp", "h", "hpp", "py", "java", "txt", "yml", "xml",
-								"idl" };
+						String[] targetExtension = { "c", "cpp", "h", "hpp", "py", "java", "txt", "yml", "xml", "idl" };
 						String[] ignoreFile = new String[] { FILE_NAME.RTC_XML_FILE_NAME };
 						if (LANGUAGE_KIND.CPP.equals(rtc.getRtcProfile().getLanguage().getKind())) {
 							// C++
 							targetCodeDir = new String[] { DIR_NAME.COMP_INCLUDE_DIR_NAME, DIR_NAME.COMP_SRC_DIR_NAME,
-									DIR_NAME.COMP_IDL_DIR_NAME, rtc.getRtcProfile().getBasicInfo().getModuleName().toLowerCase() };
+									DIR_NAME.COMP_IDL_DIR_NAME,
+									rtc.getRtcProfile().getBasicInfo().getModuleName().toLowerCase() };
 						} else if (LANGUAGE_KIND.PYTHON.equals(rtc.getRtcProfile().getLanguage().getKind())) {
 							// Python
 							targetCodeDir = new String[] { DIR_NAME.COMP_IDL_DIR_NAME };
@@ -696,7 +698,7 @@ public class RtcManagementService {
 							targetCodeDir = new String[] { DIR_NAME.COMP_SRC_DIR_NAME, DIR_NAME.COMP_IDL_DIR_NAME };
 						}
 
-						rtc.setCodeDirectory(getCodeFile(rtcDir.getPath(), targetCodeDir, targetCodeSuffix, ignoreFile,
+						rtc.setCodeDirectory(getCodeFile(rtcDir.getPath(), targetCodeDir, targetExtension, ignoreFile,
 								rtc.getPathContentMap()));
 
 						// RTC.conf読み込み
@@ -903,6 +905,67 @@ public class RtcManagementService {
 	 * ソースコード関連
 	 ************************************************************/
 	/**
+	 * ソースコードを階層的に読み込む
+	 * 
+	 * @param dirPath
+	 * @param targetDirName
+	 * @param targetExtension
+	 * @param ignoreFileName
+	 * @param pathContentMap
+	 * @return
+	 */
+	public CodeDirectory getCodeFile(String dirPath, String[] targetDirName, String[] targetExtension,
+			String[] ignoreFileName, Map<String, String> pathContentMap) {
+		File dir = new File(dirPath);
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+
+		if (FileUtil.exists(dir)) {
+			CodeDirectory parent = new CodeDirectory();
+			parent.setCurDirName(dir.getName());
+			parent.setDirPath(dirPath);
+
+			// ディレクトリ以下のファイル・ディレクトリの一覧を取得
+			File[] codes = dir.listFiles();
+			if (CollectionUtil.isNotEmpty(codes)) {
+				for (File code : codes) {
+					if (code.isDirectory()) {
+						// ディレクトリの場合
+						if (targetDirName == null
+								|| Arrays.asList(targetDirName).contains(code.getName().toLowerCase())) {
+							// ディレクトリが対象のディレクトリの場合、ディレクトリ以下のファイルを取得
+							CodeDirectory directory = getCodeFile(code.getPath(), targetDirName, targetExtension,
+									ignoreFileName, pathContentMap);
+							if (directory != null) {
+								parent.getDirectoryMap().put(code.getName(), directory);
+							}
+						}
+					} else {
+						// ファイルの場合
+						String fileExtension = FileUtil.getFileExtension(code.getName()).toLowerCase();
+						if ((targetExtension == null || Arrays.asList(targetExtension).contains(fileExtension))
+								&& (ignoreFileName == null
+										|| !Arrays.asList(ignoreFileName).contains(code.getName()))) {
+							// 対象の拡張子または無視するファイル以外
+							// ファイル名とファイルの絶対パスをMAP化する
+							parent.getCodePathMap().put(code.getName(), code.getPath());
+							// 最終更新日時もMAP化する
+							parent.getLastModifiedMap().put(code.getName(), sdf.format(code.lastModified()));
+							if (pathContentMap != null) {
+								// ファイルの絶対パスとコードをMAP化する
+								String codeStr = FileUtil.readAll(code.getPath());
+								pathContentMap.put(code.getPath(), codeStr);
+							}
+						}
+					}
+				}
+			}
+			return parent;
+		}
+		return null;
+	}
+
+	/**
 	 * コンフィグファイルを読み込む
 	 * 
 	 * @param rtcDirPath
@@ -916,46 +979,6 @@ public class RtcManagementService {
 			ret = FileUtil.readAll(configFile.getPath());
 		}
 		return ret;
-	}
-
-	/**
-	 * ソースコードを階層的に読み込む
-	 * 
-	 * @param dirPath
-	 * @return
-	 */
-	private CodeDirectory getCodeFile(String dirPath, String[] targetDirName, String[] targetCodeSuffix,
-			String[] ignoreFileName, Map<String, String> pathContentMap) {
-		File dir = new File(dirPath);
-		if (FileUtil.exists(dir)) {
-			CodeDirectory parent = new CodeDirectory();
-			parent.setCurDirName(dir.getName());
-			parent.setDirPath(dirPath);
-			File[] codes = dir.listFiles();
-			if (CollectionUtil.isNotEmpty(codes)) {
-				for (File code : codes) {
-					if (code.isDirectory() && (targetDirName == null
-							|| Arrays.asList(targetDirName).contains(code.getName().toLowerCase()))) {
-						CodeDirectory directory = getCodeFile(code.getPath(), targetDirName, targetCodeSuffix,
-								ignoreFileName, pathContentMap);
-						if (directory != null) {
-							parent.getDirectoryMap().put(code.getName(), directory);
-						}
-					} else if (Arrays.asList(targetCodeSuffix)
-							.contains(FileUtil.getFileSuffix(code.getName()).toLowerCase())
-							&& !Arrays.asList(ignoreFileName).contains(code.getName())) {
-						// ソースコードの場合
-						String codeStr = FileUtil.readAll(code.getPath());
-						// ファイル名とファイルの絶対パスをMAP化する
-						parent.getCodePathMap().put(code.getName(), code.getPath());
-						// ファイルの絶対パスとコードをMAP化する
-						pathContentMap.put(code.getPath(), codeStr);
-					}
-				}
-			}
-			return parent;
-		}
-		return null;
 	}
 
 	/**
@@ -1193,7 +1216,8 @@ public class RtcManagementService {
 
 				// ExecutionRateの自動反映
 				logger.info("Change Config File Exec Rate. target directory[" + rtcDirPath + "]");
-				RtcUtil.updateExecutionRateRtcConfig(configFile.getPath(), rtcProfile.getBasicInfo().getExecutionRate());
+				RtcUtil.updateExecutionRateRtcConfig(configFile.getPath(),
+						rtcProfile.getBasicInfo().getExecutionRate());
 			}
 		}
 	}
