@@ -290,8 +290,10 @@ public class RtcUtil {
 				if (CollectionUtil.isNotEmpty(servicePort.getServiceInterfaces())) {
 					for (ServiceInterface serviceInterface : servicePort.getServiceInterfaces()) {
 						if (INTERFACE_DIRECTION.PROVIDED.equals(serviceInterface.getDirection())) {
+							File idlFile = new File(serviceInterface.getIdlFile());
+
 							String str = "#include \""
-									+ createServiceInterfaceImplementCpp(serviceInterface.getIdlFile()) + ".h\"";
+									+ createServiceInterfaceImplementCpp(idlFile.getName()) + ".h\"";
 							if (!stringList.contains(str)) {
 								stringList.add(str);
 							}
@@ -316,7 +318,9 @@ public class RtcUtil {
 				if (CollectionUtil.isNotEmpty(servicePort.getServiceInterfaces())) {
 					for (ServiceInterface serviceInterface : servicePort.getServiceInterfaces()) {
 						if (INTERFACE_DIRECTION.REQUIRED.equals(serviceInterface.getDirection())) {
-							String str = "#include \"" + createServiceInterfaceStubCpp(serviceInterface.getIdlFile())
+							File idlFile = new File(serviceInterface.getIdlFile());
+
+							String str = "#include \"" + createServiceInterfaceStubCpp(idlFile.getName())
 									+ ".h\"";
 							if (!stringList.contains(str)) {
 								stringList.add(str);
@@ -1340,7 +1344,9 @@ public class RtcUtil {
 			for (ServicePort servicePort : rtcProfile.getServicePorts()) {
 				if (CollectionUtil.isNotEmpty(servicePort.getServiceInterfaces())) {
 					for (ServiceInterface serviceInterface : servicePort.getServiceInterfaces()) {
-						idlImportList.add(createIdlImportPython(serviceInterface.getIdlFile()));
+						File idlFile = new File(serviceInterface.getIdlFile());
+
+						idlImportList.add(createIdlImportPython(idlFile.getName()));
 					}
 				}
 			}
@@ -1361,7 +1367,9 @@ public class RtcUtil {
 				if (CollectionUtil.isNotEmpty(servicePort.getServiceInterfaces())) {
 					for (ServiceInterface serviceInterface : servicePort.getServiceInterfaces()) {
 						if (INTERFACE_DIRECTION.PROVIDED.equals(serviceInterface.getDirection())) {
-							serviceImplList.add(createServiceImplementPython(serviceInterface.getIdlFile()));
+							File idlFile = new File(serviceInterface.getIdlFile());
+
+							serviceImplList.add(createServiceImplementPython(idlFile.getName()));
 						}
 					}
 				}
@@ -2393,13 +2401,15 @@ public class RtcUtil {
 			for (ServicePort servicePort : rtcProfile.getServicePorts()) {
 				if (CollectionUtil.isNotEmpty(servicePort.getProvidedServiceInterfaces())) {
 					for (ServiceInterface provider : servicePort.getProvidedServiceInterfaces()) {
+						File idlFile = new File(provider.getIdlFile());
+
 						// IDLファイルの有無をチェックし、存在しない場合はコピーを行う
-						copyIdlFile(rtcDirPath, provider.getIdlFile());
+						copyIdlFile(rtcDirPath, idlFile.getName());
 
 						// 今回コピーを行った場合、SVC_implのコードを生成する
 						createProviderImplFileCpp(rtcDirPath, rtcProfile.getBasicInfo().getModuleName(),
 								servicePort.getName(), provider.getName(), provider.getInterfaceType(),
-								provider.getIdlFile());
+								idlFile.getName());
 					}
 				}
 			}
@@ -2470,7 +2480,7 @@ public class RtcUtil {
 				// 存在しない場合にのみ実施
 				String moduleNameArgs = "--module-name=" + moduleName;
 				String serviceArgs = "--service=" + portName + ":" + ifName + ":" + ifType.split("::")[1];
-				String idlArgs = "--service-idl=../idl/" + idlFileName;
+				String idlArgs = "--service-idl=" + rtcDirPath + "/idl/" + idlFileName;
 
 				// 一時領域を生成する
 				File tmpDir = new File(tmpDirPath);
@@ -2484,13 +2494,6 @@ public class RtcUtil {
 				File srcIdlSourceFile = FileUtil.concatenateFilePath(tmpDirPath, "SVC_impl.cpp");
 				File srcIdlHeaderFile = FileUtil.concatenateFilePath(tmpDirPath, "SVC_impl.h");
 				if (srcIdlSourceFile.exists() && srcIdlHeaderFile.exists()) {
-					// 作成されたファイルの"../idl/hoge.idl"を"hoge.idl"に置き換える
-					FileUtil.renameAllFilesContent(tmpDirPath, "..\\/idl\\/" + idlFileName.replace(".idl", ""),
-							idlFileName.replace(".idl", ""));
-					FileUtil.renameAllFilesContent(tmpDirPath,
-							"__\\/IDL\\/" + idlFileName.replace(".idl", "").toUpperCase(),
-							idlFileName.replace(".idl", "").toUpperCase());
-
 					// コピーする
 					FileUtil.fileCopy(srcIdlSourceFile, idlSourceFile);
 					FileUtil.fileCopy(srcIdlHeaderFile, idlHeaderFile);
@@ -2523,13 +2526,15 @@ public class RtcUtil {
 				// Provider
 				if (CollectionUtil.isNotEmpty(servicePort.getProvidedServiceInterfaces())) {
 					for (ServiceInterface provider : servicePort.getProvidedServiceInterfaces()) {
+						File idlFile = new File(provider.getIdlFile());
+
 						// IDLファイルの有無をチェックし、存在しない場合はコピーを行う
-						copyIdlFile(rtcDirPath, provider.getIdlFile());
+						copyIdlFile(rtcDirPath, idlFile.getName());
 
 						// 引数を生成する
 						String serviceArgs = "--service=" + servicePort.getName() + ":" + provider.getName() + ":"
 								+ provider.getInterfaceType().split("::")[1];
-						String idlArgs = "--service-idl=../idl/" + provider.getIdlFile();
+						String idlArgs = "--service-idl=" + rtcDirPath + "/idl/" + idlFile.getName();
 						args.add(serviceArgs);
 						args.add(idlArgs);
 					}
@@ -2538,13 +2543,15 @@ public class RtcUtil {
 				// Consumer
 				if (CollectionUtil.isNotEmpty(servicePort.getRequiredServiceInterfaces())) {
 					for (ServiceInterface consumer : servicePort.getRequiredServiceInterfaces()) {
+						File idlFile = new File(consumer.getIdlFile());
+
 						// IDLファイルの有無をチェックし、存在しない場合はコピーを行う
-						copyIdlFile(rtcDirPath, consumer.getIdlFile());
+						copyIdlFile(rtcDirPath, idlFile.getName());
 
 						// 引数を生成する
-						String serviceArgs = "--consumer=" + servicePort.getName() + ":" + consumer.getName() + ":"
+						String serviceArgs = "--consumer=" + servicePort.getName() + ":" + idlFile.getName() + ":"
 								+ consumer.getInterfaceType().split("::")[1];
-						String idlArgs = "--consumer-idl=../idl/" + consumer.getIdlFile();
+						String idlArgs = "--consumer-idl=" + rtcDirPath + "/idl/" + idlFile.getName();
 						args.add(serviceArgs);
 						args.add(idlArgs);
 					}
@@ -2581,9 +2588,6 @@ public class RtcUtil {
 		commandList.addAll(argsList);
 		ProcessUtil.startProcessNoReturnWithWorkingDerectory(tmpDirPath,
 				(String[]) commandList.toArray(new String[commandList.size()]));
-
-		// 作成されたファイルの"../idl/hoge.idl"を"hoge.idl"に置き換える
-		FileUtil.renameAllFilesContentToEmpty(tmpDirPath, "..\\/idl\\/");
 
 		// 一時作業領域にできたファイルをコピーしていく
 		File[] listFiles = tmpDir.listFiles();

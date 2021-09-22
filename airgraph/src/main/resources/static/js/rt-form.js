@@ -1124,7 +1124,7 @@ function openRtcSettingPopupForServicePort(portData, updateFlg) {
   // RTCのサービスポート用の設定ポップアップを表示する
   w2popup.open({
     title: 'Service Port/Interface Setting',
-    width: 650,
+    width: 900,
     height: 460,
     body: '<div id="rtc-profile-div" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px;"></div>',
     onOpen: function (event) {
@@ -1256,14 +1256,13 @@ function createOneServicePortSettingForm(portData, updateFlg) {
       { id: 'serviceinterface-tab1', caption: 'Service Interface' }
     ],
     fields: [
-      { name: 'serviceif_name', type: 'text', required: true, html: { caption: 'Interface Name', page: 0, attr: 'style="width:250px"' } },
-      { name: 'serviceif_direction', type: 'list', required: true, html: { caption: 'Direciton', page: 0, attr: 'style="width:250px"' }, options: { items: getIfDirectionChoices() } },
-      { name: 'serviceif_instancename', type: 'text', required: false, html: { caption: 'Instance Name', page: 0, attr: 'style="width:250px"' } },
-      { name: 'serviceif_valname', type: 'text', required: false, html: { caption: 'Variable Name', page: 0, attr: 'style="width:250px"' } },
-      { name: 'serviceif_idlfile', type: 'list', required: true, html: { caption: 'IDL File', page: 0, attr: 'style="width:250px"' }, options: { items: getIdlFileChoices(portData.componentName) } },
-      { name: 'serviceif_iftype', type: 'list', required: true, html: { caption: 'Interface Type', page: 0, attr: 'style="width:250px"' } },
-      // { name: 'serviceif_idlpath', type: 'text', required: false, html: {
-      // caption:'IDL Path', page:0, attr:'style="width:250px"' } },
+      { name: 'serviceif_name', type: 'text', required: true, html: { caption: 'Interface Name', page: 0, attr: 'style="width:500px"' } },
+      { name: 'serviceif_direction', type: 'list', required: true, html: { caption: 'Direciton', page: 0, attr: 'style="width:500px"' }, options: { items: getIfDirectionChoices() } },
+      { name: 'serviceif_instancename', type: 'text', required: false, html: { caption: 'Instance Name', page: 0, attr: 'style="width:500px"' } },
+      { name: 'serviceif_valname', type: 'text', required: false, html: { caption: 'Variable Name', page: 0, attr: 'style="width:500px"' } },
+      { name: 'serviceif_idlfile', type: 'list', required: true, html: { caption: 'IDL File', page: 0, attr: 'style="width:500px"' }, options: { items: getIdlFileChoices(portData.componentName) } },
+      { name: 'serviceif_iftype', type: 'list', required: true, html: { caption: 'Interface Type', page: 0, attr: 'style="width:500px"' } },
+      { name: 'serviceif_idlpath', type: 'text', required: false, html: { caption:'IDL Path', page:0, attr:'style="width:500px"' } },
     ],
     record: {},
     onChange: function (event) {
@@ -1431,7 +1430,7 @@ function clearServiceInterfaceSetting() {
   $('#serviceif_valname').attr('disabled', 'disabled');
   $('#serviceif_idlfile').attr('disabled', 'disabled');
   $('#serviceif_iftype').attr('disabled', 'disabled');
-  // $('#serviceif_idlpath').attr('disabled', 'disabled');
+  $('#serviceif_idlpath').attr('disabled', 'disabled');
   // 値を空
   w2ui['rtc-profile-if-setting'].clear()
 }
@@ -1464,7 +1463,7 @@ function setServiceInterfaceSettingData(index) {
     $('#serviceif_valname').removeAttr('disabled');
     $('#serviceif_idlfile').removeAttr('disabled');
     $('#serviceif_iftype').removeAttr('disabled');
-    // $('#serviceif_idlpath').removeAttr('disabled');
+    $('#serviceif_idlpath').removeAttr('disabled');
     // 値設定
     w2ui['rtc-profile-if-setting'].record = {
       'serviceif_name': ifData.name,
@@ -1472,7 +1471,8 @@ function setServiceInterfaceSettingData(index) {
       'serviceif_instancename': ifData.instanceName,
       'serviceif_valname': ifData.variableName,
       'serviceif_idlfile': ifData.idlFile,
-      'serviceif_iftype': ifData.interfaceType
+      'serviceif_iftype': ifData.interfaceType,
+      'serviceif_idlpath': ifData.path
     }
     $('#serviceif_name').val(ifData.name);
     $('#serviceif_direction').val(ifData.direction);
@@ -1480,7 +1480,7 @@ function setServiceInterfaceSettingData(index) {
     $('#serviceif_valname').val(ifData.variableName);
     $('#serviceif_idlfile').val(ifData.idlFile);
     $('#serviceif_iftype').val(ifData.interfaceType);
-    // $('#serviceif_idlpath').val(ifData.path);
+    $('#serviceif_idlpath').val(ifData.path);
   }
 }
 
@@ -1499,6 +1499,7 @@ function saveServiceInterfaceSettingData(index) {
   ifData.variableName = $('#serviceif_valname').val();
   ifData.idlFile = $('#serviceif_idlfile').val();
   ifData.interfaceType = $('#serviceif_iftype').val();
+  ifData.path = $('#serviceif_idlpath').val();
   w2ui['rtc-profile-if-grid'].records[index]['ifData'] = ifData;
 
   // 名称も変える

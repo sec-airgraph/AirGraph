@@ -650,7 +650,7 @@ public class RtcManagementService {
 					rtc.getModelProfile().setRemoteUrl(gitUrl);
 					rtc.getModelProfile().setClonedDirectory(rtcDir.getPath());
 
-					// IDLファイルパスはファイルパスからファイル名に変更する
+					// IDLファイルパスはファイルパスを整理する
 					if (CollectionUtil.isNotEmpty(profile.getServicePorts())) {
 						for (int i = 0; i < profile.getServicePorts().size(); i++) {
 							com.sec.rtc.entity.rtc.ServicePort servicePort = profile.getServicePorts().get(i);
@@ -658,21 +658,28 @@ public class RtcManagementService {
 								for (int j = 0; j < servicePort.getServiceInterfaces().size(); j++) {
 									ServiceInterface serviceIf = servicePort.getServiceInterfaces().get(j);
 									if (StringUtil.isNotEmpty(serviceIf.getIdlFile())) {
+										String fileName = "";
 										if (serviceIf.getIdlFile().contains("\\")) {
-											String fileName = serviceIf.getIdlFile()
+											// Windows系のファイルパス
+											fileName = serviceIf.getIdlFile()
 													.substring(serviceIf.getIdlFile().lastIndexOf("\\") + 1);
-											rtc.getRtcProfile().getServicePorts().get(i).getServiceInterfaces().get(j)
-													.setIdlFile(fileName);
+										} else if (serviceIf.getIdlFile().contains("/")) {
+											// Linux系のファイルパス
+											fileName = serviceIf.getIdlFile()
+													.substring(serviceIf.getIdlFile().lastIndexOf("/") + 1);
 										} else {
-											File idlFile = new File(serviceIf.getIdlFile());
-											if (idlFile != null) {
-												rtc.getRtcProfile().getServicePorts().get(i).getServiceInterfaces()
-														.get(j).setIdlFile(idlFile.getName());
-											}
+											fileName = serviceIf.getIdlFile();
 										}
+										// IDLフォルダの絶対パスに変換する
+										File rtcIdlFile =  FileUtil.concatenateFilePath(rtcDir.getPath(), DIR_NAME.COMP_IDL_DIR_NAME, fileName);
+										rtc.getRtcProfile().getServicePorts().get(i).getServiceInterfaces().get(j)
+												.setIdlFile(rtcIdlFile.getAbsolutePath());
+										rtc.getRtcProfile().getServicePorts().get(i).getServiceInterfaces().get(j)
+												.setPath(rtcIdlFile.getParent());
+									} else {
+										rtc.getRtcProfile().getServicePorts().get(i).getServiceInterfaces().get(j)
+												.setPath(null);
 									}
-									rtc.getRtcProfile().getServicePorts().get(i).getServiceInterfaces().get(j)
-											.setPath(null);
 								}
 							}
 						}

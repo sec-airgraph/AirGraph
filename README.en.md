@@ -11,7 +11,7 @@ Please read the [Document](https://sec-airgraph.github.io/AirGraph-doc) for deta
 > Our developing environment is `Ubuntu 16.04 64bit on arm64 processor`
 
 ## Dependencies
-* Java Open JDK 11 (AdoptOpenJDK)
+* Java Open JDK 8 (AdoptOpenJDK)
 * Apache Maven
 * [OpenRTM-aist](http://openrtm.org/) 1.1.2
 * [wasanbon](http://wasanbon.org/) 1.1.0.post5
@@ -28,11 +28,13 @@ Please read the [Document](https://sec-airgraph.github.io/AirGraph-doc) for deta
     ```
     > apt upgarde is optional.
 
-* Java Open JDK 11 (AdoptOpenJDK)
+* Java Open JDK 8 (AdoptOpenJDK)
     ```bash
     # wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -
     # echo deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ xenial main > /etc/apt/sources.list.d/adoptopenjdk.list
-    $ echo "export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-11-hotspot-amd64" >> ~/.bashrc
+    $ sudo apt update
+    $ sudo apt install adoptopenjdk-8-hotspot
+    $ echo "export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-8-hotspot-amd64" >> ~/.bashrc
     $ echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> ~/.bashrc
     ```
     > This path is for Ubuntu 16.04 64 bit version on arm64 CPU.

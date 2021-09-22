@@ -508,7 +508,7 @@ public class RtmEditorUtil {
 		Collection<File> rtcList = FileUtils.listFiles(directoryRtc, fileFilterRtc, dirFilterRtc);
 		if (CollectionUtil.isNotEmpty(rtcList)) {
 			for (File file : rtcList) {
-				map.put(file.getName(), file.getName());
+				map.put(file.getAbsolutePath(), file.getAbsolutePath());
 			}
 		}
 
@@ -525,7 +525,24 @@ public class RtmEditorUtil {
 		Collection<File> OpenRtmList = FileUtils.listFiles(directoryOpenRtm, fileFilterOpenRtm, dirFilterOpenRtm);
 		if (CollectionUtil.isNotEmpty(OpenRtmList)) {
 			for (File file : OpenRtmList) {
-				map.put(file.getName(), file.getName());
+				map.put(file.getAbsolutePath(), file.getAbsolutePath());
+			}
+		}
+
+		// openRTM_AistのフォルダからIDLのファイルを探す
+		// 作業領域パス
+		String openRtmAistDir = getOpenRtmAistDir();
+
+		File directoryOpenRtmAist = new File(openRtmAistDir);
+		// 後方一致で"idl"
+		IOFileFilter fileFilterOpenRtmAist = FileFilterUtils.suffixFileFilter("idl");
+		// サブディレクトリも検索する（しない場合はnull）
+		IOFileFilter dirFilterOpenRtmAist = FileFilterUtils.trueFileFilter();
+		// 検索開始
+		Collection<File> OpenRtmAilstList = FileUtils.listFiles(directoryOpenRtmAist, fileFilterOpenRtmAist, dirFilterOpenRtmAist);
+		if (CollectionUtil.isNotEmpty(OpenRtmAistList)) {
+			for (File file : OpenRtmAistList) {
+				map.put(file.getAbsolutePath(), file.getAbsolutePath());
 			}
 		}
 
@@ -561,6 +578,11 @@ public class RtmEditorUtil {
 		List<File> openRtmList = FileUtil.searchFileListWithSubDir(openRtmDir, "idl");
 		if (CollectionUtil.isNotEmpty(openRtmList)) {
 			targetFileList.addAll(openRtmList);
+		}
+		String openRtmAistDir = getOpenRtmAistDir();
+		List<File> openRtmAistList = FileUtil.searchFileListWithSubDir(openRtmAistDir, "idl");
+		if (CollectionUtil.isNotEmpty(openRtmAistList)) {
+			targetFileList.addAll(openRtmAistList);
 		}
 
 		if (!CollectionUtils.isEmpty(targetFileList)) {
@@ -611,21 +633,7 @@ public class RtmEditorUtil {
 			String idlFileName) {
 		Map<String, String> map = new LinkedHashMap<>();
 
-		File targetFile = null;
-
-		// 作業領域パス
-		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
-		File rtcDir = FileUtil.concatenateFilePath(workspaceDirPath + workPackageName, DIR_NAME.PACKAGE_RTC_DIR_NAME,
-				componentName);
-
-		// まずrtcのIDLフォルダから探す
-		String idlDirPath = rtcDir.getPath() + File.separator + "idl/";
-		targetFile = FileUtil.searchFileWithSubDir(idlDirPath, idlFileName, "idl");
-		if (targetFile == null) {
-			// ファイルが見つかっていない場合は、openRTMのフォルダからIDLのファイルを探す
-			String openRtmDir = getOpenRtmDir();
-			targetFile = FileUtil.searchFileWithSubDir(openRtmDir, idlFileName, "idl");
-		}
+		File targetFile = new File(idlFileName);
 
 		// ファイルが見つかった場合、interface定義の行をファイルから取得する
 		if (targetFile != null) {
@@ -800,6 +808,17 @@ public class RtmEditorUtil {
 		} else if (!(new File(openRtmDir).exists())) {
 			openRtmDir = openRtmDir.replace("1.1", "1.2");
 		}
+		return openRtmDir;
+	}
+
+	/**
+	 * RTM_Aistのディレクトリを取得する
+	 * 
+	 * @return
+	 */
+	public static String getOpenRtmAistDir() {
+		// OpenRTMのフォルダを調べる
+		String openRtmDir = PropUtil.getValue("openrtmaist.rtm.dir");
 		return openRtmDir;
 	}
 }
