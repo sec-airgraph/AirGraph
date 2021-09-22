@@ -10,7 +10,7 @@
   <packaging>jar</packaging>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>11</java.version>
+    <java.version>8</java.version>
     <start-class>com.sec.airgraph.MainApplication</start-class>
   </properties>
   

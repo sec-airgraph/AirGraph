@@ -13,7 +13,7 @@ AirGraphはAIとRobot開発のための、グラフィカルなIDEです。
 > 開発環境は `Ubuntu 16.04 64bit on arm64 processor` です。
 
 ## 依存関係
-* Java Open JDK 11 (AdoptOpenJDK)
+* Java Open JDK 8 (AdoptOpenJDK)
 * Apache Maven
 * [OpenRTM-aist](http://openrtm.org/) 1.1.2
 * [wasanbon](http://wasanbon.org/) 1.1.0.post5
@@ -31,11 +31,13 @@ AirGraphはAIとRobot開発のための、グラフィカルなIDEです。
     ```
     > apt upgardeは任意
 
-* Java Open JDK 11 (AdoptOpenJDK)
+* Java Open JDK 8 (AdoptOpenJDK)
     ```bash
     # wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add -
     # echo deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ xenial main > /etc/apt/sources.list.d/adoptopenjdk.list
-    $ echo "export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-11-hotspot-amd64" >> ~/.bashrc
+    $ sudo apt update
+    $ sudo apt install adoptopenjdk-8-hotspot
+    $ echo "export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-8-hotspot-amd64" >> ~/.bashrc
     $ echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> ~/.bashrc
     ```
     > 上記パスはUbuntu16.04(64bit版、armプロセッサ)の場合の例のため，必要に応じて変更
