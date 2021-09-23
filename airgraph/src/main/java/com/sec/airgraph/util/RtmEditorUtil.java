@@ -539,7 +539,7 @@ public class RtmEditorUtil {
 		// サブディレクトリも検索する（しない場合はnull）
 		IOFileFilter dirFilterOpenRtmAist = FileFilterUtils.trueFileFilter();
 		// 検索開始
-		Collection<File> OpenRtmAilstList = FileUtils.listFiles(directoryOpenRtmAist, fileFilterOpenRtmAist, dirFilterOpenRtmAist);
+		Collection<File> OpenRtmAistList = FileUtils.listFiles(directoryOpenRtmAist, fileFilterOpenRtmAist, dirFilterOpenRtmAist);
 		if (CollectionUtil.isNotEmpty(OpenRtmAistList)) {
 			for (File file : OpenRtmAistList) {
 				map.put(file.getAbsolutePath(), file.getAbsolutePath());
