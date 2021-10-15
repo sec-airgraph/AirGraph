@@ -6,14 +6,14 @@ Please read the [Document](https://sec-airgraph.github.io/AirGraph-doc) for deta
 <img src="https://github.com/sec-airgraph/airgraph/blob/master/docs/img/airgraph.png" width="320px">
 
 ## System Requirements
-* Ubuntu 16.04
+* Ubuntu 20.04
 
-> Our developing environment is `Ubuntu 16.04 64bit on arm64 processor`
+> Our developing environment is `Ubuntu 20.04 64bit on arm64 processor`
 
 ## Dependencies
 * Java Open JDK 8 (AdoptOpenJDK)
 * Apache Maven
-* [OpenRTM-aist](http://openrtm.org/) 1.1.2
+* [OpenRTM-aist](http://openrtm.org/) 1.2.2
 * [wasanbon](http://wasanbon.org/) 1.1.0.post5
 * [Keras](https://keras.io/) 2.2.4 with [Tensorflow](https://www.tensorflow.org) r1.12
     - hdf5, h5py must be installed.
@@ -51,7 +51,13 @@ Please read the [Document](https://sec-airgraph.github.io/AirGraph-doc) for deta
 
 * sysv-rc-conf
     ```bash
-    $ sudo apt install sysv-rc-conf -y
+    $ wget http://archive.ubuntu.com/ubuntu/pool/universe/s/sysv-rc-conf/sysv-rc-conf_0.99.orig.tar.gz
+    $ tar zxvf sysv-rc-conf_0.99.orig.tar.gz
+    $ cd sysv-rc-conf-0.99
+    $ sudo apt install make
+    $ sudo make
+    $ sudo make install
+    $ sudo apt install libcurses-ui-perl libterm-readkey-perl libcurses-perl
     ```
 
 ### Step2. Install dependent tools
@@ -122,34 +128,3 @@ $ sudo ./install_airgraph.sh
 ## Author
 - Team AirGraph - System Engineering Consultants Co., LTD.
     [mail](airgraph@sec.co.jp)
-
-## Notes
-
-### 1. First AirGraph startup might take a long time
-At startup, AirGraph clone all RT-Components registered in Wasanbon Binder.<br/>
-The first time might take a long time.
-
-### 2. Error related to rtc-template
-AirGraph uses rtc-template as IDLCompiler.
-If an error occurs, please follow the instructions in the below.
-
-1. Add PYTHONPATH In `~/.bashrc`
-```bash
-echo "export PYTHONPATH=/usr/lib/python2.7/dist-packages:$PYTHONPATH" >> ~/.bashrc
-```
-
-2. Add symbolic link to `/usr/lib/python2.7/dist-packages`
-```bash
-$ cd /usr/lib/python2.7/dist-packages
-$ sudo ln -s /usr/lib/omniidl/omniidl
-$ sudo ln -s /usr/lib/omniidl/omniidl_be
-```
-
-3. Modify `cxx_svc_impl.py`
-```bash
-$ sudo vim /usr/lib/x86_64-linux-gnu/openrtm-1.1/py_helper/cxx_svc_impl.py
-```
-```diff
-- tree = _omniidl.compile(file)
-+ tree = _omniidl.compile(file, "")
-```

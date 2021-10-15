@@ -8,14 +8,14 @@ AirGraphはAIとRobot開発のための、グラフィカルなIDEです。
 *Read this in other languages: [English](README.en.md).*
 
 ## システム要件
-* Ubuntu 16.04
+* Ubuntu 20.04
 
-> 開発環境は `Ubuntu 16.04 64bit on arm64 processor` です。
+> 開発環境は `Ubuntu 20.04 64bit on arm64 processor` です。
 
 ## 依存関係
 * Java Open JDK 8 (AdoptOpenJDK)
 * Apache Maven
-* [OpenRTM-aist](http://openrtm.org/) 1.1.2
+* [OpenRTM-aist](http://openrtm.org/) 1.2.2
 * [wasanbon](http://wasanbon.org/) 1.1.0.post5
 * [Keras](https://keras.io/) 2.2.4
     - [Tensorflow](https://www.tensorflow.org) r1.12
@@ -40,7 +40,7 @@ AirGraphはAIとRobot開発のための、グラフィカルなIDEです。
     $ echo "export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-8-hotspot-amd64" >> ~/.bashrc
     $ echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> ~/.bashrc
     ```
-    > 上記パスはUbuntu16.04(64bit版、armプロセッサ)の場合の例のため，必要に応じて変更
+    > 上記パスはUbuntu20.04(64bit版、armプロセッサ)の場合の例のため，必要に応じて変更
 
 * Apache Maven
     ```bash
@@ -54,7 +54,13 @@ AirGraphはAIとRobot開発のための、グラフィカルなIDEです。
 
 * sysv-rc-conf
     ```bash
-    $ sudo apt install sysv-rc-conf -y
+    $ wget http://archive.ubuntu.com/ubuntu/pool/universe/s/sysv-rc-conf/sysv-rc-conf_0.99.orig.tar.gz
+    $ tar zxvf sysv-rc-conf_0.99.orig.tar.gz
+    $ cd sysv-rc-conf-0.99
+    $ sudo apt install make
+    $ sudo make
+    $ sudo make install
+    $ sudo apt install libcurses-ui-perl libterm-readkey-perl libcurses-perl
     ```
 
 ### Step2. 依存関係のインストール
@@ -126,34 +132,3 @@ $ sudo ./install_airgraph.sh
 ## Author
 - AirGraph開発チーム - 株式会社セック
     [mail](airgraph@sec.co.jp)
-
-## 注意事項
-
-### 1. AirGraphの初回起動時は時間がかかる可能性があります
-AirGraphは、起動時にWasanbon Binderに登録されているRTコンポーネントを全てCloneします。
-そのため、初回起動時は、時間がかかる可能性があります。
-
-### 2. rtc-template関連のエラー
-スケルトンコード生成のためのツールとして、IDLCompilerを利用しています。
-IDLCompilerを動作させるためには以下の対応が必要です。（暫定）
-
-1. `~/.bashrc` のPYTHONPATHを修正（必要があれば）
-    ```bash
-    export PYTHONPATH=/usr/lib/python2.7/dist-packages:$PYTHONPATH
-    ```
-
-2. `/usr/lib/python2.7/dist-packages` にシンボリックリンクを追加
-    ```bash
-    cd /usr/lib/python2.7/dist-packages
-    sudo ln -s /usr/lib/omniidl/omniidl ./omniidl
-    sudo ln -s /usr/lib/omniidl/omniidl_be ./omniidl_be
-    ```
-
-3. omniidlの呼び出しの引数を修正
-    ```bash
-    sudo vim /usr/lib/x86_64-linux-gnu/openrtm-1.1/py_helper/cxx_svc_impl.py
-    ```
-    ```diff
-    - tree = _omniidl.compile(file)
-    + tree = _omniidl.compile(file, "")
-    ```

@@ -49,7 +49,7 @@ public class KerasEditorUtil {
 		}
 
 		// keras.fitを実行する
-		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(modelDirPath, logFile, "python", dataMakerPath,
+		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(modelDirPath, logFile, "python3", dataMakerPath,
 				modelJsonFilePath, resultPath, tensorBoardDirPath, datasetDirPath);
 	}
 

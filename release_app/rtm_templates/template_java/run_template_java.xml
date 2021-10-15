@@ -1,0 +1,25 @@
+<!--
+# -*- Buildfile -*-
+# @file  run_template_java.xml
+# @brief Execute RTComponent for "template_java component" 
+# @date  $Date$
+#
+# $Id$
+ -->
+<project name="template_java" default="exec">
+    <property environment="env" />
+    <property name="option" value="" />
+
+    <target name="exec" >
+        <java classname="template_javaComp">
+            <classpath>
+                <pathelement location="bin"/>
+                <pathelement location="."/>
+                <fileset dir="${env.RTM_JAVA_ROOT}/jar">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+            <arg line="${option}" />
+        </java>
+    </target>
+</project> 

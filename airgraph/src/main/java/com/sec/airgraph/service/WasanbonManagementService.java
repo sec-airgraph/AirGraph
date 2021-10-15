@@ -88,6 +88,8 @@ public class WasanbonManagementService {
 				if (FileUtil.notExists(packageDir)) {
 					// 存在しない場合にのみ
 					WasanbonUtil.clonePackageFromRepository(packagesLocalDirPath, packageRepositoryName);
+					// wasanbonからは削除
+					this.deletePackage(packageRepositoryName, false);
 				}
 			}
 		}
@@ -260,9 +262,10 @@ public class WasanbonManagementService {
 	 * 指定されたPackageを削除する
 	 * 
 	 * @param packageRepositoryName
+	 * @param isDirDel
 	 */
-	public void deletePackage(String packageRepositoryName) {
-		WasanbonUtil.deletePackage(packageRepositoryName);
+	public void deletePackage(String packageRepositoryName, boolean isDirDel) {
+		WasanbonUtil.deletePackage(packageRepositoryName, isDirDel);
 	}
 
 	/************************************************************

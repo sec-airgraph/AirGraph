@@ -529,23 +529,6 @@ public class RtmEditorUtil {
 			}
 		}
 
-		// openRTM_AistのフォルダからIDLのファイルを探す
-		// 作業領域パス
-		String openRtmAistDir = getOpenRtmAistDir();
-
-		File directoryOpenRtmAist = new File(openRtmAistDir);
-		// 後方一致で"idl"
-		IOFileFilter fileFilterOpenRtmAist = FileFilterUtils.suffixFileFilter("idl");
-		// サブディレクトリも検索する（しない場合はnull）
-		IOFileFilter dirFilterOpenRtmAist = FileFilterUtils.trueFileFilter();
-		// 検索開始
-		Collection<File> OpenRtmAistList = FileUtils.listFiles(directoryOpenRtmAist, fileFilterOpenRtmAist, dirFilterOpenRtmAist);
-		if (CollectionUtil.isNotEmpty(OpenRtmAistList)) {
-			for (File file : OpenRtmAistList) {
-				map.put(file.getAbsolutePath(), file.getAbsolutePath());
-			}
-		}
-
 		return map;
 	}
 
@@ -578,11 +561,6 @@ public class RtmEditorUtil {
 		List<File> openRtmList = FileUtil.searchFileListWithSubDir(openRtmDir, "idl");
 		if (CollectionUtil.isNotEmpty(openRtmList)) {
 			targetFileList.addAll(openRtmList);
-		}
-		String openRtmAistDir = getOpenRtmAistDir();
-		List<File> openRtmAistList = FileUtil.searchFileListWithSubDir(openRtmAistDir, "idl");
-		if (CollectionUtil.isNotEmpty(openRtmAistList)) {
-			targetFileList.addAll(openRtmAistList);
 		}
 
 		if (!CollectionUtils.isEmpty(targetFileList)) {
@@ -802,23 +780,8 @@ public class RtmEditorUtil {
 		// OpenRTMのフォルダを調べる
 		String openRtmDir = PropUtil.getValue("openrtm.rtm.dir");
 		if (!(new File(openRtmDir).exists())) {
-			openRtmDir = openRtmDir.replace("1.1", "1.2");
-		} else if (!(new File(openRtmDir).exists())) {
 			openRtmDir = PropUtil.getValue("openrtm.rtm.local.dir");
-		} else if (!(new File(openRtmDir).exists())) {
-			openRtmDir = openRtmDir.replace("1.1", "1.2");
 		}
-		return openRtmDir;
-	}
-
-	/**
-	 * RTM_Aistのディレクトリを取得する
-	 * 
-	 * @return
-	 */
-	public static String getOpenRtmAistDir() {
-		// OpenRTMのフォルダを調べる
-		String openRtmDir = PropUtil.getValue("openrtmaist.rtm.dir");
 		return openRtmDir;
 	}
 }

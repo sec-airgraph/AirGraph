@@ -1,4 +1,4 @@
-include("@PROJECT_BINARY_DIR@/CMakeFiles/CMakeJavaCompiler.cmake")
+﻿include("@PROJECT_BINARY_DIR@/CMakeFiles/CMakeJavaCompiler.cmake")
 
 set(_srcdir @JAVAC_SOURCE_DIRS@)
 set(_destdir "@JAVAC_DEST_DIR@")

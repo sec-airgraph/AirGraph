@@ -2487,7 +2487,7 @@ public class RtcUtil {
 				tmpDir.mkdir();
 
 				// rtc-templateを実行する
-				ProcessUtil.startProcessNoReturnWithWorkingDerectory(tmpDirPath, "python", "/usr/bin/rtc-template",
+				ProcessUtil.startProcessNoReturnWithWorkingDerectory(tmpDirPath, "python3", "/usr/bin/rtc-template",
 						"-bcxx", moduleNameArgs, serviceArgs, idlArgs);
 
 				// 作成されるファイル
@@ -2582,7 +2582,7 @@ public class RtcUtil {
 
 		// rtc-templateを実行する
 		List<String> commandList = new ArrayList<String>();
-		commandList.add("python");
+		commandList.add("python3");
 		commandList.add("/usr/bin/rtc-template");
 		commandList.add("-bpython");
 		commandList.addAll(argsList);

@@ -201,7 +201,7 @@ public class MainService {
 	 */
 	public void deletePackage(String packageRepositoryName) {
 		// 指定されたPackageを削除する
-		wasanbonManagementService.deletePackage(packageRepositoryName);
+		wasanbonManagementService.deletePackage(packageRepositoryName, true);
 	}
 
 	/**

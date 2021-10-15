@@ -69,7 +69,7 @@ public class WasanbonUtil {
 
 		// RTCの一覧を取得
 		String rtcStr = ProcessUtil.startProcessReturnStringWithWorkingDerectory(
-				packagesLocalDirPath + File.separator + packageRepositoryName, "python", "mgr.py", "rtc", "list");
+				packagesLocalDirPath + File.separator + packageRepositoryName, "python3", "mgr.py", "rtc", "list");
 		logger.debug("package :" + packageRepositoryName + ". rtcs list : " + rtcStr);
 		return (List<String>) YamlUtil.loadYamlFromString(rtcStr);
 	}
@@ -103,9 +103,13 @@ public class WasanbonUtil {
 	 * 
 	 * @param packageRepositoryName
 	 */
-	public static void deletePackage(String packageRepositoryName) {
+	public static void deletePackage(String packageRepositoryName, boolean isDirDel) {
 		// パッケージを削除する
-		ProcessUtil.startProcessNoReturn("wasanbon-admin.py", "package", "delete", packageRepositoryName, "-r");
+		if (isDirDel) {
+			ProcessUtil.startProcessNoReturn("wasanbon-admin.py", "package", "delete", packageRepositoryName, "-r");
+		} else {
+			ProcessUtil.startProcessNoReturn("wasanbon-admin.py", "package", "delete", packageRepositoryName);
+		}
 	}
 
 	/**
@@ -116,7 +120,7 @@ public class WasanbonUtil {
 	 */
 	public static String cloneRtcToPackage(String packagesLocalDirPath, String rtcRepositoryName) {
 		// RTCをCloneする
-		String result = ProcessUtil.startProcessReturnStringWithWorkingDerectory(packagesLocalDirPath, "python",
+		String result = ProcessUtil.startProcessReturnStringWithWorkingDerectory(packagesLocalDirPath, "python3",
 				"mgr.py", "repository", "clone", rtcRepositoryName, "-v");
 		return result;
 	}
@@ -128,7 +132,7 @@ public class WasanbonUtil {
 	 */
 	public static String syncRtcToPackage(String packagesLocalDirPath) {
 		// RTCをCloneする
-		String result = ProcessUtil.startProcessReturnStringWithWorkingDerectory(packagesLocalDirPath, "python",
+		String result = ProcessUtil.startProcessReturnStringWithWorkingDerectory(packagesLocalDirPath, "python3",
 				"mgr.py", "repository", "sync");
 		return result;
 	}
@@ -141,7 +145,7 @@ public class WasanbonUtil {
 	 */
 	public static void deleteRtcFromPackage(String packagesLocalDirPath, String rtcRepositoryName) {
 		// RTCを削除する
-		ProcessUtil.startProcessNoReturnWithWorkingDerectory(packagesLocalDirPath, "python", "mgr.py", "rtc", "delete",
+		ProcessUtil.startProcessNoReturnWithWorkingDerectory(packagesLocalDirPath, "python3", "mgr.py", "rtc", "delete",
 				rtcRepositoryName);
 	}
 
@@ -156,7 +160,7 @@ public class WasanbonUtil {
 	 */
 	public static void buildPackageAll(File logFile, String packageDirPath) {
 		// ビルドする
-		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(packageDirPath, logFile, "python", "mgr.py", "rtc",
+		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(packageDirPath, logFile, "python3", "mgr.py", "rtc",
 				"build", "all", "-v");
 	}
 
@@ -168,7 +172,7 @@ public class WasanbonUtil {
 	 */
 	public static void cleanPackageAll(File logFile, String packageDirPath) {
 		// クリーンする
-		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(packageDirPath, logFile, "python", "mgr.py", "rtc",
+		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(packageDirPath, logFile, "python3", "mgr.py", "rtc",
 				"clean", "all", "-v");
 	}
 
@@ -181,7 +185,7 @@ public class WasanbonUtil {
 	 */
 	public static void runPackage(File logFile, String packageDirPath) {
 		// 実行する
-		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(packageDirPath, logFile, "python", "mgr.py",
+		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(packageDirPath, logFile, "python3", "mgr.py",
 				"system", "run", "-v");
 	}
 
@@ -193,7 +197,7 @@ public class WasanbonUtil {
 	 */
 	public static void terminatePackage(File logFile, String packageDirPath) {
 		// 停止する
-		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(packageDirPath, logFile, "python", "mgr.py",
+		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(packageDirPath, logFile, "python3", "mgr.py",
 				"system", "terminate", "-v");
 	}
 
@@ -205,7 +209,7 @@ public class WasanbonUtil {
 	 */
 	public static boolean isRunningPackage(String packageDirPath) {
 		boolean result = false;
-		String ret = ProcessUtil.startProcessReturnStringWithWorkingDerectory(packageDirPath, "python", "mgr.py",
+		String ret = ProcessUtil.startProcessReturnStringWithWorkingDerectory(packageDirPath, "python3", "mgr.py",
 				"system", "is_running");
 		if (StringUtil.isNotEmpty(ret) && ret.trim().toUpperCase().equals("TRUE")) {
 			result = true;

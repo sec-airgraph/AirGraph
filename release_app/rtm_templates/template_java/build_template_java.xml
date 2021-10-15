@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 # -*- Buildfile -*-
 # @file  build_template_java.xml
 # @brief RTComponent makefile for "template_java component"
@@ -6,9 +6,10 @@
 #
 # $Id$
  -->
-<project name="template_java" default="compile">
+<project name="template_java" default="generatedoc">
 	<property name="source" value="src" />
 	<property name="dest" value="bin" />
+	<property name="doc" value="doc" />
 	<property environment="env" />
 
 	<target name="mkdir">
@@ -17,12 +18,35 @@
 
 
 	<target name="compile" depends="mkdir">
-		<javac srcdir="${source}" destdir="${dest}">
+		<javac includeantruntime="false" srcdir="${source}" destdir="${dest}">
 			<classpath>
 				<fileset dir="${env.RTM_JAVA_ROOT}/jar">
 					<include name="*.jar"/>
 				</fileset>
 			</classpath>
 		</javac>
+	</target>
+	<target name="generatedoc" depends="compile">
+		<javadoc
+                        Locale="ja_JP"
+                        destdir="${doc}"
+                        docencoding="UTF-8"
+			author="true" doctitle="template_java"
+			nodeprecated="false" nodeprecatedlist="false"
+                        noindex="false" nonavbar="false" notree="false"
+			package="yes" splitindex="true"
+                        use="true" version="true" charset="UTF-8"
+                        >
+			<classpath>
+				<fileset dir="${env.RTM_JAVA_ROOT}/jar">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+			<sourcefiles>
+				<fileset dir="${source}">
+					<include name="**/*.java"/>
+				</fileset>
+                	</sourcefiles>
+                </javadoc>
 	</target>
 </project>
