@@ -16,9 +16,9 @@ AirGraphはAIとRobot開発のための、グラフィカルなIDEです。
 * Java Open JDK 8 (AdoptOpenJDK)
 * Apache Maven
 * [OpenRTM-aist](http://openrtm.org/) 1.2.2
-* [wasanbon](http://wasanbon.org/) 1.1.0.post5
-* [Keras](https://keras.io/) 2.2.4
-    - [Tensorflow](https://www.tensorflow.org) r1.12
+* [wasanbon](http://wasanbon.org/) 1.2.0
+* [Keras](https://keras.io/) 2.7.0
+    - [Tensorflow](https://www.tensorflow.org) 2.7.0
     - hdf5, h5pyは必須.
 
 ## インストール手順
