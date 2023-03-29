@@ -23,4 +23,7 @@ rename s/${OLD_NAME}/${NEW_NAME}/g */*
 # 3階層目のファイルを変更する
 rename s/${OLD_NAME}/${NEW_NAME}/g */*/*
 
+# 4階層目のファイルを変更する
+rename s/${OLD_NAME}/${NEW_NAME}/g */*/*/*
+
 exit 0

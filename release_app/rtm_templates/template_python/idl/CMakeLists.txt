@@ -1,11 +1,7 @@
 set(idls )
 
-install(FILES ${idls} DESTINATION ${INC_INSTALL_DIR}/idl
-    COMPONENT idl)
-
 macro(_IDL_OUTPUTS _idl _dir _result)
-    set(${_result} ${_dir}/${_idl}SK.cc ${_dir}/${_idl}.hh
-        ${_dir}/${_idl}DynSK.cc)
+    set(${_result} ${_dir}/${_idl}Skel.cpp ${_dir}/${_idl}Skel.h)
 endmacro(_IDL_OUTPUTS)
 
 macro(_COMPILE_IDL _idl_file)
@@ -49,8 +45,4 @@ endmacro(OPENRTM_COMPILE_IDL_FILES)
 
 OPENRTM_COMPILE_IDL_FILES(${idls})
 set(ALL_IDL_SRCS ${ALL_IDL_SRCS} PARENT_SCOPE)
-FILTER_LIST(ALL_IDL_SRCS "hh$" idl_headers)
-install(FILES ${idl_headers}
-    DESTINATION ${INC_INSTALL_DIR}/${PROJECT_NAME_LOWER}/idl
-    COMPONENT headers)
-
+FILTER_LIST("ALL_IDL_SRCS" "hh$" idl_headers)

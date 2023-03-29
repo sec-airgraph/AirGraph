@@ -3,14 +3,21 @@
  **********************************************************/
 
 /**
- * RTC描画オブジェクト作成処理
- * @param T.B.D
+ * RTS描画オブジェクト作成処理
+ * 
+ * @param {*} id id
+ * @param {*} name name
+ * @param {*} posX posX
+ * @param {*} posY posY
+ * @param {*} isWork isWork
+ * @returns {*} rtsystems
  */
-function createRtsystemViewObject(id, name, posX, posY) {
+function createRtsystemViewObject(id, name, posX, posY, isWork) {
 
   // RTS作成
   var rtsystems = new joint.shapes.devs.Model({
     id: id,
+    isWork: isWork,
     position: { x: posX, y: posY },
     size: {
       width: 20,
@@ -50,7 +57,16 @@ function createRtsystemViewObject(id, name, posX, posY) {
 
 /**
  * RTC描画オブジェクト作成処理
- * @param T.B.D
+ * 
+ * @param {*} componentId componentId
+ * @param {*} modelId modelId
+ * @param {*} name name
+ * @param {*} dataPorts dataPorts
+ * @param {*} servicePorts servicePorts
+ * @param {*} posX posX
+ * @param {*} posY posY
+ * @param {*} isComponentArea isComponentArea
+ * @returns {*} rtcomponents
  */
 function createRtcomponentViewObject(componentId, modelId, name, dataPorts, servicePorts, posX, posY, isComponentArea) {
 
@@ -62,7 +78,7 @@ function createRtcomponentViewObject(componentId, modelId, name, dataPorts, serv
   var portTypeMap = new Object();
 
   if (dataPorts && dataPorts.length > 0) {
-    for (var i = 0; i < dataPorts.length; i++) {
+    for (let i = 0; i < dataPorts.length; i++) {
       if (dataPorts[i].portType == "DataInPort") {
         // 入力ポート
         inPortNames.push(dataPorts[i].name);
@@ -76,7 +92,7 @@ function createRtcomponentViewObject(componentId, modelId, name, dataPorts, serv
 
   // サービスポート
   if (servicePorts && servicePorts.length > 0) {
-    for (var i = 0; i < servicePorts.length; i++) {
+    for (let i = 0; i < servicePorts.length; i++) {
       if (servicePorts[i].position === 'LEFT') {
         inPortNames.push(servicePorts[i].name);
       } else {
@@ -120,24 +136,11 @@ function createRtcomponentViewObject(componentId, modelId, name, dataPorts, serv
   });
 
   // グラデーションをかける
-  if (!isComponentArea && curState === STATE.EXEC) {
-    rtcomponents.attr('rect/fill', {
-      type: 'linearGradient',
-      stops: [
-        { offset: '0%', color: '#b2ffb5' },
-        { offset: '100%', color: '#3dff32' }
-      ],
-      attrs: { x1: '0%', y1: '0%', x2: '0%', y2: '100%' }
-    });
+
+  if (!isComponentArea && curState === STATE.EXEC) {  
+    rtcomponents.attr('rect/fill', 'url(#GradientExec)');
   } else {
-    rtcomponents.attr('rect/fill', {
-      type: 'linearGradient',
-      stops: [
-        { offset: '0%', color: '#b2d8ff' },
-        { offset: '100%', color: '#3399ff' }
-      ],
-      attrs: { x1: '0%', y1: '0%', x2: '0%', y2: '100%' }
-    });
+    rtcomponents.attr('rect/fill', 'url(#GradientEdit)');
   }
 
   // 影をつける
@@ -148,7 +151,7 @@ function createRtcomponentViewObject(componentId, modelId, name, dataPorts, serv
 
   // ポート設定
   if (rtcomponents.portData.ports && rtcomponents.portData.ports.length > 0) {
-    for (var i = 0; i < rtcomponents.portData.ports.length; i++) {
+    for (let i = 0; i < rtcomponents.portData.ports.length; i++) {
       rtcomponents.portData.ports[i].attrs['.port-body'].r = isComponentArea ? 3 : 6;
       rtcomponents.portData.ports[i].attrs['.port-body']['port-type'] = portTypeMap[rtcomponents.portData.ports[i]['id']];
       if (rtcomponents.portData.ports[i].attrs['.port-body']['port-type'] === 'DataInPort' || rtcomponents.portData.ports[i].attrs['.port-body']['port-type'] === 'DataOutPort') {
@@ -168,8 +171,9 @@ function createRtcomponentViewObject(componentId, modelId, name, dataPorts, serv
 
 /**
  * RTCを画面から削除する
- * @param id
- * @returns
+ * 
+ * @param {*} id id
+ * @returns {undefined}
  */
 function deleteComponentViewObject(id) {
   if (mainGraph.attributes.cells.models && mainGraph.attributes.cells.models.length > 0) {
@@ -184,7 +188,8 @@ function deleteComponentViewObject(id) {
 
 /**
  * すべてのRTCを画面から削除する
- * @returns
+ * 
+ * @returns {undefined}
  */
 function deleteAllComponentsViewObject() {
   if (mainGraph.attributes.cells.models && mainGraph.attributes.cells.models.length > 0) {
@@ -197,7 +202,7 @@ function deleteAllComponentsViewObject() {
 /**
  * 位置情報を更新する
  * 
- * @returns
+ * @returns {undefined}
  */
 function updateLocation() {
 
@@ -205,7 +210,7 @@ function updateLocation() {
   if (mainGraph.attributes.cells.models) {
 
     var modelList = mainGraph.attributes.cells.models;
-    for (var i = 0; i < modelList.length; i++) {
+    for (let i = 0; i < modelList.length; i++) {
 
       var model = modelList[i];
 
@@ -214,8 +219,8 @@ function updateLocation() {
       // コンポーネントの位置を保存する
       if (mainRtsMap[curWorkspaceName].rtsProfile.components) {
 
-        var componentList = mainRtsMap[curWorkspaceName].rtsProfile.components;
-        for (var j = 0; j < componentList.length; j++) {
+        let componentList = mainRtsMap[curWorkspaceName].rtsProfile.components;
+        for (let j = 0; j < componentList.length; j++) {
           var component = componentList[j];
           if (component.instanceName === model.attributes.id) {
             isComponent = true;
@@ -238,21 +243,21 @@ function updateLocation() {
         if (mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors) {
 
           var dataPortConectorList = mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors;
-          for (var j = 0; j < dataPortConectorList.length; j++) {
+          for (let j = 0; j < dataPortConectorList.length; j++) {
             var dataPortConnector = dataPortConectorList[j];
             if (dataPortConnector.connectorId === model.attributes.id) {
 
               if (model.attributes.vertices) {
                 var propList = [];
                 // 折れ線以外を格納する
-                for (var k = 0; k < mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors[j].properties.length; k++) {
+                for (let k = 0; k < mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors[j].properties.length; k++) {
                   var orgProp = mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors[j].properties[k];
                   if (orgProp['name'] !== 'vertice') {
                     propList.push(orgProp);
                   }
                 }
 
-                for (var k = 0; k < model.attributes.vertices.length; k++) {
+                for (let k = 0; k < model.attributes.vertices.length; k++) {
                   var property = new Object();
                   property['name'] = 'vertice';
                   property['value'] = '{"x": ' + model.attributes.vertices[k].x + ', "y": ' + model.attributes.vertices[k].y + '}';
@@ -271,10 +276,10 @@ function updateLocation() {
   // コンポーネントの位置を保存する
   if (mainRtsMap[curWorkspaceName].rtsProfile.components) {
 
-    var componentList = mainRtsMap[curWorkspaceName].rtsProfile.components;
-    for (var i = 0; i < componentList.length; i++) {
+    let componentList = mainRtsMap[curWorkspaceName].rtsProfile.components;
+    for (let i = 0; i < componentList.length; i++) {
       if (mainGraph.attributes.cells.models) {
-        for (var j = 0; j < mainGraph.attributes.cells.models.length; j++) {
+        for (let j = 0; j < mainGraph.attributes.cells.models.length; j++) {
           if (mainRtsMap[curWorkspaceName].rtsProfile.components[i].instanceName === mainGraph.attributes.cells.models[j].attributes.id) {
             if (!mainRtsMap[curWorkspaceName].rtsProfile.componentMap[mainRtsMap[curWorkspaceName].rtsProfile.components[i].id][0].location) {
               mainRtsMap[curWorkspaceName].rtsProfile.componentMap[mainRtsMap[curWorkspaceName].rtsProfile.components[i].id][0].location = new Object();
@@ -294,8 +299,9 @@ function updateLocation() {
 
 /**
  * PackageのComponent部分を更新する
- * @param rtc
- * @returns
+ * 
+ * @param {*} rtc rtc
+ * @returns {undefined}
  */
 function updateRtcInPackage(rtc) {
   // RTC置き換え
@@ -314,11 +320,12 @@ function updateRtcInPackage(rtc) {
  **********************************************************/
 /**
  * ポート名称の重複をチェックする
- * @param componentId
- * @param index
- * @param portName
- * @param isData
- * @returns
+ * 
+ * @param {*} componentId componentId
+ * @param {*} index index
+ * @param {*} portName portName
+ * @param {*} isData isData
+ * @returns {boolean} result
  */
 function existSamePortName(componentId, index, portName, isData) {
   var rtcomponent = getComponentInPackage(componentId);
@@ -327,7 +334,7 @@ function existSamePortName(componentId, index, portName, isData) {
     return false;
   }
 
-  for (var i = 0; i < rtcomponent.rtcProfile.dataPorts.length; i++) {
+  for (let i = 0; i < rtcomponent.rtcProfile.dataPorts.length; i++) {
     if (rtcomponent.rtcProfile.dataPorts[i].name === portName) {
       if (isData === false || i != index) {
         // 名称が一致していても自分自身ならOK
@@ -336,7 +343,7 @@ function existSamePortName(componentId, index, portName, isData) {
     }
   }
 
-  for (var i = 0; i < rtcomponent.rtcProfile.servicePorts.length; i++) {
+  for (let i = 0; i < rtcomponent.rtcProfile.servicePorts.length; i++) {
     if (rtcomponent.rtcProfile.servicePorts[i].name === portName) {
       if (isData === true || i != index) {
         // 名称が一致していても自分自身ならOK
@@ -354,8 +361,9 @@ function existSamePortName(componentId, index, portName, isData) {
 /**
  * 新規作成時のデフォルトのデータポートを作成する
  * 
- * @param componentId
- * @param isIn
+ * @param {*} componentId componentId
+ * @param {*} isIn isIn
+ * @returns {Object} portData
  */
 function getDefaultDataPort(componentId, isIn) {
   // 入力・出力識別用
@@ -375,7 +383,7 @@ function getDefaultDataPort(componentId, isIn) {
 
   // コンポーネントを取得する
   var rtcomponent = getComponentInPackage(componentId);
-  var componentIndex = getComponentIndexInPackage(componentId);;
+  var componentIndex = getComponentIndexInPackage(componentId);
   if (!rtcomponent || componentIndex < 0) {
     return portData;
   }
@@ -407,12 +415,12 @@ function getDefaultDataPort(componentId, isIn) {
 /**
  * 入力ポートを追加する
  * 
- * @param componentId
- * @param portName
- * @param dataType
- * @param valName
- * @param isIn
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} portName portName
+ * @param {*} dataType dataType
+ * @param {*} valName valName
+ * @param {*} isIn isIn
+ * @returns {*} rtcomponent
  */
 function addDataPort(componentId, portName, dataType, valName, isIn) {
   // 入力・出力識別用
@@ -425,7 +433,7 @@ function addDataPort(componentId, portName, dataType, valName, isIn) {
 
   // コンポーネントを取得する
   var rtcomponent = getComponentInPackage(componentId);
-  var componentIndex = getComponentIndexInPackage(componentId);;
+  var componentIndex = getComponentIndexInPackage(componentId);
   if (!rtcomponent || componentIndex < 0) {
     return null;
   }
@@ -444,22 +452,22 @@ function addDataPort(componentId, portName, dataType, valName, isIn) {
     mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId][0].dataPorts.push(portRts);
   }
   return rtcomponent;
-};
+}
 
 /**
  * データポートを更新する
  * 
- * @param componentId
- * @param index
- * @param portName
- * @param dataType
- * @param valName
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} index index
+ * @param {*} portName portName
+ * @param {*} dataType dataType
+ * @param {*} valName valName
+ * @returns {*} rtcomponent
  */
 function updateDataPort(componentId, index, portName, dataType, valName) {
   // コンポーネントを取得する
   var rtcomponent = getComponentInPackage(componentId);
-  var componentIndex = getComponentIndexInPackage(componentId);;
+  var componentIndex = getComponentIndexInPackage(componentId);
   if (!rtcomponent || componentIndex < 0) {
     return null;
   }
@@ -478,14 +486,14 @@ function updateDataPort(componentId, index, portName, dataType, valName) {
   }
 
   return rtcomponent;
-};
+}
 
 /**
  * データポートを削除する
  * 
- * @param componentId
- * @param index
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} index index
+ * @returns {undefined}
  */
 function deleteDataPort(componentId, index) {
   // IDを元に作業領域オブジェクトマップから取得
@@ -516,9 +524,10 @@ function deleteDataPort(componentId, index) {
 /**
  * 指定ポートが接続済かどうかを調べる
  * 
- * @param componentId
- * @param portName
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} modelId modelId
+ * @param {*} portName portName
+ * @returns {boolean} result
  */
 function isPortConnected(componentId, modelId, portName) {
   var dataPortConnectors = mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors;
@@ -540,10 +549,10 @@ function isPortConnected(componentId, modelId, portName) {
 /**
  * ログの出力を解除する
  * 
- * @param componentId
- * @param modelId
- * @param portName
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} modelId modelId
+ * @param {*} portName portName
+ * @returns {undefined}
  */
 function removeLogger(componentId, modelId, portName) {
   // 一度非表示にしておく
@@ -552,7 +561,7 @@ function removeLogger(componentId, modelId, portName) {
   // 接続情報を削除する
   var dataPortConnectors = mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors;
   if (dataPortConnectors && dataPortConnectors.length > 0) {
-    for (var i = 0; i < dataPortConnectors.length; i++) {
+    for (let i = 0; i < dataPortConnectors.length; i++) {
       var dataPortConnector = dataPortConnectors[i];
       if (dataPortConnector.sourceDataPort.componentId === componentId &&
         dataPortConnector.sourceDataPort.instanceName === modelId &&
@@ -566,7 +575,7 @@ function removeLogger(componentId, modelId, portName) {
   // Packageの情報を更新する
   var componentArr = mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId];
   if (componentArr && componentArr[0].dataPorts) {
-    for (var i = 0; i < componentArr[0].dataPorts.length; i++) {
+    for (let i = 0; i < componentArr[0].dataPorts.length; i++) {
       var dataport = componentArr[0].dataPorts[i];
       if (dataport.name === portName) {
         mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId][0].dataPorts[i].logging = false;
@@ -581,11 +590,11 @@ function removeLogger(componentId, modelId, portName) {
 /**
  * ロガーの表示・非表示を切り替える
  * 
- * @param componentId
- * @param modelId
- * @param portName
- * @param loggerVisible
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} modelId modelId
+ * @param {*} portName portName
+ * @param {*} loggerVisible loggerVisible
+ * @returns {undefined}
  */
 function changeLoggerDisplay(componentId, modelId, portName, loggerVisible) {
   // 接続情報を更新する
@@ -593,9 +602,9 @@ function changeLoggerDisplay(componentId, modelId, portName, loggerVisible) {
 
   var dataPortConnectorsList = mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors;
   if (dataPortConnectorsList && dataPortConnectorsList.length > 0) {
-    for (var i = 0; i < dataPortConnectorsList.length; i++) {
+    for (let i = 0; i < dataPortConnectorsList.length; i++) {
 
-      var dataPortConnector = dataPortConnectorsList[i];
+      let dataPortConnector = dataPortConnectorsList[i];
       if (dataPortConnector.sourceDataPort.componentId === componentId &&
         dataPortConnector.sourceDataPort.instanceName === modelId &&
         dataPortConnector.sourceDataPort.portName === modelId + '.' + portName &&
@@ -609,9 +618,9 @@ function changeLoggerDisplay(componentId, modelId, portName, loggerVisible) {
 
     // 同一ロガーを使用していて表示となっているコネクタの件数を数える
     var sameLoggerCnt = 0;
-    for (var i = 0; i < dataPortConnectorsList.length; i++) {
+    for (let i = 0; i < dataPortConnectorsList.length; i++) {
 
-      var dataPortConnector = dataPortConnectorsList[i];
+      let dataPortConnector = dataPortConnectorsList[i];
       if (dataPortConnector.visible === true && dataPortConnector.targetDataPort.componentId === loggerId) {
         sameLoggerCnt++;
       }
@@ -629,7 +638,7 @@ function changeLoggerDisplay(componentId, modelId, portName, loggerVisible) {
   if (componentList && componentList.length > 0) {
 
     var rtcomponent = componentList[0];
-    for (var i = 0; i < rtcomponent.dataPorts.length; i++) {
+    for (let i = 0; i < rtcomponent.dataPorts.length; i++) {
       if (rtcomponent.dataPorts[i].name === portName) {
         mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId][0].dataPorts[i].loggerVisible = loggerVisible;
         break;
@@ -646,7 +655,8 @@ function changeLoggerDisplay(componentId, modelId, portName, loggerVisible) {
  **********************************************************/
 /**
  * データポート接続情報を設定する
- * @returns
+ * 
+ * @returns {undefined}
  */
 function setDataPortConnectionInfo() {
   if (mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors && mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors.length > 0) {
@@ -713,35 +723,35 @@ function setDataPortConnectionInfo() {
       }
     }
   }
-};
+}
 
 /**
  * データポート接続情報を更新する
  * 
- * @param rtc
- * @param oldPortName
- * @param newPortName
- * @param isIn
- * @returns
+ * @param {*} rtc rtc
+ * @param {*} oldPortName oldPortNa
+ * @param {*} newPortName newPortName
+ * @param {*} isIn isIn
+ * @returns {undefined} 
  */
 function updateDataPortConnectionInfo(rtc, oldPortName, newPortName, isIn) {
   // リンク情報を再定義
   var instanceName = null;
-  for (var i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
+  for (let i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
     if (mainRtsMap[curWorkspaceName].rtsProfile.components[i].id === rtc.rtcProfile.id) {
       instanceName = mainRtsMap[curWorkspaceName].rtsProfile.components[i].instanceName;
     }
   }
   if (mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors && mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors.length > 0) {
-    for (var i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors.length; i++) {
+    for (let i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors.length; i++) {
       if (isIn === false) {
-        for (var j = 0; j < rtc.rtcProfile.dataPorts.length; j++) {
+        for (let j = 0; j < rtc.rtcProfile.dataPorts.length; j++) {
           if (mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors[i].sourceDataPort.portName === (instanceName + '.' + oldPortName)) {
             mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors[i].sourceDataPort.portName = instanceName + '.' + newPortName;
           }
         }
       } else {
-        for (var j = 0; j < rtc.rtcProfile.dataPorts.length; j++) {
+        for (let j = 0; j < rtc.rtcProfile.dataPorts.length; j++) {
           if (mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors[i].targetDataPort.portName === (instanceName + '.' + oldPortName)) {
             mainRtsMap[curWorkspaceName].rtsProfile.dataPortConnectors[i].targetDataPort.portName = instanceName + '.' + newPortName;
           }
@@ -753,8 +763,9 @@ function updateDataPortConnectionInfo(rtc, oldPortName, newPortName, isIn) {
 
 /**
  * データポート接続情報を削除する
- * @param connectorId
- * @returns
+ * 
+ * @param {*} connectorId connectorId
+ * @returns {undefined}
  */
 function deleteDataPortConnectionInfo(connectorId) {
   // 画面から削除
@@ -773,10 +784,11 @@ function deleteDataPortConnectionInfo(connectorId) {
 
 /**
  * データポート接続情報を追加する
- * @param connectorId
- * @param sourcePortData
- * @param targetPortData
- * @returns
+ * 
+ * @param {*} connectorId connectorId
+ * @param {*} sourcePortData sourcePortData
+ * @param {*} targetPortData targetPortData
+ * @returns {undefined}
  */
 function addDataPortConnectionInfo(connectorId, sourcePortData, targetPortData) {
   // 接続情報クラス
@@ -797,7 +809,7 @@ function addDataPortConnectionInfo(connectorId, sourcePortData, targetPortData) 
   sourceDataPort['portName'] = sourcePortData.modelId + '.' + sourcePortData.portName;
   sourceDataPort['instanceName'] = sourcePortData.modelId;
   sourceDataPort['properties'] = [];
-  for (var i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
+  for (let i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
     if (mainRtsMap[curWorkspaceName].rtsProfile.components[i].instanceName === sourcePortData.modelId) {
       var propSource = new Object();
       propSource['name'] = 'COMPONENT_PATH_ID';
@@ -814,7 +826,7 @@ function addDataPortConnectionInfo(connectorId, sourcePortData, targetPortData) 
   targetDataPort['portName'] = targetPortData.modelId + '.' + targetPortData.portName;
   targetDataPort['instanceName'] = targetPortData.modelId;
   targetDataPort['properties'] = [];
-  for (var i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
+  for (let i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
     if (mainRtsMap[curWorkspaceName].rtsProfile.components[i].instanceName === targetPortData.modelId) {
       var propTarget = new Object();
       propTarget['name'] = 'COMPONENT_PATH_ID';
@@ -860,8 +872,9 @@ function addDataPortConnectionInfo(connectorId, sourcePortData, targetPortData) 
 /**
  * 新規作成時のデフォルトのサービスポートを作成する
  * 
- * @param componentId
- * @param isIn
+ * @param {*} componentId componentId
+ * @param {*} isIn isIn
+ * @returns {Object} portData
  */
 function getDefaultServicePort(componentId) {
   // 入力・出力識別用
@@ -872,7 +885,7 @@ function getDefaultServicePort(componentId) {
 
   // コンポーネントを取得する
   var rtcomponent = getComponentInPackage(componentId);
-  var componentIndex = getComponentIndexInPackage(componentId);;
+  var componentIndex = getComponentIndexInPackage(componentId);
   if (!rtcomponent || componentIndex < 0) {
     return portData;
   }
@@ -901,16 +914,16 @@ function getDefaultServicePort(componentId) {
 /**
  * サービスポートを追加する
  * 
- * @param componentId
- * @param portName
- * @param position
- * @param interfaceList
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} portName portName
+ * @param {*} position position
+ * @param {*} interfaceList interfaceList
+ * @returns {*} rtcomponent
  */
 function addServicePort(componentId, portName, position, interfaceList) {
   // コンポーネントを取得する
   var rtcomponent = getComponentInPackage(componentId);
-  var componentIndex = getComponentIndexInPackage(componentId);;
+  var componentIndex = getComponentIndexInPackage(componentId);
   if (!rtcomponent || componentIndex < 0) {
     return null;
   }
@@ -934,16 +947,17 @@ function addServicePort(componentId, portName, position, interfaceList) {
 /**
  * サービスポートを更新する
  * 
- * @param componentId
- * @param portName
- * @param position
- * @param interfaceList
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} index index
+ * @param {*} portName portName
+ * @param {*} position position
+ * @param {*} interfaceList interfaceList
+ * @returns {*} rtcomponent
  */
 function updateServicePort(componentId, index, portName, position, interfaceList) {
   // コンポーネントを取得する
   var rtcomponent = getComponentInPackage(componentId);
-  var componentIndex = getComponentIndexInPackage(componentId);;
+  var componentIndex = getComponentIndexInPackage(componentId);
   if (!rtcomponent || componentIndex < 0) {
     return null;
   }
@@ -967,9 +981,9 @@ function updateServicePort(componentId, index, portName, position, interfaceList
 /**
  * サービスポートを削除する
  * 
- * @param componentId
- * @param index
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} index index
+ * @returns {undefined}
  */
 function deleteServicePort(componentId, index) {
   // IDを元に作業領域オブジェクトマップから取得
@@ -1002,7 +1016,8 @@ function deleteServicePort(componentId, index) {
  **********************************************************/
 /**
  * サービスポート接続情報を設定する
- * @returns
+ * 
+ * @returns {undefined}
  */
 function setServicePortConnectionInfo() {
   if (mainRtsMap[curWorkspaceName].rtsProfile.servicePortConnectors && mainRtsMap[curWorkspaceName].rtsProfile.servicePortConnectors.length > 0) {
@@ -1064,28 +1079,27 @@ function setServicePortConnectionInfo() {
       }
     }
   }
-};
+}
 
 /**
  * サービスポート接続情報を更新する
  * 
- * @param rtc
- * @param oldPortName
- * @param newPortName
- * @param isIn
- * @returns
+ * @param {*} rtc rtc
+ * @param {*} oldPortName oldPortName
+ * @param {*} newPortName newPortName
+ * @returns {undefined} 
  */
 function updateServicePortConnectionInfo(rtc, oldPortName, newPortName) {
   // リンク情報を再定義
   var instanceName = null;
-  for (var i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
+  for (let i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
     if (mainRtsMap[curWorkspaceName].rtsProfile.components[i].id === rtc.rtcProfile.id) {
       instanceName = mainRtsMap[curWorkspaceName].rtsProfile.components[i].instanceName;
     }
   }
   if (mainRtsMap[curWorkspaceName].rtsProfile.servicePortConnectors && mainRtsMap[curWorkspaceName].rtsProfile.servicePortConnectors.length > 0) {
-    for (var i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.servicePortConnectors.length; i++) {
-      for (var j = 0; j < rtc.rtcProfile.servicePorts.length; j++) {
+    for (let i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.servicePortConnectors.length; i++) {
+      for (let j = 0; j < rtc.rtcProfile.servicePorts.length; j++) {
         // サービスポートは接続元・接続先両方を見る必要がある
         if (mainRtsMap[curWorkspaceName].rtsProfile.servicePortConnectors[i].sourceDataPort.portName === (instanceName + '.' + oldPortName)) {
           mainRtsMap[curWorkspaceName].rtsProfile.servicePortConnectors[i].sourceDataPort.portName = instanceName + '.' + newPortName;
@@ -1100,8 +1114,9 @@ function updateServicePortConnectionInfo(rtc, oldPortName, newPortName) {
 
 /**
  * サービスポート接続情報を削除する
- * @param connectorId
- * @returns
+ *
+ * @param {*} connectorId connectorId
+ * @returns {undefined}
  */
 function deleteServicePortConnectionInfo(connectorId) {
   // 画面から削除
@@ -1120,10 +1135,11 @@ function deleteServicePortConnectionInfo(connectorId) {
 
 /**
  * サービスポート接続情報を追加する
- * @param connectorId
- * @param sourcePortData
- * @param targetPortData
- * @returns
+ *
+ * @param {*} connectorId connectorId
+ * @param {*} sourcePortData sourcePortData
+ * @param {*} targetPortData targetPortData
+ * @returns {undefined}
  */
 function addServicePortConnectionInfo(connectorId, sourcePortData, targetPortData) {
   // 接続情報クラス
@@ -1139,7 +1155,7 @@ function addServicePortConnectionInfo(connectorId, sourcePortData, targetPortDat
   sourceServicePort['portName'] = sourcePortData.modelId + '.' + sourcePortData.portName;
   sourceServicePort['instanceName'] = sourcePortData.modelId;
   sourceServicePort['properties'] = [];
-  for (var i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
+  for (let i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
     if (mainRtsMap[curWorkspaceName].rtsProfile.components[i].instanceName === sourcePortData.modelId) {
       var propSource = new Object();
       propSource['name'] = 'COMPONENT_PATH_ID';
@@ -1156,7 +1172,7 @@ function addServicePortConnectionInfo(connectorId, sourcePortData, targetPortDat
   targetServicePort['portName'] = targetPortData.modelId + '.' + targetPortData.portName;
   targetServicePort['instanceName'] = targetPortData.modelId;
   targetServicePort['properties'] = [];
-  for (var i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
+  for (let i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.components.length; i++) {
     if (mainRtsMap[curWorkspaceName].rtsProfile.components[i].instanceName === targetPortData.modelId) {
       var propTarget = new Object();
       propTarget['name'] = 'COMPONENT_PATH_ID';
@@ -1184,11 +1200,15 @@ function addServicePortConnectionInfo(connectorId, sourcePortData, targetPortDat
  **********************************************************/
 /**
  * コンフィギュレーション設定を更新する
+ *
+ * @param {*} componentId componentId
+ * @param {*} configurationList configurationList
+ * @returns {*} rtcomponent
  */
 function updateRtcConfiguration(componentId, configurationList) {
   // コンポーネントを取得する
   var rtcomponent = getComponentInPackage(componentId);
-  var componentIndex = getComponentIndexInPackage(componentId);;
+  var componentIndex = getComponentIndexInPackage(componentId);
   if (!rtcomponent || componentIndex < 0) {
     return null;
   }
@@ -1208,8 +1228,10 @@ function updateRtcConfiguration(componentId, configurationList) {
 /**
  * RTCにイベントを設定する
  * 
- * @param id
- * @returns
+ * @param {*} id id
+ * @param {*} modelId modelId
+ * @param {*} rtcomponent rtcomponent
+ * @returns {undefined}
  */
 function setEventRtcomponent(id, modelId, rtcomponent) {
   // ComponentIdを設定しておく
@@ -1220,20 +1242,20 @@ function setEventRtcomponent(id, modelId, rtcomponent) {
 
   // 全体ダブルクリックイベント設定
   $('rect', '[model-id = ' + modelId + ']').off('dblclick', '**');
-  $('rect', '[model-id = ' + modelId + ']').on('dblclick', function (event) {
+  $('rect', '[model-id = ' + modelId + ']').on('dblclick', function () {
     openSourceCodePopup(id);
   });
 
   // データポート・形状変更およびメニュー設定
-  for (var i = 0; i < rtcomponent.rtcProfile.dataPorts.length; i++) {
-    var port = rtcomponent.rtcProfile.dataPorts[i];
-    var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  for (let i = 0; i < rtcomponent.rtcProfile.dataPorts.length; i++) {
+    let port = rtcomponent.rtcProfile.dataPorts[i];
+    let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 
     // RTSプロファイルから情報を取得する
-    var logging = false;
-    var loggerVisible = false;
+    let logging = false;
+    let loggerVisible = false;
     if (mainRtsMap[curWorkspaceName].rtsProfile.componentMap[id] && mainRtsMap[curWorkspaceName].rtsProfile.componentMap[id][0].dataPorts) {
-      for (var j = 0; j < mainRtsMap[curWorkspaceName].rtsProfile.componentMap[id][0].dataPorts.length; j++) {
+      for (let j = 0; j < mainRtsMap[curWorkspaceName].rtsProfile.componentMap[id][0].dataPorts.length; j++) {
         if (mainRtsMap[curWorkspaceName].rtsProfile.componentMap[id][0].dataPorts[j].name === port.name) {
           logging = mainRtsMap[curWorkspaceName].rtsProfile.componentMap[id][0].dataPorts[j].logging;
           loggerVisible = mainRtsMap[curWorkspaceName].rtsProfile.componentMap[id][0].dataPorts[j].loggerVisible;
@@ -1242,9 +1264,9 @@ function setEventRtcomponent(id, modelId, rtcomponent) {
       }
     }
 
-    var target = null;
-    var parent = null;
-    var div = null;
+    let target = null;
+    let parent = null;
+    let div = null;
     if (port.portType == "DataInPort") {
       // 入力ポート
       target = $('circle[port-group=in][port=' + port.name + ']', '[model-id = ' + modelId + ']');
@@ -1270,7 +1292,7 @@ function setEventRtcomponent(id, modelId, rtcomponent) {
     // UbuntuChromeでポート位置が不正のため設定し直す
     parent[0].setAttribute('transform', parent[0].getAttribute('transform'));
 
-    var componentName = rtcomponent.modelProfile.modelName;
+    let componentName = rtcomponent.modelProfile.modelName;
     if (rtcomponent.modelProfile.clonedDirectory.indexOf(componentName) < 0) {
       componentName = rtcomponent.modelProfile.gitName;
     }
@@ -1301,19 +1323,19 @@ function setEventRtcomponent(id, modelId, rtcomponent) {
 
   // サービスポート・形状変更およびメニュー設定
   if (rtcomponent.rtcProfile.servicePorts && rtcomponent.rtcProfile.servicePorts.length > 0) {
-    var componentName = rtcomponent.modelProfile.modelName;
+    let componentName = rtcomponent.modelProfile.modelName;
     if (rtcomponent.modelProfile.clonedDirectory.indexOf(componentName) < 0) {
       componentName = rtcomponent.modelProfile.gitName;
     }
-    for (var i = 0; i < rtcomponent.rtcProfile.servicePorts.length; i++) {
-      var port = rtcomponent.rtcProfile.servicePorts[i];
+    for (let i = 0; i < rtcomponent.rtcProfile.servicePorts.length; i++) {
+      let port = rtcomponent.rtcProfile.servicePorts[i];
       // サービスポートはポート単位でのみ表示
       // 表示位置を反映する
       if (port.position === 'LEFT') {
-        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', 'M -12 -7 L 0 -7 0 7 -12 7 Z');
-        var target = $('circle[port-group=in][port=' + port.name + ']', '[model-id = ' + modelId + ']');
-        var parent = target.parent();
+        let target = $('circle[port-group=in][port=' + port.name + ']', '[model-id = ' + modelId + ']');
+        let parent = target.parent();
 
         path.setAttribute('class', 'port-body');
         path.setAttribute('id', target.attr('id'));
@@ -1327,7 +1349,7 @@ function setEventRtcomponent(id, modelId, rtcomponent) {
         parent.append(path);
         // UbuntuChromeでポート位置が不正のため設定し直す
         parent[0].setAttribute('transform', parent[0].getAttribute('transform'));
-        var div = $('text', parent);
+        let div = $('text', parent);
         if (div) {
           $(div).addClass('rtc-serviceport-menu');
           $(div).attr('font-size', 12);
@@ -1335,10 +1357,10 @@ function setEventRtcomponent(id, modelId, rtcomponent) {
           $(div).data({ 'id': id, 'componentName': componentName, 'modelId': modelId, 'index': i, 'portName': port.name, 'position': port.position, 'interfaceArray': port.serviceInterfaces });
         }
       } else {
-        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        let path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', 'M 0 -7 L 12 -7 12 7 0 7 Z');
-        var target = $('circle[port-group=out][port=' + port.name + ']', '[model-id = ' + modelId + ']');
-        var parent = target.parent();
+        let target = $('circle[port-group=out][port=' + port.name + ']', '[model-id = ' + modelId + ']');
+        let parent = target.parent();
 
         path.setAttribute('class', 'port-body');
         path.setAttribute('id', target.attr('id'));
@@ -1352,7 +1374,7 @@ function setEventRtcomponent(id, modelId, rtcomponent) {
         parent.append(path);
         // UbuntuChromeでポート位置が不正のため設定し直す
         parent[0].setAttribute('transform', parent[0].getAttribute('transform'));
-        var div = $('text', parent);
+        let div = $('text', parent);
         if (div) {
           $(div).addClass('rtc-serviceport-menu');
           $(div).attr('font-size', 12);
@@ -1366,6 +1388,9 @@ function setEventRtcomponent(id, modelId, rtcomponent) {
 
 /**
  * データポートリンクにイベントを設定する
+ * 
+ * @param {*} dataPortConnector dataPortConnector
+ * @returns {undefined}
  */
 function setEventDataportLink(dataPortConnector) {
   // 全体右クリックメニュー設定
@@ -1383,6 +1408,9 @@ function setEventDataportLink(dataPortConnector) {
 
 /**
  * サービスポートリンクにイベントを設定する
+ * 
+ * @param {*} servicePortConnector servicePortConnector
+ * @returns {undefined}
  */
 function setEventServiceportLink(servicePortConnector) {
   // 全体右クリックメニュー設定
@@ -1401,8 +1429,8 @@ function setEventServiceportLink(servicePortConnector) {
 /**
  * componentIdからComponentを取得する
  * 
- * @param componentId
- * @returns
+ * @param {*} componentId componentId
+ * @returns {*} rtcomponent
  */
 function getComponentInPackage(componentId) {
   var rtcomponent = null;
@@ -1420,8 +1448,8 @@ function getComponentInPackage(componentId) {
 /**
  * componentIdからComponentのINDEXを取得する
  * 
- * @param componentId
- * @returns
+ * @param {*} componentId componentId
+ * @returns {number} componentIndex
  */
 function getComponentIndexInPackage(componentId) {
   var componentIndex = -1;
@@ -1439,8 +1467,8 @@ function getComponentIndexInPackage(componentId) {
 /**
  * componentIdからインスタンス名を取得
  * 
- * @param componentId
- * @returns 
+ * @param {*} componentId componentId
+ * @returns {string} instanceName
  */
 function getInstanceNameInPackage(componentId) {
   var instanceName = null;
@@ -1455,8 +1483,8 @@ function getInstanceNameInPackage(componentId) {
 /**
  * componentIdからアクティブなコンフィギュレーション設定を取得する
  * 
- * @param componentId
- * @returns
+ * @param {*} componentId componentId
+ * @returns {*} activeConfigSet
  */
 function getActiveConfigInPackage(componentId) {
   var activeConfigSet = null;
@@ -1472,9 +1500,9 @@ function getActiveConfigInPackage(componentId) {
  * componentIdとポートインスタンス名から<br>
  * ロガーに接続されているコネクタ名を取得する
  * 
- * @param componentId
- * @param instancePortName
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} portInstanceName portInstanceName
+ * @returns {string} connectorName
  */
 function getConnectorNameInPackage(componentId, portInstanceName) {
   var connectorName = null;
@@ -1499,9 +1527,9 @@ function getConnectorNameInPackage(componentId, portInstanceName) {
  * componentIdとポートインスタンス名から<br>
  * ロガーとして使用しているコンポーネントのIDを取得する
  * 
- * @param componentId
- * @param instancePortName
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} portInstanceName portInstanceName
+ * @returns {string} loggerId
  */
 function getLoggerIdInPackage(componentId, portInstanceName) {
   var loggerId = null;
@@ -1527,10 +1555,10 @@ function getLoggerIdInPackage(componentId, portInstanceName) {
  * componentId,activeConfigSet,confignameから<br>
  * Configの設定値を取得する
  * 
- * @param componentId
- * @param activeConfig
- * @param configKey
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} activeConfigSet activeConfigSet
+ * @param {*} configName configName
+ * @returns {string} directoryPath
  */
 function getActiveConfigDataInPackage(componentId, activeConfigSet, configName) {
   var directoryPath = null;
@@ -1565,8 +1593,8 @@ function getActiveConfigDataInPackage(componentId, activeConfigSet, configName) 
 /**
  * componentIdからpathURIを取得
  * 
- * @param componentId
- * @returns 
+ * @param {*} componentId componentId
+ * @returns {string} pathUri
  */
 function getPathUriInPackage(componentId) {
   var pathUri = null;
@@ -1577,10 +1605,39 @@ function getPathUriInPackage(componentId) {
 }
 
 /**
+ * componentIdのRTCのpathURIを変更する
+ * 
+ * @param {*} componentId componentId
+ * @param {*} newPathUri newPathUri
+ * @returns {undefined}
+ */
+function changePathUriInPackage(componentId, newPathUri) {
+
+  if (mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId]) {
+    mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId][0].pathUri = newPathUri;
+  }
+}
+
+/**
+ * すべてのRTCのpathURIをデフォルトに戻す
+ * 
+ * @returns {undefined}
+ */
+function changeAllPathUriIntoLocalhost() {
+  let components = document.getElementById('main-panel').getElementsByTagName('rect');
+  for (let i = 0; i < components.length; i++){
+    let componentId = components[i].getAttribute('component-id');
+    changePathUriInPackage(componentId, 'localhost:2809/' + components[i].parentElement.parentElement.getAttribute('model-id') + '.rtc');
+  }
+  // サーバーに通知
+  updatePackage();
+}
+
+/**
  * componentIdからコードディレクトリ管理情報を取得する
  * 
- * @param componentId
- * @returns
+ * @param {*} componentId componentId
+ * @returns {*} codeDirectory
  */
 function getCodeDirectoryInPackageRtcDir(componentId) {
   var codeDirectory = null;
@@ -1599,8 +1656,8 @@ function getCodeDirectoryInPackageRtcDir(componentId) {
 /**
  * modelIdからComponent名を取得
  * 
- * @param modelId
- * @returns 
+ * @param {*} modelId modelId
+ * @returns {string} componentName
  */
 function getComponentNameInComponents(modelId) {
   var componentName = null;
@@ -1613,8 +1670,8 @@ function getComponentNameInComponents(modelId) {
 /**
  * modelIdからGitリポジトリ名を取得
  * 
- * @param modelId
- * @returns 
+ * @param {*} modelId modelId
+ * @returns {string} gitName
  */
 function getRepositryNameInComponents(modelId) {
   var gitName = null;
@@ -1627,8 +1684,8 @@ function getRepositryNameInComponents(modelId) {
 /**
  * modelIdからCloneされているディレクトリ名を取得
  * 
- * @param modelId
- * @returns
+ * @param {*} modelId modelId
+ * @returns {string} clonedDirectory
  */
 function getClonedDirectory(modelId) {
   var clonedDirectory = null;
@@ -1643,6 +1700,9 @@ function getClonedDirectory(modelId) {
  **********************************************************/
 /**
  * ポート名称から接続情報のポート名称に変換する
+ * 
+ * @param {*} portDataType portDataType
+ * @returns {string} 接続情報のポート名称
  */
 function getConnectionPortDataType(portDataType) {
   var strs = portDataType.split('::');

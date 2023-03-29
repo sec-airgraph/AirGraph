@@ -2,7 +2,9 @@
  * 右クリックメニュー設定
  *************************************************************************/
 /**
- * 作業領域の右クリックメニュー設定
+ * 作業領域の右クリックメニュー設定.
+ *
+ * @returns {undefined}
  */
 function setMainAreaContextMenu() {
   $.contextMenu({
@@ -33,6 +35,11 @@ function setMainAreaContextMenu() {
   });
 }
 
+/**
+ * DataMakerポップアップを生成する.
+ *
+ * @returns {undefined}
+ */
 function openDataMakerPopup() {
 
   sourceEditor.setModel(Monaco.Editor.createModel(modelMap[curWorkspaceName].dataMakerStr, 'python'));
@@ -86,9 +93,9 @@ function openDataMakerPopup() {
 }
 
 /**
- * ソースエディタを生成する
- * 
- * @returns
+ * ソースエディタを生成する.
+ *
+ * @returns {undefined}
  */
 function createDataMakerEditor() {
   require.config({

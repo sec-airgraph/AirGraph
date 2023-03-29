@@ -9,6 +9,6 @@ cd ../airgraph/
 mvn package
 
 # copy binary files
-cp -r target/airgraph-1.0.0.jar ../release_app/airgraph.jar
+cp -r target/airgraph-2.0.0.jar ../release_app/airgraph.jar
 
 exit 0

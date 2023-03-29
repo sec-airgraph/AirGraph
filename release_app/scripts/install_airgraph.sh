@@ -31,6 +31,7 @@ mkdir -p ${TARGET_DIR}
 mkdir -p ${TARGET_DIR}/bin
 mkdir -p ${TARGET_DIR}/scripts
 mkdir -p ${TARGET_DIR}/data
+make_dir ${TARGET_DIR}/hosts
 make_dir ${TARGET_DIR}/logs
 
 make_dir ${TARGET_DIR}/data/datasets
@@ -46,16 +47,22 @@ make_dir ${TARGET_DIR}/data/rtm_templates
 make_dir ${TARGET_DIR}/data/rtm_workspace
 
 # 必要なファイルをコピー
-cp -r ./airgraph.jar ${TARGET_DIR}/bin/.
-cp -r ./scripts/airgraph ${TARGET_DIR}/scripts/.
+cp -rv ./airgraph.jar ${TARGET_DIR}/bin/.
+cp -rv ./scripts/airgraph ${TARGET_DIR}/scripts/.
 
-cp -r ./rtm_scripts/* ${TARGET_DIR}/data/rtm_scripts/.
-cp -r ./rtm_templates/* ${TARGET_DIR}/data/rtm_templates/.
-cp -r ./keras_templates/* ${TARGET_DIR}/data/keras_templates/.
-cp -r ./keras_models/* ${TARGET_DIR}/data/keras_models/.
+cp -rv ./rtm_scripts/* ${TARGET_DIR}/data/rtm_scripts/.
+cp -rv ./rtm_templates/* ${TARGET_DIR}/data/rtm_templates/.
+cp -rv ./keras_templates/* ${TARGET_DIR}/data/keras_templates/.
+cp -rv ./keras_models/* ${TARGET_DIR}/data/keras_models/.
 
-cp -r ./datasets/* ${TARGET_DIR}/data/datasets/.
+cp -rv ./datasets/* ${TARGET_DIR}/data/datasets/.
 
+# host設定ファイルをコピー（上書き確認つき）
+cp -iv hosts/* ${TARGET_DIR}/hosts/
+for conf in `ls -1 hosts/`;
+do
+  chmod 777 ${TARGET_DIR}/hosts/${conf};
+done
 # 自動起動設定
 set_startup off
 

@@ -1,21 +1,19 @@
 package com.sec.airgraph.service;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
+import com.sec.airgraph.util.Const.COMMON.DIR_NAME;
 import com.sec.airgraph.util.GitUtil;
 import com.sec.airgraph.util.PropUtil;
 import com.sec.airgraph.util.StringUtil;
 import com.sec.airgraph.util.WasanbonUtil;
-import com.sec.airgraph.util.Const.COMMON.DIR_NAME;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
- * IDE管理用サービス
+ * IDE管理用サービス.
  * 
  * @author Tsuyoshi Hirose
  *
@@ -25,30 +23,34 @@ import com.sec.airgraph.util.Const.COMMON.DIR_NAME;
 public class IdeManagementService {
 
 	/**
-	 * logger
+	 * logger.
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(IdeManagementService.class);
 
 	/************************************************************
 	 * Git関連
 	 ************************************************************/
-
 	/**
-	 * PackageをローカルリポジトリにCommitする
-	 * 
-	 * @param workPackageName
-	 * @param commitMessage
+	 * PackageをローカルリポジトリにCommitする.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param packageName パッケージ名
+	 * @param commitMessage コミットメッセージ
+	 * @return commit結果
 	 */
-	public String commitPackage(String workPackageName, String commitMessage) {
+	public String commitPackage(String workPackageName, String packageName, String commitMessage) {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String workPackageDirPath = workspaceDirPath + File.separator + workPackageName;
-
+		
+		//packageNameを取得する
+		packageName = packageName.replace("rts_", "");
+		
 		// コンポーネントをパッケージにリンクする
-		WasanbonUtil.syncRtcToPackage(workPackageDirPath);
-
+		WasanbonUtil.syncRtcToPackage(packageName);
+		
 		// Commitする
-		String result = GitUtil.gitCommit(workPackageDirPath, commitMessage);
+		String result = GitUtil.gitPackageCommit(workPackageDirPath, packageName, commitMessage);
 
 		logger.info("Commit Package. package[" + workPackageName + "]result[" + result + "]");
 
@@ -56,11 +58,15 @@ public class IdeManagementService {
 	}
 
 	/**
-	 * PackageをリモートリポジトリにPushする
-	 * 
-	 * @param workPackageName
+	 * PackageをリモートリポジトリにPushする.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param packageName パッケージ名
+	 * @param userName GitHubユーザー名
+	 * @param password GitHubパスワード
+	 * @return push結果
 	 */
-	public String pushPackage(String workPackageName, String userName, String password) {
+	public String pushPackage(String workPackageName, String packageName, String userName, String password) {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String workPackageDirPath = workspaceDirPath + File.separator + workPackageName;
@@ -68,6 +74,9 @@ public class IdeManagementService {
 		// URLをID/Pass付きに変換する
 		String gitUrl = GitUtil.getGitUrl(workPackageDirPath).trim();
 		String newGitUrl = gitUrl;
+		
+		//packageNameを取得する
+		packageName = packageName.replace("rts_", "");
 
 		if (StringUtil.isNotEmpty(userName) && StringUtil.isNotEmpty(password)) {
 			try {
@@ -80,9 +89,9 @@ public class IdeManagementService {
 				newGitUrl = gitUrl;
 			}
 		}
-
+		
 		// Pushする
-		String result = GitUtil.gitPush(workPackageDirPath);
+		String result = GitUtil.gitPackagePush(packageName);
 
 		// URLを戻す
 		GitUtil.changeRemoteUrl(workPackageDirPath, gitUrl);
@@ -93,9 +102,12 @@ public class IdeManagementService {
 	}
 
 	/**
-	 * PackageをリモートリポジトリからPullする
-	 * 
-	 * @param workPackageName
+	 * PackageをリモートリポジトリからPullする.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param userName GitHubユーザー名
+	 * @param password GitHubパスワード
+	 * @return pull結果
 	 */
 	public String pullPackage(String workPackageName, String userName, String password) {
 		// 作業領域パス
@@ -130,20 +142,23 @@ public class IdeManagementService {
 	}
 
 	/**
-	 * ComponentをローカルリポジトリにCommitする
+	 * ComponentをローカルリポジトリにCommitする.
 	 * 
-	 * @param workPackageName
-	 * @param componentName
-	 * @param commitMessage
+	 * @param workPackageName パッケージ名
+	 * @param componentName コンポーネント名
+	 * @param commitMessage コミットメッセージ
+	 * @return commit結果
 	 */
 	public String commitComponent(String workPackageName, String componentName, String commitMessage) {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		String rtcDirPath = StringUtil.concatenate(File.separator, workspaceDirPath, workPackageName,
 				DIR_NAME.PACKAGE_RTC_DIR_NAME, componentName);
-
+		
+		String packageName = workPackageName.replace("rts_", "");
+		
 		// Commitする
-		String result = GitUtil.gitCommit(rtcDirPath, commitMessage);
+		String result = GitUtil.gitComponentCommit(rtcDirPath, packageName, componentName, commitMessage);
 
 		logger.info("Commit Component. package[" + workPackageName + "]componentName[" + componentName + "]result["
 				+ result + "]");
@@ -152,12 +167,13 @@ public class IdeManagementService {
 	}
 
 	/**
-	 * ComponentをリモートリポジトリにPushする
+	 * ComponentをリモートリポジトリにPushする.
 	 * 
-	 * @param workPackageName
-	 * @param componentName
-	 * @param userName
-	 * @param password
+	 * @param workPackageName パッケージ名
+	 * @param componentName コンポーネント名
+	 * @param userName GitHubユーザー名
+	 * @param password GitHubパスワード
+	 * @return push結果
 	 */
 	public String pushComponent(String workPackageName, String componentName, String userName, String password) {
 		// 作業領域パス
@@ -180,9 +196,11 @@ public class IdeManagementService {
 				newGitUrl = gitUrl;
 			}
 		}
+		
+		String packageName = workPackageName.replace("rts_", "");
 
 		// Pushする
-		String result = GitUtil.gitPush(rtcDirPath);
+		String result = GitUtil.gitComponentPush(packageName, componentName);
 
 		// URLを戻す
 		GitUtil.changeRemoteUrl(rtcDirPath, gitUrl);
@@ -194,12 +212,13 @@ public class IdeManagementService {
 	}
 
 	/**
-	 * ComponentをリモートリポジトリからPullする
-	 * 
-	 * @param workPackageName
-	 * @param componentName
-	 * @param userName
-	 * @param password
+	 * ComponentをリモートリポジトリからPullする.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param componentName コンポーネント名
+	 * @param userName GitHubユーザー名
+	 * @param password GitHubパスワード
+	 * @return pull結果
 	 */
 	public String pullComponent(String workPackageName, String componentName, String userName, String password) {
 		// 作業領域パス
@@ -233,5 +252,49 @@ public class IdeManagementService {
 				+ result + "]");
 
 		return result;
+	}
+	
+	/**
+	 * コミットハッシュを取得する.
+	 *
+	 * @param packageName パッケージ名
+	 * @return コミットハッシュ
+	 */
+	public String getCommitHash(String packageName) {
+		// 作業領域パス
+		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
+		logger.info(workspaceDirPath);
+		
+		// commit hashを取得する
+		return GitUtil.getCommitHash(workspaceDirPath, packageName);
+
+	}
+	
+	/**
+	 * packageのstatusを確認する.
+	 * 
+	 * @param ws ワークスペース名
+	 * @param rtsName パッケージ名
+	 * @return 実行結果
+	 */
+	public String checkPackageStatus(String ws, String rtsName) {
+			
+		String packageName = rtsName.replace("rts_", "");
+		
+		return GitUtil.checkPackageStatus(ws, packageName);
+	}
+	
+	/**
+	 * RTCのstatusを確認する.
+	 * 
+	 * @param ws ワークスペース名
+	 * @param rtsName パッケージ名
+	 * @return 実行結果
+	 */
+	public String checkRtcsStatus(String ws, String rtsName) {
+			
+		String packageName = rtsName.replace("rts_", "");
+		
+		return GitUtil.checkRtcsStatus(ws, packageName);
 	}
 }

@@ -1,29 +1,28 @@
 package com.sec.airgraph.util;
 
 import java.io.File;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * KerasIDE関連Utility
- * 
+ * KerasIDE関連Utility.
+ *
  * @author Ryuiciro Kodama
  *
  */
 public class KerasEditorUtil {
 
 	/**
-	 * logger
+	 * logger.
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(KerasEditorUtil.class);
 
 	/**
-	 * 学習を実行する
-	 * 
-	 * @param modelName
-	 * @param modelDirPath
+	 * 学習を実行する.
+	 *
+	 * @param modelName モデル名
+	 * @param modelDirPath モデルディレクトリパス
 	 */
 	public static void learn(String modelName, String modelDirPath) {
 		// TensorBoardが参照しに行くディレクトリのパス
@@ -49,15 +48,15 @@ public class KerasEditorUtil {
 		}
 
 		// keras.fitを実行する
-		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(modelDirPath, logFile, "python", dataMakerPath,
+		ProcessUtil.startProcessNoReturnWithWorkingDerectoryAndLog(modelDirPath, logFile, "python3", dataMakerPath,
 				modelJsonFilePath, resultPath, tensorBoardDirPath, datasetDirPath);
 	}
 
 	/**
-	 * アップロードしたdata_makerファイルを保存する
-	 * 
-	 * @param wprkspaceModelName
-	 * @param dataMakerFile
+	 * アップロードしたdata_makerファイルを保存する.
+	 *
+	 * @param workspaceModelName ワークスペースモデル名
+	 * @param dataMakerFile data_makerファイル
 	 */
 	public static void saveDataMakerFile(String workspaceModelName, MultipartFile dataMakerFile) {
 		// 作業領域パス

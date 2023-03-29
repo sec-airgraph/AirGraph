@@ -20,11 +20,11 @@
 # -- Project information -----------------------------------------------------
 
 project = u'AirGraph'
-copyright = u'2018, System Engineering Consultants Co., LTD.'
-author = u'Team AirGraph - System Engineering Consultants Co., LTD.'
+copyright = u'2023, Systems Engineering Consultants Co., LTD.'
+author = u'Team AirGraph - Systems Engineering Consultants Co., LTD.'
 
 # The short X.Y version
-version = u''
+version = u'2.0'
 # The full version, including alpha/beta/rc tags
 release = u''
 

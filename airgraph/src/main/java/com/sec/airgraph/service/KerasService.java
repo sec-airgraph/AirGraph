@@ -1,5 +1,14 @@
 package com.sec.airgraph.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sec.airgraph.util.FileUtil;
+import com.sec.airgraph.util.KerasEditorUtil;
+import com.sec.airgraph.util.PropUtil;
+import com.sec.airgraph.util.StringUtil;
+import com.sec.keras.entity.field.KerasFieldInfo;
+import com.sec.keras.entity.field.KerasTabInfo;
+import com.sec.keras.entity.model.KerasModel;
+import com.sec.rtc.entity.rtc.CodeDirectory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -7,26 +16,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sec.rtc.entity.rtc.CodeDirectory;
-import com.sec.keras.entity.field.KerasFieldInfo;
-import com.sec.keras.entity.field.KerasTabInfo;
-import com.sec.keras.entity.model.KerasModel;
-import com.sec.airgraph.util.FileUtil;
-import com.sec.airgraph.util.PropUtil;
-import com.sec.airgraph.util.StringUtil;
-import com.sec.airgraph.util.KerasEditorUtil;
-
 /**
- * Kerasサービス
- * 
+ * Kerasサービス.
+ *
  * @author Tsuyoshi Hirose
  *
  */
@@ -34,24 +32,24 @@ import com.sec.airgraph.util.KerasEditorUtil;
 public class KerasService {
 
 	/**
-	 * logger
+	 * logger.
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(KerasService.class);
 
 	/**
-	 * Keras管理サービス
+	 * Keras管理サービス.
 	 */
 	@Autowired
 	private KerasManagementService kerasManagementService;
 
 	/**
-	 * RTC管理サービス
+	 * RTC管理サービス.
 	 */
 	@Autowired
 	private RtcManagementService rtcManagementService;
 
 	/**
-	 * Kerasネットワーク情報を全て取得する
+	 * Kerasネットワーク情報を全て取得する.
 	 */
 	public KerasFieldInfo loadAllNetworkArea() {
 
@@ -63,7 +61,7 @@ public class KerasService {
 	}
 
 	/**
-	 * すべてのリポジトリを展開する
+	 * すべてのリポジトリを展開する.
 	 */
 	private void cloneKerasRepository() {
 
@@ -73,9 +71,9 @@ public class KerasService {
 	}
 
 	/**
-	 * Kerasネットワーク領域情報を取得する
-	 * 
-	 * @return
+	 * Kerasネットワーク領域情報を取得する.
+	 *
+	 * @return Kerasネットワーク領域情報
 	 */
 	private KerasFieldInfo getKerasFieldInfo() {
 		logger.info("Start create Keras network area.");
@@ -127,9 +125,9 @@ public class KerasService {
 	}
 
 	/**
-	 * レイヤーのプロパティ設定用JSONを読み込む
-	 * 
-	 * @return
+	 * レイヤーのプロパティ設定用JSONを読み込む.
+	 *
+	 * @return プロパティ設定用JSON
 	 */
 	public List<String> getAllLayerPropertyTemplates() {
 		logger.info("Start load Keras layer propery templates.");
@@ -140,10 +138,10 @@ public class KerasService {
 
 		// レイヤーのテンプレートフォルダ内にあるファイルをすべて読込レイヤーに設定
 		File propertyTemplateDir = new File(propertyTemplateDirPath);
-		File propertyDirs[] = propertyTemplateDir.listFiles();
+		File[] propertyDirs = propertyTemplateDir.listFiles();
 		for (File propertyDir : propertyDirs) {
 			if (FileUtil.exists(propertyDir) && propertyDir.isDirectory()) {
-				File files[] = propertyDir.listFiles();
+				File[] files = propertyDir.listFiles();
 				for (File file : files) {
 					list.add(FileUtil.readAll(file.getPath()));
 				}
@@ -154,9 +152,9 @@ public class KerasService {
 	}
 
 	/**
-	 * 作業領域のすべてのモデルを読み込む
-	 * 
-	 * @return
+	 * 作業領域のすべてのモデルを読み込む.
+	 *
+	 * @return 作業領域のすべてのモデル
 	 */
 	public List<KerasModel> loadAllPackagesWorkspace() {
 		// 作業領域パス
@@ -166,10 +164,10 @@ public class KerasService {
 	}
 
 	/**
-	 * モデルを作業領域フォルダに保存する
-	 * 
-	 * @param dirName
-	 * @param modelString
+	 * モデルを作業領域フォルダに保存する.
+	 *
+	 * @param dirName ディレクトリ名
+	 * @param modelString モデル
 	 */
 	public void saveModel(String dirName, String modelString) {
 		// 作業領域パス
@@ -189,11 +187,11 @@ public class KerasService {
 			// 作業ディレクトリに作業内容を保存
 			// JSONファイルを保存
 			String modelFilePath = targetDirPath + "/" + savingModel.getModelName() + ".json";
-			FileUtil.writeAll(modelFilePath, savingModel.getJsonString());
+			FileUtil.writeAll(modelFilePath, savingModel.getJsonString(), true);
 
 			// data_maker.pyを保存
 			String dataMakerFilePath = targetDirPath + "/" + "data_maker.py";
-			FileUtil.writeAll(dataMakerFilePath, savingModel.getDataMakerStr());
+			FileUtil.writeAll(dataMakerFilePath, savingModel.getDataMakerStr(), true);
 
 			// データ・セット連携
 			String datasetName = savingModel.getDataset();
@@ -211,9 +209,9 @@ public class KerasService {
 	}
 
 	/**
-	 * モデルを削除する
-	 * 
-	 * @param modelName
+	 * モデルを削除する.
+	 *
+	 * @param modelName モデル名
 	 */
 	public void deleteModel(String modelName) {
 		// 作業領域パス
@@ -223,8 +221,8 @@ public class KerasService {
 	}
 
 	/**
-	 * Kerasの学習実行
-	 * 
+	 * Kerasの学習実行.
+	 *
 	 * @param modelString modelの情報が乗ったJSON文字列
 	 */
 	public void fit(String modelString) {
@@ -253,10 +251,10 @@ public class KerasService {
 	}
 
 	/**
-	 * ログを読み込む
-	 * 
-	 * @param workPackageName
-	 * @return
+	 * ログを読み込む.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @return ログ
 	 */
 	public Map<String, String> tailAllLog(String workPackageName) {
 		Map<String, String> logMap = new HashMap<>();
@@ -269,38 +267,38 @@ public class KerasService {
 	}
 
 	/**
-	 * データセットの選択肢を取得する
-	 * 
-	 * @return
+	 * データセットの選択肢を取得する.
+	 *
+	 * @return データセットの選択肢
 	 */
-	public Map<String, String> getDatasetChoices() {
+	public List<String> getDatasetChoices() {
 		return kerasManagementService.loadDatasetList();
 	}
 
 	/**
-	 * データセットディレクトリを圧縮して保存先を返す
-	 * 
-	 * @param workspaceModelName
-	 * @return
+	 * データセットディレクトリを圧縮して保存先を返す.
+	 *
+	 * @param workspaceModelName ワークスペースモデル名
+	 * @return 保存先
 	 */
 	public String downloadDataset(String workspaceModelName) {
 		return kerasManagementService.downloadDataset(workspaceModelName);
 	}
 
 	/**
-	 * データセットファイルをアップロードする
-	 * 
-	 * @param datasetFile
+	 * データセットファイルをアップロードする.
+	 *
+	 * @param datasetFile データセットファイル
 	 */
 	public void uploadDataset(MultipartFile datasetFile) {
 		kerasManagementService.uploadDataset(datasetFile);
 	}
 
 	/**
-	 * 指定されたデータセットのデータの一覧を取得する
-	 * 
-	 * @param datasetName
-	 * @return
+	 * 指定されたデータセットのデータの一覧を取得する.
+	 *
+	 * @param datasetName データセット名
+	 * @return データセットのデータの一覧
 	 */
 	public CodeDirectory getDatasetDataList(String datasetName) {
 		// データセット領域のパス
@@ -310,42 +308,42 @@ public class KerasService {
 	}
 
 	/**
-	 * ロボットの選択肢を取得する
-	 * 
-	 * @return
+	 * AirGraphホストの一覧を取得する.
+	 *
+	 * @return AirGraphホストの一覧
 	 */
-	public Map<String, String> getRobotChoices() {
-		return kerasManagementService.getRobotChoices();
+	public List<String> getAirGraphHostChoices() {
+		return kerasManagementService.getAirGraphHostChoices();
 	}
 
 	/**
-	 * 指定されたロボットのデータセットの一覧を取得する
-	 * @param robotHostName
-	 * @return
+	 * 指定されたロボットのデータセットの一覧を取得する.
+	 *
+	 * @param robotHostName ホスト名
+	 * @return ロボットのデータセットの一覧
 	 */
-	public Map<String, String> getRobotDatasetChoices(String robotHostName) {
+	public List<String> getRobotDatasetChoices(String robotHostName) {
 		return kerasManagementService.getRobotDatasetChoices(robotHostName);
 	}
 
 	/**
-	 * 指定されたデータセットディレクトリのデータを取得する
-	 * 
-	 * @param datasetName
-	 * @param targetDate
-	 * @return
+	 * 指定されたデータセットディレクトリのデータを取得する.
+	 *
+	 * @param datasetName データセット名
+	 * @param targetDate 対象日
+	 * @return データセットディレクトリのデータ
 	 */
 	public boolean compressDatasets(String datasetName, String targetDate) {
 		return kerasManagementService.compressDatasets(datasetName, targetDate);
 	}
 
 	/**
-	 * 指定されたデータセットをダウンロードする
-	 * 
-	 * @param robotHostName
-	 * @param datasetName
-	 * @param targetDate
+	 * 指定されたデータセットをダウンロードする.
+	 *
+	 * @param robotHostName ロボットホスト名 
+	 * @param datasetName データセット名
 	 */
-	public boolean downloadDatasets(String robotHostName, String datasetName, String targetDate) {
-		return kerasManagementService.downloadDatasets(robotHostName, datasetName, targetDate);
+	public boolean downloadDatasets(String robotHostName, String datasetName) {
+		return kerasManagementService.downloadDatasets(robotHostName, datasetName);
 	}
 }

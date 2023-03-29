@@ -1,11 +1,11 @@
 {
 	"class_name": "MaxPooling2D",
 	"fields": [
-		{ "name": "pool_size",				"type": "text",	"required": true,	"html": { "caption": "Pool Size",			"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "strides",				"type": "text",	"required": true,	"html": { "caption": "Strides",				"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "padding",				"type": "list",	"required": true,	"html": { "caption": "Padding",				"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "data_format",			"type": "list",	"required": true,	"html": { "caption": "Data Format",			"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "batch_input_shape",		"type": "text",	"required": true,	"html": { "caption": "Batch Input Shape",	"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "dtype",					"type": "list",	"required": true,	"html": { "caption": "Dtype",				"page": 0,	"attr": "style=\"width:200px\"" } }
+		{ "field": "pool_size",				"type": "text",	"required": true,	"html": { "label": "Pool Size",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "strides",				"type": "text",	"required": true,	"html": { "label": "Strides",				"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "padding",				"type": "list",	"required": true,	"html": { "label": "Padding",				"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "data_format",			"type": "list",	"required": true,	"html": { "label": "Data Format",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "batch_input_shape",		"type": "text",	"required": true,	"html": { "label": "Batch Input Shape",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "dtype",					"type": "list",	"required": true,	"html": { "label": "Dtype",				"page": 0,	"attr": "style=\"width:200px\"" } }
 	]
 }

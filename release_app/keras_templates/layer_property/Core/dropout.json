@@ -1,6 +1,6 @@
 {
 	"class_name": "Dropout",
 	"fields": [
-		{ "name": "rate",	"type": "float",	"required": true,	"html": { "caption": "Rate",	"page": 0,	"attr": "style=\"width:50px\"" } }
+		{ "field": "rate",	"type": "float",	"required": true,	"html": { "label": "Rate",	"page": 0,	"attr": "style=\"width:50px\"" } }
 	]
 }

@@ -1,6 +1,6 @@
 {
 	"class_name": "Masking",
 	"fields": [
-		{ "name": "mask_value",	"type": "float",	"required": true,	"html": { "caption": "Mask Value",	"page": 0,	"attr": "style=\"width:50px\"" } }
+		{ "field": "mask_value",	"type": "float",	"required": true,	"html": { "label": "Mask Value",	"page": 0,	"attr": "style=\"width:50px\"" } }
 	]
 }

@@ -1,18 +1,18 @@
 {
 	"class_name": "BatchNormalization",
 	"fields": [
-		{ "name": "axis",							"type": "int",		"required": true,	"html": { "caption": "Axis",						"page": 0,	"attr": "style=\"width:50px\"" } },
-		{ "name": "momentum",						"type": "float",	"required": true,	"html": { "caption": "Momentum",					"page": 0,	"attr": "style=\"width:50px\"" } },
-		{ "name": "epsilon",						"type": "float",	"required": true,	"html": { "caption": "Epsilon",						"page": 0,	"attr": "style=\"width:50px\"" } },
-		{ "name": "center",							"type": "checkbox",	"required": true,	"html": { "caption": "Center",						"page": 0,	"attr": "" } },
-		{ "name": "scale",							"type": "checkbox",	"required": true,	"html": { "caption": "Scale",						"page": 0,	"attr": "" } },
-		{ "name": "beta_initializer",				"type": "list",	"required": true,		"html": { "caption": "Beta Initializer",			"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "gamma_initializer",				"type": "list",	"required": true,		"html": { "caption": "Gamma Initializer",			"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "moving_mean_initializer",		"type": "list",	"required": true,		"html": { "caption": "Moving Mean Initializer",		"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "moving_variance_initializer",	"type": "list",	"required": true,		"html": { "caption": "Moving Variance Initializer",	"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "beta_regularizer",				"type": "list",	"required": true,		"html": { "caption": "Beta Regularizer",			"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "gamma_regularizer",				"type": "list",	"required": true,		"html": { "caption": "Gamma Regularizer",			"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "beta_constraint",				"type": "list",	"required": true,		"html": { "caption": "Beta Constraint",				"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "gamma_constraint",				"type": "list",	"required": true,		"html": { "caption": "Gamma Constraint",			"page": 0,	"attr": "style=\"width:200px\"" } }
+		{ "field": "axis",							"type": "int",		"required": true,	"html": { "label": "Axis",						"page": 0,	"attr": "style=\"width:50px\"" } },
+		{ "field": "momentum",						"type": "float",	"required": true,	"html": { "label": "Momentum",					"page": 0,	"attr": "style=\"width:50px\"" } },
+		{ "field": "epsilon",						"type": "float",	"required": true,	"html": { "label": "Epsilon",						"page": 0,	"attr": "style=\"width:50px\"" } },
+		{ "field": "center",							"type": "checkbox",	"required": true,	"html": { "label": "Center",						"page": 0,	"attr": "" } },
+		{ "field": "scale",							"type": "checkbox",	"required": true,	"html": { "label": "Scale",						"page": 0,	"attr": "" } },
+		{ "field": "beta_initializer",				"type": "list",	"required": true,		"html": { "label": "Beta Initializer",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "gamma_initializer",				"type": "list",	"required": true,		"html": { "label": "Gamma Initializer",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "moving_mean_initializer",		"type": "list",	"required": true,		"html": { "label": "Moving Mean Initializer",		"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "moving_variance_initializer",	"type": "list",	"required": true,		"html": { "label": "Moving Variance Initializer",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "beta_regularizer",				"type": "list",	"required": true,		"html": { "label": "Beta Regularizer",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "gamma_regularizer",				"type": "list",	"required": true,		"html": { "label": "Gamma Regularizer",			"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "beta_constraint",				"type": "list",	"required": true,		"html": { "label": "Beta Constraint",				"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "gamma_constraint",				"type": "list",	"required": true,		"html": { "label": "Gamma Constraint",			"page": 0,	"attr": "style=\"width:200px\"" } }
 	]
 }

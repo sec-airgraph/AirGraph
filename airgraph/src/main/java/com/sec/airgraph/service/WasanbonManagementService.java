@@ -1,25 +1,8 @@
 package com.sec.airgraph.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sec.rtc.entity.rtc.Actions;
-import com.sec.rtc.entity.rtc.Rtc;
-import com.sec.rtc.entity.rts.Component;
-import com.sec.rtc.entity.rts.DataPortConnector;
-import com.sec.rtc.entity.rts.Rts;
 import com.sec.airgraph.util.CollectionUtil;
 import com.sec.airgraph.util.Const.COMMON.DIR_NAME;
-import com.sec.airgraph.util.Const.COMMON.FILE_NAME;
 import com.sec.airgraph.util.Const.COMMON.FILE_SUFFIX;
 import com.sec.airgraph.util.Const.RT_COMPONENT.COMPONENT_CONNECTOR_TYPE;
 import com.sec.airgraph.util.Const.RT_COMPONENT.LANGUAGE_KIND;
@@ -30,10 +13,26 @@ import com.sec.airgraph.util.PropUtil;
 import com.sec.airgraph.util.RtcUtil;
 import com.sec.airgraph.util.StringUtil;
 import com.sec.airgraph.util.WasanbonUtil;
+import com.sec.rtc.entity.BuildRunDTO;
+import com.sec.rtc.entity.rtc.Actions;
+import com.sec.rtc.entity.rtc.Rtc;
+import com.sec.rtc.entity.rts.Component;
+import com.sec.rtc.entity.rts.DataPortConnector;
+import com.sec.rtc.entity.rts.Rts;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 
 /**
- * Wasanbon管理サービス
- * 
+ * Wasanbon管理サービス.
+ *
  * @author Tsuyoshi Hirose
  * 
  */
@@ -41,37 +40,25 @@ import com.sec.airgraph.util.WasanbonUtil;
 public class WasanbonManagementService {
 
 	/**
-	 * logger
+	 * logger.
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(WasanbonManagementService.class);
 
 	/**
-	 * RTC管理サービス
+	 * RTC管理サービス.
 	 */
 	@Autowired
 	private RtcManagementService rtcManagementService;
 
 	/************************************************************
-	 * Wasanbon関連
-	 ************************************************************/
-	/**
-	 * すべてのBinderを取得する
-	 * 
-	 * @return
-	 */
-	public Map<String, Map<String, String>> getBinderList() {
-		return WasanbonUtil.getBinderList();
-	}
-
-	/************************************************************
 	 * RTS(Package)関連
 	 ************************************************************/
 	/**
-	 * すべてのPackageをCloneする
-	 * 
-	 * @param packagesLocalDirPath
+	 * すべてのPackageをCloneする.
+	 *
+	 * @param hostId ホストID
 	 */
-	public void cloneAllPackages() {
+	public void cloneAllPackages(String hostId) {
 
 		// Packagesローカルリポジトリ格納先
 		String packagesLocalDirPath = PropUtil.getValue("packages.local.directory.path");
@@ -79,7 +66,7 @@ public class WasanbonManagementService {
 		logger.info("Start clone package. packagesLocalDirPath[" + packagesLocalDirPath + "]");
 
 		// Packageの一覧を取得
-		List<String> packagesList = WasanbonUtil.getPackagesListFromBinder();
+		List<String> packagesList = WasanbonUtil.getPackagesListFromBinder(hostId);
 
 		if (CollectionUtil.isNotEmpty(packagesList)) {
 			for (String packageRepositoryName : packagesList) {
@@ -87,7 +74,7 @@ public class WasanbonManagementService {
 				File packageDir = new File(packagesLocalDirPath + packageRepositoryName);
 				if (FileUtil.notExists(packageDir)) {
 					// 存在しない場合にのみ
-					WasanbonUtil.clonePackageFromRepository(packagesLocalDirPath, packageRepositoryName);
+					WasanbonUtil.clonePackageFromRepositoryToDirectory(packagesLocalDirPath, packageRepositoryName);
 				}
 			}
 		}
@@ -96,25 +83,31 @@ public class WasanbonManagementService {
 	}
 
 	/**
-	 * 新規パッケージを作業領域に生成する
-	 * 
-	 * @param workPackageName
-	 * @param packageRepositoryName
+	 * 新規パッケージを作業領域に生成する.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param packageRepositoryName パッケージリポジトリ名
+	 * @param newId ID
+	 * @param newSAbstract newSAbstract
+	 * @param newVersion バージョン
+	 * @param newRemoteUrl リモートリポジトリURL
+	 * @param newPackageName パッケージ名
+	 * @param hostId ホストID
 	 */
 	public void createNewPackageToWorkspace(String workPackageName, String packageRepositoryName, String newId,
-			String newSAbstract, String newVersion, String newRemoteUrl) {
+			String newSAbstract, String newVersion, String newRemoteUrl, String newPackageName, String hostId) {
 
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 
 		logger.info("Package作業領域展開処理開始. workspaceDirPath[" + workspaceDirPath + "]packageRepositoryName["
-				+ packageRepositoryName + "]");
+				+ packageRepositoryName + "]" + workPackageName);
 
 		// 空のパッケージを作成する
-		WasanbonUtil.createPackage(workspaceDirPath, workPackageName);
+		WasanbonUtil.createPackage(workspaceDirPath, newPackageName, hostId);
 
 		// 空のRtsProfileを生成する
-		File packageDir = new File(workspaceDirPath + File.separator + workPackageName);
+		File packageDir = new File(workspaceDirPath + File.separator + newPackageName);
 		Rts rts = rtcManagementService.createNewRtsProfile();
 
 		// 入力内容を設定
@@ -127,23 +120,29 @@ public class WasanbonManagementService {
 		rtcManagementService.saveRtsProfile(packageDir, rts.getRtsProfile(), false);
 
 		// Git初期化
-		GitUtil.gitInit(packageDir.getPath());
+		GitUtil.gitPackageInit(newPackageName);
 
 		// GitIgnore
 		GitUtil.createGitIgnoreForPackage(packageDir.getPath());
 
 		// リモートリポジトリを設定する
-		GitUtil.gitAddRemote(packageDir.getPath(), newRemoteUrl);
+		GitUtil.gitAddPackageRemote(newPackageName, newRemoteUrl);
 	}
 
 	/**
-	 * 指定されたパッケージを作業領域にCloneする
-	 * 
-	 * @param workPackageName
-	 * @param packageRepositoryName
+	 * 指定されたパッケージを作業領域にCloneする.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param packageRepositoryName パッケージリポジトリ名
+	 * @param newId ID
+	 * @param newSAbstract newSAbstract
+	 * @param newVersion バージョン
+	 * @param newRemoteUrl リモートリポジトリURL
+	 * @param newPackageName パッケージ名
+	 * @param hostId ホストID
 	 */
 	public void clonePackageToWorkspace(String workPackageName, String packageRepositoryName, String newId,
-			String newSAbstract, String newVersion, String newRemoteUrl) {
+			String newSAbstract, String newVersion, String newRemoteUrl, String newPackageName, String hostId) {
 
 		// Packagesローカルリポジトリ格納先
 		String packagesLocalDirPath = PropUtil.getValue("packages.local.directory.path");
@@ -155,7 +154,7 @@ public class WasanbonManagementService {
 				+ packageRepositoryName + "]");
 
 		// 空のパッケージを作成する
-		WasanbonUtil.createPackage(workspaceDirPath, workPackageName);
+		WasanbonUtil.createPackage(workspaceDirPath, workPackageName, hostId);
 
 		// コピー元からRTCをコピーする
 		File srcRtcDir = new File(
@@ -184,10 +183,10 @@ public class WasanbonManagementService {
 		rtcManagementService.saveRtsProfile(destPackageDir, destRts.getRtsProfile(), false);
 
 		// Git初期化
-		GitUtil.gitInit(destPackageDir.getPath());
+		GitUtil.gitPackageInit(newPackageName);
 
 		// コピー元のリモートリポジトリを設定する
-		GitUtil.gitAddRemote(destPackageDir.getPath(), srcRts.getModelProfile().getRemoteUrl().trim());
+		GitUtil.gitAddPackageRemote(destPackageDir.getName(), srcRts.getModelProfile().getRemoteUrl().trim());
 
 		// リモートリポジトリの内容をマージする
 		GitUtil.gitFetchOrigin(destPackageDir.getPath(), true);
@@ -199,15 +198,14 @@ public class WasanbonManagementService {
 		if (!newRemoteUrl.equals(srcRts.getModelProfile().getRemoteUrl())) {
 			GitUtil.changeRemoteUrl(destPackageDir.getPath(), newRemoteUrl);
 		}
-
 		// RTS構成情報のXMLを出力する
 		rtcManagementService.saveRtsProfile(destPackageDir, destRts.getRtsProfile(), false);
 	}
 
 	/**
-	 * 作業領域にCloneされているすべてのパッケージを読み込む
+	 * 作業領域にCloneされているすべてのパッケージを読み込む.
 	 * 
-	 * @return
+	 * @return パッケージリスト
 	 */
 	public List<Rts> loadAllPackagesWorkspace() {
 		List<Rts> list = new ArrayList<Rts>();
@@ -237,10 +235,10 @@ public class WasanbonManagementService {
 	}
 
 	/**
-	 * 作業領域にCloneされている指定されたパッケージを読み込む
-	 * 
-	 * @param workPackageName
-	 * @return
+	 * 作業領域にCloneされている指定されたパッケージを読み込む.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @return 指定されたパッケージの情報
 	 */
 	public Rts loadPackageWorkspace(String workPackageName) {
 		Rts work = null;
@@ -257,9 +255,9 @@ public class WasanbonManagementService {
 	}
 
 	/**
-	 * 指定されたPackageを削除する
-	 * 
-	 * @param packageRepositoryName
+	 * 指定されたPackageを削除する.
+	 *
+	 * @param packageRepositoryName パッケージリポジトリ名
 	 */
 	public void deletePackage(String packageRepositoryName) {
 		WasanbonUtil.deletePackage(packageRepositoryName);
@@ -269,9 +267,9 @@ public class WasanbonManagementService {
 	 * RTC(Component)関連
 	 ************************************************************/
 	/**
-	 * 指定されたPackageに新規コンポーネントを組み込む
-	 * 
-	 * @param componentData
+	 * 指定されたPackageに新規コンポーネントを組み込む.
+	 *
+	 * @param componentData コンポーネントの情報
 	 */
 	public void createNewComponent(String componentData) {
 
@@ -287,7 +285,7 @@ public class WasanbonManagementService {
 		String componentName = newRtc.getRtcProfile().getBasicInfo().getModuleName().replaceAll(" ", "").replaceAll("　",
 				"");
 		newRtc.getRtcProfile().getBasicInfo().setModuleName(componentName);
-
+		
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
 		// 作業領域Rtcディレクトリパス
@@ -305,6 +303,8 @@ public class WasanbonManagementService {
 			break;
 		case LANGUAGE_KIND.PYTHON:
 			templateName = MODULE_NAME.NEW_PYTHON_TEMPLATE_NAME;
+			break;
+		default:
 			break;
 		}
 		String templateRtcPath = templateRtcDirPath + templateName;
@@ -394,33 +394,35 @@ public class WasanbonManagementService {
 		RtcUtil.updateExecutionRateRtcConfig(configFile.getPath(),
 				newRtc.getRtcProfile().getBasicInfo().getExecutionRate());
 
-		// Git初期化
-		GitUtil.gitInit(newRtcDir.getPath());
+		// Git初期化 
+		GitUtil.gitComponentInit(workSpaceName, componentName);
 
 		// GitIgnore
 		GitUtil.createGitIgnoreForComponent(newRtcDir.getPath());
 
 		// リモートリポジトリを設定する
-		GitUtil.gitAddRemote(newRtcDir.getPath(), newRtc.getModelProfile().getRemoteUrl());
+		GitUtil.gitAddComponentRemote(workSpaceName, componentName, newRtc.getModelProfile().getRemoteUrl());
 
 	}
 
 	/**
-	 * 指定されたPackageに指定されたComponentを組み込む
-	 * 
-	 * @param workPackageName
-	 * @param componentRepositoryName
-	 * @param gitName
-	 * @param clonedDirectory
+	 * 指定されたPackageに指定されたComponentを組み込む.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param componentName コンポーネント名
+	 * @param gitName git名
+	 * @param clonedDirectory クローンされたディレクトリ
 	 */
 	public void addComponent(String workPackageName, String componentName, String gitName, String clonedDirectory) {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
+
+		String packageName = workPackageName.replace("rts_", "");
 		// 作業領域Packageディレクトリパス
 		String workPackageDirPath = workspaceDirPath + workPackageName;
-
+		
 		// すでに組み込まれていないかの確認をする
-		List<String> curRtcList = WasanbonUtil.getRtcsListFromPackage(workspaceDirPath, workPackageName);
+		List<String> curRtcList = WasanbonUtil.getRtcsListFromPackage(packageName);
 		if (CollectionUtil.isEmpty(curRtcList) || !curRtcList.contains(componentName)) {
 			if (StringUtil.isNotEmpty(clonedDirectory)) {
 				// すでにCloneされているディレクトリからコピーする
@@ -433,28 +435,20 @@ public class WasanbonManagementService {
 
 			} else {
 				// 組み込まれていない場合は組み込む
-				String result = WasanbonUtil.cloneRtcToPackage(workPackageDirPath, componentName);
-				if (StringUtil.isNotEmpty(result) && result.contains("Local Repository Not Found")) {
-					// 名称で失敗した場合はGit名称で読み込む
-					logger.warn("Failed to Clone RTC Not Found. name[" + componentName + "]");
-					result = WasanbonUtil.cloneRtcToPackage(workPackageDirPath, gitName);
-					if (StringUtil.isNotEmpty(result) && result.contains("Local Repository Not Found")) {
-						logger.error("Failed to Clone RTC Not Found. name[" + gitName + "]");
-					}
-				}
+				WasanbonUtil.cloneRtcToPackage(packageName, componentName);
 			}
 		}
 	}
 
 	/**
-	 * 指定されたデータ型からロガー用Componentを追加する
-	 * 
-	 * @param workPackageName
-	 * @param id
-	 * @param instanceName
-	 * @param portName
-	 * @param pathUri
-	 * @param dataType
+	 * 指定されたデータ型からロガー用Componentを追加する.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param id ID
+	 * @param instanceName インスタンス名
+	 * @param portName ポート名
+	 * @param pathUri パスURI
+	 * @param dataType データタイプ
 	 */
 	public void addLoggerComponent(String workPackageName, String id, String instanceName, String portName,
 			String pathUri, String dataType) {
@@ -520,24 +514,22 @@ public class WasanbonManagementService {
 	}
 
 	/**
-	 * 指定されたPackageから指定されたComponentを削除する
-	 * 
-	 * @param workPackageName
-	 * @param id
-	 * @param componentName
+	 * 指定されたPackageから指定されたComponentを削除する.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param id ID
+	 * @param componentName コンポーネント名
 	 */
 	public void deleteComponent(String workPackageName, String id, String componentName) {
 		// 作業領域パス
 		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
-		// 作業領域Packageディレクトリパス
-		File workPackageDir = new File(workspaceDirPath + workPackageName);
 
-		// 組み込まれているかの確認をする
-		List<String> curRtcList = WasanbonUtil.getRtcsListFromPackage(workspaceDirPath, workPackageName);
-		if (CollectionUtil.isNotEmpty(curRtcList) && curRtcList.contains(componentName)) {
-			// 組み込まれている場合は削除する
-			WasanbonUtil.deleteRtcFromPackage(workPackageDir.getPath(), componentName);
-		}
+		String packageName = workPackageName.replace("rts_", "");
+		// 作業領域Packageディレクトリパス
+		File workPackageDir = new File(workspaceDirPath + packageName);
+		
+		// 組み込まれている場合は削除する
+		WasanbonUtil.deleteRtcFromPackage(packageName, componentName);
 
 		// 作業領域の再読み込みを行う
 		Rts rts = rtcManagementService.loadRtsProfile(workPackageDir, false);
@@ -570,26 +562,17 @@ public class WasanbonManagementService {
 	 * ビルド・実行関連
 	 ************************************************************/
 	/**
-	 * 指定されたPackageのすべてのRtcをビルドする
-	 * 
-	 * @param packageRepositoryName
+	 * 指定されたPackageのすべてのRtcをビルドする.
+	 *
+	 * @param buildRunDto ビルドに必要な情報
 	 */
-	public void buildPackageAll(String packageRepositoryName) {
-		// 作業領域パス
-		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
+	public void buildPackageAll(BuildRunDTO buildRunDto) {
 
-		// 対象Packageディレクトリ
-		String packageDirPath = workspaceDirPath + packageRepositoryName + File.separator;
-
-		// ログファイル
-		String logFilePath = packageDirPath + DIR_NAME.PACKAGE_LOG_DIR_NAME + File.separator + FILE_NAME.WASANBON_LOG;
-		File logFile = new File(logFilePath);
-
-		WasanbonUtil.buildPackageAll(logFile, packageDirPath);
+		WasanbonUtil.buildPackageAll(buildRunDto);
 
 		// Configファイルをコピーする
-		String rtcDirPath = packageDirPath + DIR_NAME.PACKAGE_RTC_DIR_NAME + File.separator;
-		String confDirPath = packageDirPath + DIR_NAME.PACKAGE_CONF_DIR_NAME + File.separator;
+		String rtcDirPath = buildRunDto.getPackageDirPath() + DIR_NAME.PACKAGE_RTC_DIR_NAME + File.separator;
+		String confDirPath = buildRunDto.getPackageDirPath() + DIR_NAME.PACKAGE_CONF_DIR_NAME + File.separator;
 		File[] rtcs = new File(rtcDirPath).listFiles();
 		if (CollectionUtil.isNotEmpty(rtcs)) {
 			for (File rtc : rtcs) {
@@ -606,79 +589,191 @@ public class WasanbonManagementService {
 	}
 
 	/**
-	 * 指定されたPackageのすべてのRtcをCleanする
-	 * 
-	 * @param packageRepositoryName
+	 * 指定されたPackageのすべてのRtcをCleanする.
+	 *
+	 * @param buildRunDto クリーンに必要な情報
 	 */
-	public void cleanPackageAll(String packageRepositoryName) {
-		// 作業領域パス
-		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
-
-		// 対象Packageディレクトリ
-		String packageDirPath = workspaceDirPath + packageRepositoryName + File.separator;
-
-		// ログファイル
-		String logFilePath = packageDirPath + DIR_NAME.PACKAGE_LOG_DIR_NAME + File.separator + FILE_NAME.WASANBON_LOG;
-		File logFile = new File(logFilePath);
-
-		WasanbonUtil.cleanPackageAll(logFile, packageDirPath);
+	public void cleanPackageAll(BuildRunDTO buildRunDto) {
+		
+		WasanbonUtil.cleanPackageAll(buildRunDto);
 	}
 
 	/**
-	 * 指定されたPackageを実行する
-	 * 
-	 * @param packageRepositoryName
+	 * 指定されたPackageのSystemを実行する.
+	 *
+	 * @param buildRunDto 実行に必要な情報
 	 */
-	public void runPackage(String packageRepositoryName) {
-		// 作業領域パス
-		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
+	public void runSystem(BuildRunDTO buildRunDto) {
+		
+		WasanbonUtil.runSystem(buildRunDto);
+	}
+	
+	/**
+	 * RTCをスタートする.
+	 *
+	 * @param buildRunDto 実行に必要な情報
+	 */
+	public void startRtcs(BuildRunDTO buildRunDto) {
+	
+		WasanbonUtil.startRtcs(buildRunDto);
+	}
+	
+	/**
+	 * コネクトする.
+	 *
+	 * @param buildRunDto 実行に必要な情報
+	 */
+	public void connectPorts(BuildRunDTO buildRunDto) {
 
-		// 対象Packageディレクトリ
-		String packageDirPath = workspaceDirPath + packageRepositoryName + File.separator;
+		WasanbonUtil.connectPorts(buildRunDto);
+	}
+	
+	/**
+	 * アクティベイトかディアクティベイトをする.
+	 *
+	 * @param buildRunDto 実行に必要な情報
+	 * @param isActivate アクティベイトかどうか
+	 */
+	public void activateOrDeactivateRtcs(BuildRunDTO buildRunDto, boolean isActivate) {
 
-		// ログファイル
-		String logFilePath = packageDirPath + DIR_NAME.PACKAGE_LOG_DIR_NAME + File.separator + FILE_NAME.WASANBON_LOG;
-		File logFile = new File(logFilePath);
+		WasanbonUtil.activateOrDeactivateRtcs(buildRunDto, isActivate);
+	}
 
-		if (!WasanbonUtil.isRunningPackage(packageDirPath)) {
-			WasanbonUtil.runPackage(logFile, packageDirPath);
-		} else {
-			logger.warn("Package is already Running. package[" + packageRepositoryName + "]");
+	/**
+	 * 指定されたPackageのSystemを停止する.
+	 *
+	 * @param buildRunDto 実行に必要な情報
+	 */
+	public void terminateSystem(BuildRunDTO buildRunDto) {
+
+		WasanbonUtil.terminateSystem(buildRunDto);
+	}
+
+	/**
+	 * Packageの実行状況を確認する.
+	 *
+	 * @param ws ワークスペース名
+	 * @param rtsName パッケージ名
+	 * @param hostId ホストID
+	 * @return Packageの実行状況
+	 */
+	public Map<String, Object> isRunningPackage(String ws, String rtsName, String hostId) {
+		
+		String packageName = rtsName.replace("rts_", "");
+		if (ws.equals("exec")) { 
+			packageName = "exec_" + packageName;
 		}
+		return WasanbonUtil.isRunningPackage(ws, packageName, hostId);
+	}
+	
+	/************************************************************
+	 * Binder関連
+	 ************************************************************/
+	/**
+	 * すべてのBinderを取得する.
+	 *
+	 * @param hostId ホストID
+	 * @return binderの一覧
+	 */
+	public Map<String, Map<String, String>> getBinderList(String hostId) {
+		return WasanbonUtil.getBinderList(hostId);
+	}
+	
+	/**
+	 * Binderにパッケージを追加する.
+	 *
+	 * @param packageName パッケージ名
+	 * @param binderName バインダー名
+	 * @return 実行結果
+	 */
+	public String addPackageToBinder(String packageName, String binderName) {
+
+		return WasanbonUtil.addPackageToBinder(packageName, binderName);
 	}
 
 	/**
-	 * 指定されたPackageを停止する
-	 * 
-	 * @param packageRepositoryName
+	 * Binderのパッケージを更新する.
+	 *
+	 * @param ws ワークスペース名
+ 	 * @param packageName パッケージ名
+	 * @param binderName バインダー名
+	 * @return 実行結果
 	 */
-	public void terminatePackage(String packageRepositoryName) {
-		// 作業領域パス
-		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
+	public String updatePackageToBinder(String ws, String packageName, String binderName) {
 
-		// 対象Packageディレクトリ
-		String packageDirPath = workspaceDirPath + packageRepositoryName + File.separator;
-
-		// ログファイル
-		String logFilePath = packageDirPath + DIR_NAME.PACKAGE_LOG_DIR_NAME + File.separator + FILE_NAME.WASANBON_LOG;
-		File logFile = new File(logFilePath);
-
-		WasanbonUtil.terminatePackage(logFile, packageDirPath);
+		return WasanbonUtil.updatePackageToBinder(ws, packageName, binderName);
 	}
 
 	/**
-	 * Packageの実行状況を確認する
-	 * 
-	 * @param packageRepositoryName
-	 * @return
+	 * BinderにRTCを追加する.
+	 *
+	 * @param ws ワークスペース名
+	 * @param packageName パッケージ名
+	 * @param rtcName コンポーネント名
+	 * @param binderName バインダー名
+	 * @return 実行結果
 	 */
-	public boolean isRunningPackage(String packageRepositoryName) {
-		// 作業領域パス
-		String workspaceDirPath = PropUtil.getValue("workspace.local.directory.path");
+	public String addRtcToBinder(String ws, String packageName, String rtcName, String binderName) {
 
-		// 対象Packageディレクトリ
-		String packageDirPath = workspaceDirPath + packageRepositoryName + File.separator;
+		return WasanbonUtil.addRtcToBinder(ws, packageName, rtcName, binderName);
+	}
+	
+	/**
+	 * BinderのRTCを更新する.
+	 *
+	 * @param ws ワークスペース名
+	 * @param packageName パッケージ名
+	 * @param rtcName コンポーネント名
+	 * @param binderName バインダー名
+	 * @return 実行結果
+	 */
+	public String updateRtcToBinder(String ws, String packageName, String rtcName, String binderName) {
+		
+		return WasanbonUtil.updateRtcToBinder(ws, packageName, rtcName, binderName);
+	}
+	
+	/**
+	 * Binderをcommitする.
+	 *
+	 * @param binderName バインダー名
+	 * @param comment コミットメッセージ
+	 * @return コミット結果
+	 */
+	public String commitBinder(String binderName, String comment) {
 
-		return WasanbonUtil.isRunningPackage(packageDirPath);
+		return WasanbonUtil.commitBinder(binderName, comment);
+	}
+
+	/**
+	 * Binderをpushする.
+	 *
+	 * @param binderName バインダー名
+	 * @param comment コミットメッセージ
+	 * @return push結果
+	 */
+	public String pushBinder(String binderName, String comment) {
+
+		return WasanbonUtil.pushBinder(binderName, comment);
+	}
+	
+	/**
+	 * nameserverを起動する.
+	 *
+	 * @param hostId ホストID
+	 */
+	public void startNameserver(String hostId) {
+
+		WasanbonUtil.startNameserver(hostId);
+	}
+	
+	/**
+	 * nameserverのstatusを確認する.
+	 *
+	 * @param hostId ホストID
+	 * @return nameserverのstatus
+	 */
+	public boolean checkNameserverStatus(String hostId)  {
+
+		return WasanbonUtil.checkNameserverStatus(hostId);
 	}
 }

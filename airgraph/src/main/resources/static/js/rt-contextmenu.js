@@ -3,6 +3,8 @@
  *************************************************************************/
 /**
  * 作業領域右クリックメニュー作成
+ * 
+ * @returns {undefined}
  */
 function createContextMenuMainPaper() {
   // 作業領域全体の右クリックメニュー設定
@@ -21,6 +23,8 @@ function createContextMenuMainPaper() {
 
 /**
  * 作業領域の右クリックメニュー設定
+ * 
+ * @returns {undefined}
  */
 function setMainAreaContextMenu() {
   $.contextMenu({
@@ -35,23 +39,33 @@ function setMainAreaContextMenu() {
       } else if (key === 'edit') {
         // Package設定
         openPackageProfileSetting();
-      } else if (key === 'delete') {
+      }  else if (key ==='add_binder'){
+     // Package追加ダイアログ表示
+        openAddorUpdatetoBinderPopup(true, true, 0, "Add Package to Binder");
+    } else if (key ==='update_binder'){
+     // Package追加ダイアログ表示
+        openAddorUpdatetoBinderPopup(true, false, 0, "Update Package to Binder");
+    } else if (key === 'delete') {
         // Package削除
         w2confirm('表示中のPackageを削除します。<br/>よろしいですか？', function (btn) {
-          if (btn === 'Yes') {
-            deletePackage(curWorkspaceName);
+        if (btn === 'Yes') {
+          deletePackage(curWorkspaceName);
           }
         });
       }
     },
     items: {
-      'save': { name: 'Save All', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'save': { name: 'Save All', icon: 'fa-floppy-o', disabled: function (key, opt) { return curState !== STATE.EDIT } },
       'sep1': '---------',
       'edit': { name: 'Edit Package Setting', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
       'sep2': '---------',
-      'git': { name: 'Git Repository Link', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'git': { name: 'Git Repository Link', icon: 'fa-cloud-upload', disabled: function (key, opt) { return curState !== STATE.EDIT } },
       'sep3': '---------',
-      'delete': { name: 'Remove Package', icon: 'delete', disabled: function (key, opt) { return curState !== STATE.EDIT } }
+      'add_binder': { name: 'Add Package to Binder', icon: 'add', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'sep4': '---------',
+      'update_binder': { name: 'Update Package to Binder', icon: 'fa-long-arrow-up', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'sep5': '---------',
+      'delete': { name: 'Remove Package', icon: 'delete', disabled: function (key, opt) { return curState !== STATE.EDIT } },
     }
   });
 }
@@ -61,6 +75,8 @@ function setMainAreaContextMenu() {
  *************************************************************************/
 /**
  * コンポーネントの右クリックメニュー設定
+ * 
+ * @returns {undefined}
  */
 function setComponentContextMenu() {
   $.contextMenu({
@@ -98,6 +114,12 @@ function setComponentContextMenu() {
       } else if (key === 'source') {
         // ソースコード編集
         openSourceCodePopup(componentId);
+      } else if (key === 'addbinder') {
+        // RTC追加ダイアログ表示
+        openAddorUpdatetoBinderPopup(false, true, componentId, "Add RTC to Binder");
+      } else if (key === 'updatebinder') {
+        // RTC更新ダイアログ表示
+        openAddorUpdatetoBinderPopup(false, false, componentId, "Update RTC to Binder");
       }
     },
     items: {
@@ -109,7 +131,9 @@ function setComponentContextMenu() {
       'configuration': { name: 'Edit Configuration Parameters', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
       'source': { name: 'Edit Source Code', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
       'sep2': '---------',
-      'git': { name: 'Git Repository Link', icon: 'edit', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'addbinder': { name: 'Add RTC to Binder', icon: 'add', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'updatebinder': { name: 'Update RTC to Binder', icon: 'fa-long-arrow-up', disabled: function (key, opt) { return curState !== STATE.EDIT } },
+      'git': { name: 'Git Repository Link', icon: 'fa-cloud-upload', disabled: function (key, opt) { return curState !== STATE.EDIT } },
       'sep3': '---------',
       'delete': { name: 'Remove Component', icon: 'delete', disabled: function (key, opt) { return curState !== STATE.EDIT } },
     }
@@ -120,6 +144,8 @@ function setComponentContextMenu() {
  *************************************************************************/
 /**
  * データ入力ポートの右クリックメニュー設定
+ * 
+ * @returns {undefined}
  */
 function setDataInPortContextMenu() {
   $.contextMenu({
@@ -162,6 +188,8 @@ function setDataInPortContextMenu() {
 
 /**
  * データ出力ポートの右クリックメニュー設定
+ * 
+ * @returns {undefined}
  */
 function setDataOutPortContextMenu() {
   $.contextMenu({
@@ -211,7 +239,8 @@ function setDataOutPortContextMenu() {
 
 /**
  * データポートの接続情報の右クリックメニュー設定
- * @returns
+ * 
+ * @returns {undefined}
  */
 function setDataportConnectionContextMenu() {
   $.contextMenu({
@@ -249,8 +278,9 @@ function setDataportConnectionContextMenu() {
 /**
  * データポートの変更を反映する
  * 
- * @param elm
- * @returns
+ * @param {*} opt opt
+ * @param {*} elm elm
+ * @returns {undefined}
  */
 function updateDataportChanged(opt, elm) {
   var $this = elm;
@@ -294,9 +324,9 @@ function updateDataportChanged(opt, elm) {
 /**
  * データポートの接続情報を変更する
  * 
- * @param oldInfo
- * @param newInfo
- * @returns
+ * @param {*} oldInfo oldInfo
+ * @param {*} newInfo newInfo
+ * @returns {undefined}
  */
 function updateDataportConnectorInfo(oldInfo, newInfo) {
   if (oldInfo.interfaceType !== newInfo.interfaceType
@@ -337,6 +367,8 @@ function updateDataportConnectorInfo(oldInfo, newInfo) {
 
 /**
  * サービスポートの右クリックメニュー設定
+ * 
+ * @returns {undefined}
  */
 function setServicePortContextMenu() {
   $.contextMenu({
@@ -376,6 +408,8 @@ function setServicePortContextMenu() {
 /**
  * ファイル追加用右クリックメニュー
  * 
+ * @returns {undefined}
+ * 
  */
 function setSourceEditorFolderContextMenu() {
   $.contextMenu({
@@ -402,6 +436,12 @@ function setSourceEditorFolderContextMenu() {
   });
 }
 
+
+/**
+ * ファイル削除用右クリックメニュー
+ * 
+ * @returns {undefined}
+ */
 function setSourceEdtiorFileContextMenu() {
   $.contextMenu({
     selector: '.rtc-source-file-menu',

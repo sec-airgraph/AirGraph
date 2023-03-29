@@ -105,10 +105,10 @@ public class Actions {
 	 ****************************************/
 	
 	/**
-	 * Actionsが全て一致するかを判定する
-	 * 
-	 * @param target
-	 * @return
+	 * Actionsが全て一致するかを判定する.
+	 *
+	 * @param target target
+	 * @return Actionsが全て一致するか
 	 */
 	public boolean equalsActions(Actions target) {
 		boolean result = true;

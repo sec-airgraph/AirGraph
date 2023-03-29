@@ -2,7 +2,9 @@
  * データ・セット関連
  *************************************************************************/
 /**
- * データ・セットモニタを表示する
+ * データ・セットモニタを表示する.
+ *
+ * @returns {undefined}
  */
 function openDatasetListViewer() {
   // すでに表示している場合は何もしない
@@ -11,14 +13,14 @@ function openDatasetListViewer() {
   }
 
   // データセット名の一覧を取得
-  var datasets = getDatasetChoices();
-  var selectedDataset = '';
-  var codeDirectory = '';
+  let datasets = getDatasetChoices();
+  let selectedDataset = '';
+  let codeDirectory = '';
 
   // ロボットの一覧を取得
-  var robots = getRobotChoices();
-  var selectedRobot = '';
-  var robotDatasets = '';
+  let hosts = getAirGraphHostChoices();
+  let selectedRobot = '';
+  let robotDatasets = '';
 
   // 本体
   var div = $('<div>');
@@ -36,7 +38,7 @@ function openDatasetListViewer() {
       { type: 'left', size: 200, resizable: false, style: pstyle, content: $().w2sidebar(createDatasetMonitorLeft(selectedDataset, codeDirectory)) },
       { type: 'main', style: pstyle, content: $().w2grid(createDatasetMonitorMain()) },
       { type: 'right', size: 310, resizable: false, style: pstyle, content: "<div id = 'dataset-monitor-right'>" },
-      { type: 'bottom', size: 210, resizable: false, style: pstyle, content: $().w2form(createDatasetMonitorBottom(robots, selectedRobot, robotDatasets)) }
+      { type: 'bottom', size: 210, resizable: false, style: pstyle, content: $().w2form(createDatasetMonitorBottom(hosts, selectedRobot, datasets)) }
     ]
   });
 
@@ -63,10 +65,11 @@ function openDatasetListViewer() {
 }
 
 /**
- * データセット名選択部分を表示
- * 
- * @param datasets
- * @param selectedDataset
+ * データセット名選択部分を表示.
+ *
+ * @param {*} datasets データセット名
+ * @param {*} selectedDataset 選択されたデータセット名
+ * @returns {Map} form
  */
 function createDatasetMonitorTop(datasets, selectedDataset) {
   // データセット選択部分を生成
@@ -78,7 +81,7 @@ function createDatasetMonitorTop(datasets, selectedDataset) {
       dataset_name: selectedDataset,
     },
     fields: [
-      { name: 'dataset_name', type: 'list', required: true, html: { caption: 'Dataset Name', attr: 'style="width:200px"' }, options: { items: datasets } },
+      { field: 'dataset_name', type: 'select', required: true, html: { label: 'Dataset Name', attr: 'style="width:200px"' }, options: { items: datasets } },
     ],
     onChange: function (event) {
       if ($('#dataset_name').val()) {
@@ -93,10 +96,11 @@ function createDatasetMonitorTop(datasets, selectedDataset) {
 }
 
 /**
- * ディレクトリ一覧部分を表示
- * 
- * @param  selectedDataset 
- * @param  codeDirectory 
+ * ディレクトリ一覧部分を表示.
+ *
+ * @param {*} selectedDataset 選択されたデータセット名
+ * @param {*} codeDirectory ディレクトリ
+ * @returns {Map} サイドバー
  */
 function createDatasetMonitorLeft(selectedDataset, codeDirectory) {
   // ツリーを生成する
@@ -116,13 +120,16 @@ function createDatasetMonitorLeft(selectedDataset, codeDirectory) {
     };
     return sidebarData;
   }
-  return '';
+  return {
+    name: 'tmp'
+  };
 }
 
 /**
- * ディレクトリ一覧部分を更新
- * 
- * @param  selectedDataset 
+ * ディレクトリ一覧部分を更新.
+ *
+ * @param {*} selectedDataset 選択されたデータセット名
+ * @returns {undefined}
  */
 function updateDatasetMonitorLeft(selectedDataset) {
   // 一度削除
@@ -151,16 +158,17 @@ function updateDatasetMonitorLeft(selectedDataset) {
   };
   // 再設定
   if (w2ui['layout-panel-dataset-listviewer']) {
-    w2ui['layout-panel-dataset-listviewer'].content('left', $().w2sidebar(sidebarData));
+    w2ui['layout-panel-dataset-listviewer'].html('left', $().w2sidebar(sidebarData));
   }
 }
 
 /**
- * ディレクトリ一覧のサイドバーを作成する
- * 
- * @param selectedDataset 
- * @param codeDirectory 
- * @param prefix 
+ * ディレクトリ一覧のサイドバーを作成する.
+ *
+ * @param {*} selectedDataset 選択されたデータセット名
+ * @param {*} codeDirectory ディレクトリ
+ * @param {*} prefix 接頭辞
+ * @returns {Map} node
  */
 function createMonitorSideBar(selectedDataset, codeDirectory, prefix) {
   if (codeDirectory) {
@@ -183,14 +191,16 @@ function createMonitorSideBar(selectedDataset, codeDirectory, prefix) {
 }
 
 /**
- * データ一覧部分表示
+ * データ一覧部分表示.
+ *
+ * @returns {Map} grid
  */
 function createDatasetMonitorMain() {
   var grid = {
     name: 'dataset-data-grid',
     columns: [
-      { field: 'name', caption: 'file name', size: '70%', editable: false, sortable: true },
-      { field: 'date', caption: 'update date', size: '30%', editable: false, sortable: true }
+      { field: 'name', text: 'file name', size: '70%', editable: false, sortable: true },
+      { field: 'date', text: 'update date', size: '30%', editable: false, sortable: true }
     ],
     onClick: function (event) {
       $('#dataset-monitor-right').empty();
@@ -208,9 +218,10 @@ function createDatasetMonitorMain() {
 }
 
 /**
- * グリッド・モニタ部分にデータを設定する
- * 
- * @param  selectedIds 
+ * グリッド・モニタ部分にデータを設定する.
+ *
+ * @param {*} selectedIds 選択されたデータセット名
+ * @returns {undefined}
  */
 function setDatasetMonitorGridData(selectedIds) {
   var dataArray = [];
@@ -249,13 +260,14 @@ function setDatasetMonitorGridData(selectedIds) {
 }
 
 /**
- * ロボットからの転送部分を作成
- * 
- * @param robots
- * @param selectedRobot
- * @param datasets
+ * ロボットからの転送部分を作成.
+ *
+ * @param {*} hosts ホスト名の配列
+ * @param {*} selectedRobot 選択されたロボット
+ * @param {*} datasets データセット
+ * @returns {Map} form
  */
-function createDatasetMonitorBottom(robots, selectedRobot, datasets) {
+function createDatasetMonitorBottom(hosts, selectedRobot, datasets) {
   // データセット選択部分を生成
   var form = {
     name: 'dataset-monitor-bottom',
@@ -265,20 +277,19 @@ function createDatasetMonitorBottom(robots, selectedRobot, datasets) {
       robot_name: selectedRobot
     },
     fields: [
-      { name: 'robot_name', type: 'list', required: true, html: { caption: 'Robot Name', attr: 'style="width:200px"' }, options: { items: robots } },
-      { name: 'robot_dataset_name', type: 'list', required: true, html: { caption: 'Dataset Name', attr: 'style="width:200px"' }, options: { items: datasets } },
-      // { name: 'robot_start_date', type: 'text', html: { caption: 'Target Date', attr: 'style="width:200px"' }}
+      { field: 'robot_host_name', type: 'select', required: true, html: { label: 'Host Name', attr: 'style="width:200px"' }, options: { items: hosts } },
+      { field: 'robot_dataset_name', type: 'select', required: true, html: { label: 'Dataset Name', attr: 'style="width:200px"' }, options: { items: datasets } },
     ],
     actions: {
       'Download': function () {
         if (this.validate().length === 0) {
-          getRobotDatasets($('#robot_name').val(), $('#robot_dataset_name').val(), '');
+          getRobotDatasets($('#robot_host_name').val(), $('#robot_dataset_name').val());
         }
       }
     },
     onChange: function (event) {
-      if (event.target === 'robot_name') {
-        updateDatasetMonitorBottom(robots, $('#robot_name').val());
+      if (event.target === 'robot_host_name') {
+        updateDatasetMonitorBottom($('#robot_host_name').val());
       }
     }
   };
@@ -286,26 +297,27 @@ function createDatasetMonitorBottom(robots, selectedRobot, datasets) {
 }
 
 /**
- * ロボットからの転送部分を更新
- * 
- * @param robots 
- * @param selectedRobot 
+ * ロボットからの転送部分を更新.
+ *
+ * @param {*} selectedHost 選択されたホスト
+ * @returns {undefined}
  */
-function updateDatasetMonitorBottom(robots, selectedRobot) {
+function updateDatasetMonitorBottom(selectedHost) {
   // 対象のロボットのデータセット選択肢を取得
-  var datasets = '';
-  if (selectedRobot) {
-    datasets = getRobotDatasetChoices(selectedRobot);
+  let datasets = '';
+  if (selectedHost) {
+    datasets = getRobotDatasetChoices(selectedHost);
   }
   w2ui['dataset-monitor-bottom'].fields[1].options.items = datasets;
   w2ui['dataset-monitor-bottom'].refresh();
-  $('#robot_name').val(selectedRobot);
+  $('#robot_host_name').val(selectedHost);
 }
 
 /**
- * データセットデータ一覧取得
- * 
- * @param datasetName 
+ * データセットデータ一覧取得.
+ *
+ * @param {*} datasetName データセット名
+ * @returns {string} レスポンス
  */
 function getDatasetDataList(datasetName) {
   var result = $.ajax({
@@ -319,8 +331,9 @@ function getDatasetDataList(datasetName) {
 }
 
 /**
- * データセットモニタを表示する
- * @returns
+ * データセットモニタを表示する.
+ *
+ * @returns {undefined}
  */
 function openDatasetMonitor() {
   // 対象のコネクタのモニタが存在する場合は何もしない
@@ -341,7 +354,7 @@ function openDatasetMonitor() {
 
   // パネルを表示
   var pstyle = 'border: 1px solid #dfdfdf; padding: 0px;';
-  $('#div-datasetmonitor').w2layout({
+  $(div).w2layout({
     name: 'layout-panel-dataset-listviewer',
     padding: 0,
     panels: [
@@ -353,7 +366,6 @@ function openDatasetMonitor() {
       },
     ]
   });
-
   // 画像取得開始
   var datasetTimerID = startTailDataset($(document.getElementById('img-datasetmonitor')));
 
@@ -379,27 +391,30 @@ function openDatasetMonitor() {
 }
 
 /**
-   * データセット監視開始
-   * @param elm
-   * @returns
-   */
+ * データセット監視開始.
+ *
+ * @param {*} elm 要素
+ * @returns {number} setInterval()
+ */
 function startTailDataset(elm) {
   return setInterval(function () { tailDataset(elm) }, 1000);
 }
 
 /**
- * データ・セット監視終了
- * @param id
- * @returns
+ * データ・セット監視終了.
+ *
+ * @param {*} id ID
+ * @returns {undefined}
  */
 function stopTailDataset(id) {
   clearInterval(id);
 }
 
 /**
- * データセット監視
- * @param elm
- * @returns
+ * データセット監視.
+ *
+ * @param {*} elm 要素
+ * @returns {undefined}
  */
 function tailDataset(elm) {
   if (w2ui['dataset-monitor-sidebar']) {
@@ -410,9 +425,11 @@ function tailDataset(elm) {
 }
 
 /**
- * データセットの画像取得
- * @param elm
- * @returns
+ * データセットの画像取得.
+ *
+ * @param {*} elm 要素
+ * @param {*} filePath ファイルパス
+ * @returns {undefined}
  */
 function getDatasetImage(elm, filePath) {
   if (w2ui['dataset-monitor-sidebar']) {

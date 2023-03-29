@@ -75,3 +75,10 @@ body,div,p,a,ul,li,ol,img,br,h1,h2,h3,h4,h5,h6,table,tr,td,th,em,strong{
 .available-cell rect {
     stroke-dasharray: 5, 2;
 }
+
+/* host area styling */
+.host-area-div {
+	height: 33%;
+	width: 100%;
+	background-color: #fff;
+}

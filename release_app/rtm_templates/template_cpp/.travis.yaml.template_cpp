@@ -1,0 +1,68 @@
+﻿language: cpp
+sudo: required
+
+#notifications:
+#  email:
+#    recipients:
+#      - someone@mail.com
+#    on_success: change # default: change
+#    on_failure: always # default: change
+
+matrix:
+  include:
+    # Ubuntu14.04 + Stable OpenRTM-aist
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      env: repo="http://openrtm.org/pub/Linux/ubuntu/ trusty"
+    # Ubuntu12.04 + Stable OpenRTM-aist
+    - os: linux
+      compiler: gcc
+      env: repo="http://openrtm.org/pub/Linux/ubuntu/ precise"
+    # Ubuntu14.04 + Latest OpenRTM-aist
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      env: repo="http://staging.openrtm.org/pub/Linux/ubuntu/ trusty"
+    # Ubuntu12.04 + Latest OpenRTM-aist
+    - os: linux
+      compiler: gcc
+      env: repo="http://staging.openrtm.org/pub/Linux/ubuntu/ precise"
+
+addons:
+  apt:
+    packages:
+    - software-properties-common
+    - g++
+    - uuid-dev
+    - doxygen
+    - omniorb-nameserver
+    - libomniorb4-dev
+    - omniidl
+
+before_script:
+  - echo "deb $repo main" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get -qq update
+  - sudo apt-get install -y --force-yes openrtm-aist
+  - sudo apt-get install -y --force-yes openrtm-aist-dev
+  - sudo apt-get install -y --force-yes openrtm-aist-example
+
+script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - sudo make install
+
+before_deploy:
+  - sudo make package
+
+#deploy:
+#  provider: releases
+#  api_key:
+#    secure: "xxxxxxxxxxxxxxxxxxxxx"
+#  file: template_cpp-1.0.0.tar.gz
+#  skip_cleanup: true
+#  on:
+#    tags: true
+#    all_branches: true

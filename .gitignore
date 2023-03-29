@@ -5,3 +5,9 @@ airgraph/.*-cache/
 airgraph/target/
 docs/build
 release_app/*.jar
+package.json
+package-lock.json
+.eslintrc.js
+.eslintignore
+node_modules/
+google_checks.xml

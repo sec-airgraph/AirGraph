@@ -8,6 +8,8 @@
 <link th:replace="common/head :: common_link" />
 
 <!--/* RTC編集用Javascript読み込み */-->
+<script type="text/javascript" th:src="@{/js/common.js}"             src="/js/common.js"></script>
+<script type="text/javascript" th:src="@{/js/zip.js}"                src="/js/zip.js"></script>
 <script type="text/javascript" th:src="@{/js/rt-main.js}"            src="/js/rt-main.js"></script>
 <script type="text/javascript" th:src="@{/js/rt-component.js}"       src="/js/rt-component.js"></script>
 <script type="text/javascript" th:src="@{/js/rt-contextmenu.js}"     src="/js/rt-contextmenu.js"></script>
@@ -29,7 +31,7 @@ var componentMap = new Object(); /*[- Component -]*/
  * 作業領域定義
  * -----------------------------]*/
 /*[- 現在の作業領域名 -]*/
-var WORKSPACE_PREFIX = 'rts_work';
+var WORKSPACE_PREFIX = 'rts_';
 var curWorkspaceName;
 var workspaceCounter = 0;
  
@@ -61,6 +63,10 @@ var tailTimerID = 0;
 
 /*[- ロック数 -]*/
 var lockCnt = 0;
+
+/*[- ホスト関連 -]*/
+var hostMap = new Object();
+var airGraphHostMap = new Object();
 
 /*[-----------------------------
  * 選択肢
@@ -208,6 +214,11 @@ function getURLInterfaceTypeChoices() {
   return /*[[@{/main/interfaceTypeChoices}]]*/;
 }
 
+/*[- デプロイ -]*/
+function getUrlDeploy() {
+  return /*[[@{/main/deploy}]]*/;
+}
+
 /*[- 全ビルド -]*/
 function getUrlBuildAll() {
   return /*[[@{/main/buildPackageAll}]]*/;
@@ -219,13 +230,28 @@ function getUrlCleanAll() {
 }
 
 /*[- 実行 -]*/
-function getUrlRunPackage() {
-  return /*[[@{/main/runPackage}]]*/;
+function getUrlRunSystem() {
+  return /*[[@{/main/runSystem}]]*/;
+}
+
+/*[- コネクト -]*/
+function getUrlConnectPorts() {
+  return /*[[@{/main/connectPorts}]]*/;
+}
+
+/*[- アクティベイトまたはディアクティベイト -]*/
+function getUrlActivateOrDeactivateRTCs() {
+  return /*[[@{/main/activateOrDeactivateRtcs}]]*/;
+}
+
+/*[- スタート -]*/
+function getUrlStartRTCs() {
+  return /*[[@{/main/StartRTCs}]]*/;
 }
 
 /*[- 停止 -]*/
-function getUrlTerminatePackage() {
-  return /*[[@{/main/terminatePackage}]]*/;
+function getUrlTerminateSystem() {
+  return /*[[@{/main/terminateSystem}]]*/;
 }
 
 /*[- 実行状況確認 -]*/
@@ -236,6 +262,16 @@ function getUrlIsRunningPackage() {
 /*[- ログ監視 -]*/
 function getUrlTailLog() {
   return /*[[@{/main/tailLog}]]*/;
+}
+
+/*[- wasanbon.log取得 -]*/
+function getUrlGetExecuteWasanbonLog() {
+  return /*[[@{/main/getExecuteWasanbonLog}]]*/;
+}
+
+/*[- wasanbon.log取得 -]*/
+function getUrlClearExecuteWasanbonLog() {
+  return /*[[@{/main/clearExecuteWasanbonLog}]]*/;
 }
 
 /*[- 画像監視 -]*/
@@ -249,7 +285,7 @@ function getUrlGetImage() {
 }
 
 /*[- 結果取得 -]*/
-function getUrlGetResult() {
+function getUrl() {
   return /*[[@{/main/getResult}]]*/;
 }
 
@@ -288,6 +324,26 @@ function getUrlPullComponent() {
   return /*[[@{/main/pullComponent}]]*/;
 }
 
+/*[- コミットハッシュを取得 -]*/
+function getUrlGetCommitHash() {
+  return /*[[@{/main/getCommitHash}]]*/;
+}
+
+/*[- CheckPackageStatus -]*/
+function getUrlCheckPackageStatus() {
+  return /*[[@{/main/checkPackageStatus}]]*/;
+}
+
+/*[- checkRtcsStatus -]*/
+function getUrlCheckRtcsStatus() {
+  return /*[[@{/main/checkRtcsStatus}]]*/;
+}
+
+/*[- checkNameserverStatus -]*/
+function getUrlCheckNameserverStatus() {
+  return /*[[@{/main/checkNameserverStatus}]]*/;
+}
+
 /*[- Keras表示 -]*/
 function getUrlKerasMain() {
   return /*[[@{/keras}]]*/;
@@ -311,6 +367,96 @@ function getUrlUpdateDnnModels() {
 /*[- Datasetのデータ一覧取得 -]*/
 function getUrlGetDatasetDataList() {
   return /*[[@{/keras/getDatasetDataList}]]*/;
+}
+
+/*[- ホスト定義ファイルに新規登録 -]*/
+function getUrlregisterHostToConfigFile() {
+  return  /*[[@{/main/registerHostToConfigFile}]]*/;
+}
+
+/*[- AirGraph用ホストを新規登録 -]*/
+function getUrlAddAirGraphHost() {
+  return  /*[[@{/main/addAirGraphHost}]]*/;
+}
+
+/*[- ホスト名、または(IP, Port)が重複しないか判定する -]*/
+function getUrlIsHostNameUnique(){
+	return  /*[[@{/main/isHostNameUnique}]]*/;
+}
+
+/*[- ホストIDが重複しないか判定する -]*/
+function getUrlIsHostIdUnique(){
+	return  /*[[@{/main/isHostIdUnique}]]*/;
+}
+/*[- ホスト定義ファイルを読み込む -]*/
+function getUrlloadHostList() {
+  return  /*[[@{/main/loadHostList}]]*/;
+}
+
+/*[- ホスト定義ファイルを更新する -]*/
+function getUrlUpdateHostConfigFile() {
+  return  /*[[@{/main/updateHostConfigFile}]]*/;
+}
+
+/*[- RTCホスト割り当てファイルを更新する -]*/
+function getUrlUpdateRTCHostAssignFile() {
+  return  /*[[@{/main/updateRTCHostAssignFile}]]*/;
+}
+
+/*[- GitHub設定ファイルを取得する -]*/
+function getUrlGetGitHubConfigFile(){
+  return  /*[[@{/main/getGitHubConfigFile}]]*/;
+}
+
+/*[- GitHub設定ファイルを取得する -]*/
+function getUrlCreateBinder(){
+  return  /*[[@{/main/createBinder}]]*/;
+}
+/*[- Airgraphのバージョン確認 -]*/
+function getUrlAitgraphVersion() {
+	return /*[[@{/main/getAirgraphVersion}]]*/;
+}
+
+/*[- Wasanbonのバージョン確認 -]*/
+function getUrlWasanbonVersion() {
+	return /*[[@{/main/getWasanbonVersion}]]*/;
+}
+
+/*[- Binderにパッケージを追加する -]*/
+function getUrlUpdateBinder() {
+  return  /*[[@{/main/updateBinder}]]*/;
+}
+
+/*[- Binderにパッケージを追加する -]*/
+function getUrlAddPackageToBinder() {
+  return  /*[[@{/main/addPackageToBinder}]]*/;
+}
+/*[- Binderのパッケージを更新する -]*/
+function getUrlUpdatePackageToBinder() {
+  return  /*[[@{/main/updatePackageToBinder}]]*/;
+}
+/*[- BinderにRTCを追加する -]*/
+function getUrlAddRTCToBinder() {
+  return  /*[[@{/main/addRtcToBinder}]]*/;
+}
+/*[- BinderのRTCを更新する -]*/
+function getUrlUpdateRTCToBinder() {
+  return  /*[[@{/main/updateRtcToBinder}]]*/;
+}
+
+/*[- BinderをCommitする -]*/
+function getUrlCommitBinder() {
+  return  /*[[@{/main/commitBinder}]]*/;
+}
+
+/*[- BinderをPushする -]*/
+function getUrlPushBinder() {
+  return  /*[[@{/main/pushBinder}]]*/;
+}
+
+/*[- nameserver start -]*/
+function getUrlStartNameserver() {
+  return  /*[[@{/main/startNameserver}]]*/;
 }
 
 /*[-----------------------------
@@ -348,13 +494,16 @@ $(function() {
   /*[- コンポーネント右クリックメニュー設定 -]*/
   createContextMenuMainPaper();
   
+  /*binderを更新する*/
+  updateBinder();
+  
   /*[- コンポーネント領域情報を展開する -]*/
   loadAllComponentArea();
 });
 </script>
 </head>
 <body>
-  <form id="mainForm" name="mainForm" method="POST" th:action="@{/main/getResult}" th:object="${mainForm}">
+  <!--/*<form id="mainForm" name="mainForm" method="POST" th:action="@{/main/getResult}" th:object="${mainForm}">*/-->
     <!--/* 全領域 */-->
     <div id="layout-panel"></div>
     <!--/* エディタ */-->
@@ -362,11 +511,28 @@ $(function() {
     <div id="monaco-editor-parent"><div id="monaco-editor" style="height:100%; width:99%"></div></div>
     <div id="wasanbon-log-parent"><div id="wasanbon-log" style="height:100%; width:99%"></div></div>
     <div id="python-log-parent"><div id="python-log" style="height:100%; width:99%"></div></div>
-  </form>
   <form id="idlUploadForm" name="idlUploadForm" method="post" enctype="multipart/form-data" th:action="@{/main/idlUpload}">
     <input type="file" id="idl-upload" name="idl-upload" style="display:none" onchange="uploadIdlFile();"></input>
     <input type="hidden" id="idl-package-name" name="idl-package-name"></input>
     <input type="hidden" id="idl-component-name" name="idl-component-name"></input>
   </form>
+  
+  <!--/* RTCアイコンのグラデーション定義 */-->
+  <svg xmlns="http://www.w3.org/2000/svg">
+	  <defs>
+	    <linearGradient id="GradientExec" x1="0" x2="0" y1="0" y2="100%">
+	      <stop offset="0%" stop-color="#b2ffb5" />
+	      <stop offset="100%" stop-color="#3dff32" />
+	    </linearGradient>
+	  </defs>
+	  
+	  <defs>
+	    <linearGradient id="GradientEdit" x1="0" x2="0" y1="0" y2="100%">
+	      <stop offset="0%" stop-color="#b2d8ff" />
+	      <stop offset="100%" stop-color="#3399ff" />
+	    </linearGradient>
+	  </defs>
+</svg>
+
 </body>
 </html>

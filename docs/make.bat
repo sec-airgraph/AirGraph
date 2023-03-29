@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=source
 set BUILDDIR=build
-set SPHINXPROJ=RTMKeras-IDE
+set SPHINXPROJ=AirGraph
 
 if "%1" == "" goto help
 

@@ -5,27 +5,26 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * プロセス実行Utility
- * 
+ * プロセス実行Utility.
+ *
  * @author Tsuyoshi Hirose
  *
  */
 public class ProcessUtil {
 
 	/**
-	 * logger
+	 * logger.
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(ProcessUtil.class);
 
 	/**
-	 * 戻り値無しでプロセスを実行する
-	 * 
-	 * @param command
+	 * 戻り値無しでプロセスを実行する.
+	 *
+	 * @param command コマンド
 	 */
 	public static void startProcessNoReturn(String... command) {
 		// 置換する
@@ -49,10 +48,10 @@ public class ProcessUtil {
 	}
 
 	/**
-	 * 実行フォルダを指定して、戻り値無しでプロセスを実行する
-	 * 
-	 * @param workingDirPath
-	 * @param command
+	 * 実行フォルダを指定して、戻り値無しでプロセスを実行する.
+	 *
+	 * @param workingDirPath 実行フォルダ
+	 * @param command コマンド
 	 */
 	public static void startProcessNoReturnWithWorkingDerectory(String workingDirPath, String... command) {
 		// 置換する
@@ -78,11 +77,11 @@ public class ProcessUtil {
 	}
 
 	/**
-	 * 実行フォルダを指定して、戻り値無しでプロセスを実行し結果を指定されたファイルに出力する
-	 * 
-	 * @param workingDirPath
-	 * @param logFile
-	 * @param command
+	 * 実行フォルダを指定して、戻り値無しでプロセスを実行し結果を指定されたファイルに出力する.
+	 *
+	 * @param workingDirPath 実行フォルダ
+	 * @param logFile ログファイル 
+	 * @param command コマンド
 	 */
 	public static void startProcessNoReturnWithWorkingDerectoryAndLog(String workingDirPath, File logFile,
 			String... command) {
@@ -111,9 +110,10 @@ public class ProcessUtil {
 	}
 
 	/**
-	 * 戻り値ありでプロセスを実行する
-	 * 
-	 * @param command
+	 * 戻り値ありでプロセスを実行する.
+	 *
+	 * @param command コマンド
+	 * @return 戻り値
 	 */
 	public static String startProcessReturnString(String... command) {
 		// 置換する
@@ -149,9 +149,11 @@ public class ProcessUtil {
 	}
 
 	/**
-	 * 実行フォルダを指定して、戻り値ありでプロセスを実行する
-	 * 
-	 * @param command
+	 * 実行フォルダを指定して、戻り値ありでプロセスを実行する.
+	 *
+	 * @param workingDirPath 実行フォルダ
+	 * @param command コマンド
+	 * @return 戻り値
 	 */
 	public static String startProcessReturnStringWithWorkingDerectory(String workingDirPath, String... command) {
 		// 置換する

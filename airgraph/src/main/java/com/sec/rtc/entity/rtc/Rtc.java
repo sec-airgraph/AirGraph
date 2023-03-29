@@ -26,7 +26,7 @@ public class Rtc {
 	 */
 	private CodeDirectory codeDirectory = new CodeDirectory();
 	
-	/*:
+	/**
 	 * ソースコード絶対パス内容MAP
 	 */
 	private Map<String, String> pathContentMap = new HashMap<>();

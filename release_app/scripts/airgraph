@@ -20,8 +20,8 @@ cmd="java -jar /opt/AirGraph/bin/airgraph.jar"
 
 name=`basename $0`
 pid_file="/opt/AirGraph/bin/$name.pid"
-stdout_log="/opt/AirGraph/logs/$name.log"
-stderr_log="/opt/AirGraph/logs/$name.err"
+stdout_log="/opt/AirGraph/logs/$name.script.log"
+stderr_log="/opt/AirGraph/logs/$name.script.err"
 
 get_pid() {
     cat "$pid_file"

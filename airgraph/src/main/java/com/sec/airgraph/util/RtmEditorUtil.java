@@ -1,23 +1,5 @@
 package com.sec.airgraph.util;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.sec.rtc.entity.rtc.Configuration;
-import com.sec.rtc.entity.rtc.NeuralNetworkInfo;
-import com.sec.rtc.entity.rtc.RtcProfile;
 import com.sec.airgraph.util.Const.COMMON.DIR_NAME;
 import com.sec.airgraph.util.Const.RT_COMPONENT.ACTIVITY_TYPE;
 import com.sec.airgraph.util.Const.RT_COMPONENT.COMPONENT_KIND;
@@ -27,17 +9,34 @@ import com.sec.airgraph.util.Const.RT_COMPONENT.EXECUTION_TYPE;
 import com.sec.airgraph.util.Const.RT_COMPONENT.INTERFACE_DIRECTION;
 import com.sec.airgraph.util.Const.RT_COMPONENT.PORT_DATA_TYPE;
 import com.sec.airgraph.util.Const.RT_COMPONENT.PORT_POSITION;
+import com.sec.rtc.entity.rtc.Configuration;
+import com.sec.rtc.entity.rtc.NeuralNetworkInfo;
+import com.sec.rtc.entity.rtc.RtcProfile;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 
 /**
- * IDE関連Utility
- * 
+ * IDE関連Utility.
+ *
  * @author Tsuyoshi Hirose
  *
  */
 public class RtmEditorUtil {
 
 	/**
-	 * logger
+	 * logger.
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(RtmEditorUtil.class);
 
@@ -45,9 +44,9 @@ public class RtmEditorUtil {
 	 * 選択肢用Map作成処理関連
 	 ************************************************************/
 	/**
-	 * コンポーネント型Mapを生成する
-	 * 
-	 * @return
+	 * コンポーネント型Mapを生成する.
+	 *
+	 * @return コンポーネント型Map
 	 */
 	public static Map<String, String> createComponentTypeMap() {
 		Map<String, String> map = new LinkedHashMap<>();
@@ -60,9 +59,9 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * アクティビティ型Mapを生成する
-	 * 
-	 * @return
+	 * アクティビティ型Mapを生成する.
+	 *
+	 * @return アクティビティ型Map
 	 */
 	public static Map<String, String> createActivityTypeMap() {
 		Map<String, String> map = new LinkedHashMap<>();
@@ -75,9 +74,9 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * コンポーネント種類Mapを生成する
-	 * 
-	 * @return
+	 * コンポーネント種類Mapを生成する.
+	 *
+	 * @return コンポーネント種類Map
 	 */
 	public static Map<String, String> createComponentKindMap() {
 		Map<String, String> map = new LinkedHashMap<>();
@@ -90,9 +89,9 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * コンポーネント種類Mapを生成する
-	 * 
-	 * @return
+	 * コンポーネント種類Mapを生成する.
+	 *
+	 * @return コンポーネント種類Map
 	 */
 	public static Map<String, String> createExecutionTypeMap() {
 		Map<String, String> map = new LinkedHashMap<>();
@@ -104,10 +103,10 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * 各ポート型に対応する文字列を取得する
-	 * 
-	 * @param portDataType
-	 * @return
+	 * 各ポート型に対応する文字列を取得する.
+	 *
+	 * @param portDataType ポート型 
+	 * @return 各ポート型に対応する文字列
 	 */
 	public static String getPythonConstructorForImg(String portDataType) {
 		// Pythonのコンストラクタ
@@ -143,10 +142,10 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * 各ポート型に対応する文字列を取得する
-	 * 
-	 * @param portDataType
-	 * @return
+	 * 各ポート型に対応する文字列を取得する.
+	 *
+	 * @param portDataType ポート型
+	 * @return 各ポート型に対応する文字列
 	 */
 	public static String getPythonConstructorForRtc(String portDataType) {
 		// Pythonのコンストラクタ
@@ -456,9 +455,9 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * ポート表示位置Mapを生成する
-	 * 
-	 * @return
+	 * ポート表示位置Mapを生成する.
+	 *
+	 * @return ポート表示位置Map
 	 */
 	public static Map<String, String> createPortPositionMap() {
 		Map<String, String> map = new LinkedHashMap<>();
@@ -470,9 +469,9 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * インタフェースの向きMapを生成する
-	 * 
-	 * @return
+	 * インタフェースの向きMapを生成する.
+	 *
+	 * @return インタフェースの向きMap
 	 */
 	public static Map<String, String> createIfDirectionMap() {
 		Map<String, String> map = new LinkedHashMap<>();
@@ -484,11 +483,11 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * 指定されたRTCに設定しているIDLファイルを含めて、IDLファイルの一覧を取得する
-	 * 
-	 * @param workPackageName
-	 * @param componentName
-	 * @return
+	 * 指定されたRTCに設定しているIDLファイルを含めて、IDLファイルの一覧を取得する.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param componentName コンポーネント名
+	 * @return IDLファイルの一覧
 	 */
 	public static Map<String, String> createIdlFileMap(String workPackageName, String componentName) {
 		Map<String, String> map = new LinkedHashMap<>();
@@ -529,32 +528,16 @@ public class RtmEditorUtil {
 			}
 		}
 
-		// openRTM_AistのフォルダからIDLのファイルを探す
-		// 作業領域パス
-		String openRtmAistDir = getOpenRtmAistDir();
-
-		File directoryOpenRtmAist = new File(openRtmAistDir);
-		// 後方一致で"idl"
-		IOFileFilter fileFilterOpenRtmAist = FileFilterUtils.suffixFileFilter("idl");
-		// サブディレクトリも検索する（しない場合はnull）
-		IOFileFilter dirFilterOpenRtmAist = FileFilterUtils.trueFileFilter();
-		// 検索開始
-		Collection<File> OpenRtmAistList = FileUtils.listFiles(directoryOpenRtmAist, fileFilterOpenRtmAist, dirFilterOpenRtmAist);
-		if (CollectionUtil.isNotEmpty(OpenRtmAistList)) {
-			for (File file : OpenRtmAistList) {
-				map.put(file.getAbsolutePath(), file.getAbsolutePath());
-			}
-		}
-
 		return map;
 	}
 
 	/**
-	 * 指定されたRTCに設定しているIDLファイルを含めて、全てのIDLファイルのDataType型を取得する
-	 * 
-	 * @param workPackageName
-	 * @param componentName
-	 * @return
+	 * 指定されたRTCに設定しているIDLファイルを含めて、全てのIDLファイルのDataType型を取得する.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param componentName コンポーネント名
+	 * @param isDataType データ型かどうか
+	 * @return 全てのIDLファイルのDataType型
 	 */
 	public static Map<String, String> createDataTypeMap(String workPackageName, String componentName,
 			boolean isDataType) {
@@ -578,11 +561,6 @@ public class RtmEditorUtil {
 		List<File> openRtmList = FileUtil.searchFileListWithSubDir(openRtmDir, "idl");
 		if (CollectionUtil.isNotEmpty(openRtmList)) {
 			targetFileList.addAll(openRtmList);
-		}
-		String openRtmAistDir = getOpenRtmAistDir();
-		List<File> openRtmAistList = FileUtil.searchFileListWithSubDir(openRtmAistDir, "idl");
-		if (CollectionUtil.isNotEmpty(openRtmAistList)) {
-			targetFileList.addAll(openRtmAistList);
 		}
 
 		if (!CollectionUtils.isEmpty(targetFileList)) {
@@ -622,12 +600,12 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * 指定されたRTCに設定しているIDLファイルを含めて、指定されたIDLファイルのinterface型を取得する
-	 * 
-	 * @param workPackageName
-	 * @param componentName
-	 * @param idlFileName
-	 * @return
+	 * 指定されたRTCに設定しているIDLファイルを含めて、指定されたIDLファイルのinterface型を取得する.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param componentName コンポーネント名
+	 * @param idlFileName IDLファイル名
+	 * @return 指定されたIDLファイルのinterface型
 	 */
 	public static Map<String, String> createInterfaceTypeMap(String workPackageName, String componentName,
 			String idlFileName) {
@@ -662,11 +640,11 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * アップロードしたIDLファイルを保存する
-	 * 
-	 * @param workPackageName
-	 * @param componentName
-	 * @param idlFile
+	 * アップロードしたIDLファイルを保存する.
+	 *
+	 * @param workPackageName パッケージ名
+	 * @param componentName コンポーネント名
+	 * @param idlFile IDLファイル
 	 */
 	public static void saveIdlFile(String workPackageName, String componentName, MultipartFile idlFile) {
 		// 作業領域パス
@@ -682,11 +660,11 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * NN設定情報を反映する
-	 * 
-	 * @param newNN
-	 * @param oldNN
-	 * @param rtcProfile
+	 * NN設定情報を反映する.
+	 *
+	 * @param newNN 新NN設定情報
+	 * @param oldNN 旧NN設定情報
+	 * @param rtcProfile RTCプロファイル
 	 */
 	public static void updateNeuralNetworkInfo(NeuralNetworkInfo newNN, NeuralNetworkInfo oldNN,
 			RtcProfile rtcProfile) {
@@ -763,10 +741,10 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * データセットディレクトリを更新する
-	 * 
-	 * @param newDatasetName
-	 * @param oldDatasetName
+	 * データセットディレクトリを更新する.
+	 *
+	 * @param newDatasetName 新データセットディレクトリ
+	 * @param oldDatasetName 旧データセットディレクトリ
 	 */
 	private static void updateDatasetDirectory(String newDatasetName, String oldDatasetName) {
 		String newDirectoryPath = PropUtil.getValue("dataset.directory.path") + newDatasetName;
@@ -794,31 +772,16 @@ public class RtmEditorUtil {
 	}
 
 	/**
-	 * RTMのディレクトリを取得する
-	 * 
-	 * @return
+	 * RTMのディレクトリを取得する.
+	 *
+	 * @return RTMのディレクトリ
 	 */
 	public static String getOpenRtmDir() {
 		// OpenRTMのフォルダを調べる
 		String openRtmDir = PropUtil.getValue("openrtm.rtm.dir");
 		if (!(new File(openRtmDir).exists())) {
-			openRtmDir = openRtmDir.replace("1.1", "1.2");
-		} else if (!(new File(openRtmDir).exists())) {
 			openRtmDir = PropUtil.getValue("openrtm.rtm.local.dir");
-		} else if (!(new File(openRtmDir).exists())) {
-			openRtmDir = openRtmDir.replace("1.1", "1.2");
 		}
-		return openRtmDir;
-	}
-
-	/**
-	 * RTM_Aistのディレクトリを取得する
-	 * 
-	 * @return
-	 */
-	public static String getOpenRtmAistDir() {
-		// OpenRTMのフォルダを調べる
-		String openRtmDir = PropUtil.getValue("openrtmaist.rtm.dir");
 		return openRtmDir;
 	}
 }

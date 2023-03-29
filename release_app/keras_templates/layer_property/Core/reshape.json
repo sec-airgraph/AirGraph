@@ -1,8 +1,8 @@
 { 
 	"class_name": "Reshape",
 	"fields": [
-		{ "name": "target_shape",		"type": "text",	"required": true,	"html": { "caption": "Target Shape",		"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "batch_input_shape",	"type": "text",	"required": false,	"html": { "caption": "Batch Input Shape",	"page": 0,	"attr": "style=\"width:200px\"" } },
-		{ "name": "dtype",				"type": "list", "required": false,	"html": { "caption": "Dtype",				"page": 0,	"attr": "style=\"width:200px\"" } }
+		{ "field": "target_shape",		"type": "text",	"required": true,	"html": { "label": "Target Shape",		"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "batch_input_shape",	"type": "text",	"required": false,	"html": { "label": "Batch Input Shape",	"page": 0,	"attr": "style=\"width:200px\"" } },
+		{ "field": "dtype",				"type": "list", "required": false,	"html": { "label": "Dtype",				"page": 0,	"attr": "style=\"width:200px\"" } }
 	]
 }

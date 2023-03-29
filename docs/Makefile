@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = RTMKeras-IDE
+SPHINXPROJ    = AirGraph
 SOURCEDIR     = source
 BUILDDIR      = build
 

@@ -2,7 +2,9 @@
  * 初期レイアウト処理
  *************************************************************************/
 /**
- * 全体初期レイアウト処理
+ * 全体初期レイアウト処理.
+ * 
+ * @returns {undefined}
  */
 function layoutPanelAll() {
   var pstyle = 'border: 1px solid #dfdfdf; padding: 0px;';
@@ -21,7 +23,9 @@ function layoutPanelAll() {
 }
 
 /**
- * 作業領域作成処理
+ * 作業領域作成処理.
+ *
+ * @returns {*} panel
  */
 function createMainPanel() {
   // 背景
@@ -39,7 +43,9 @@ function createMainPanel() {
 }
 
 /**
- * ツールバー領域作成処理
+ * ツールバー領域作成処理.
+ * 
+ * @returns {*} panel
  */
 function createToolBarPanel() {
   // 背景
@@ -52,7 +58,9 @@ function createToolBarPanel() {
 }
 
 /**
- * ネットワーク領域作成処理
+ * ネットワーク領域作成処理.
+ * 
+ * @returns {*} panel
  */
 function createNetworkPanel() {
   // 背景
@@ -81,7 +89,9 @@ function createNetworkPanel() {
 }
 
 /**
- * プロパティ領域作成処理
+ * プロパティ領域作成処理.
+ * 
+ * @returns {*} panel
  */
 function createPropertyPanel() {
   // 背景
@@ -92,7 +102,9 @@ function createPropertyPanel() {
 }
 
 /**
- * JSON領域作成処理
+ * JSON領域作成処理.
+ *
+ * @returns {*} panel
  */
 function createJsonPanel() {
   // 背景
@@ -105,7 +117,9 @@ function createJsonPanel() {
 }
 
 /**
- * フッター領域作成処理
+ * フッター領域作成処理.
+ *
+ * @returns {*} panel
  */
 function createFooterPanel() {
   // 背景
@@ -172,30 +186,32 @@ function createFooterPanel() {
  ******************************************************************************/
 
 /**
- * ツールバーを生成する
+ * ツールバーを生成する.
+ * 
+ * @returns {undefined}
  */
 function setToolbarComponent() {
   $('#toolbar-panel').w2toolbar({
     name: 'toolbar',
     items: [
       {
-        type: 'menu', id: 'file-menu', caption: 'File', icon: 'fa fa-files-o',
+        type: 'menu', id: 'file-menu', text: 'File', icon: 'fa fa-files-o',
         items: [
-          { type: 'menu', id: 'save-menu', caption: 'Save This Model', icon: 'fa fa-floppy-o' }
+          { type: 'menu', id: 'save-menu', text: 'Save This Model', icon: 'fa fa-floppy-o' }
         ]
       },
       {
-        type: 'menu', id: 'tool-menu', caption: 'Tools', icon: 'fa fa-tasks',
+        type: 'menu', id: 'tool-menu', text: 'Tools', icon: 'fa fa-tasks',
         items: [
-          { type: 'menu', id: 'learn-menu', caption: 'Lean', icon: 'fa fa-refresh' }
+          { type: 'menu', id: 'learn-menu', text: 'Learn', icon: 'fa fa-refresh' }
         ]
       },
       {
-        type: 'menu', id: 'setting-menu', caption: 'Dataset', icon: 'fa fa-book',
+        type: 'menu', id: 'setting-menu', text: 'Dataset', icon: 'fa fa-book',
         items: [
-          { type: 'menu', id: 'dataset-menu', caption: 'Open Dataset Viewer', icon: 'fa fa-television' },
-          { type: 'menu', id: 'upload-menu', caption: 'Upload Dataset', icon: 'fa fa-upload' },
-          { type: 'menu', id: 'download-menu', caption: 'Download Dataset', icon: 'fa fa-download' }
+          { type: 'menu', id: 'dataset-menu', text: 'Open Dataset Viewer', icon: 'fa fa-television' },
+          { type: 'menu', id: 'upload-menu', text: 'Upload Dataset', icon: 'fa fa-upload' },
+          { type: 'menu', id: 'download-menu', text: 'Download Dataset', icon: 'fa fa-download' }
         ]
       },
     ],
@@ -244,9 +260,9 @@ function setToolbarComponent() {
 }
 
 /**
- * 作業領域の選択肢を設定する
+ * 作業領域の選択肢を設定する.
  * 
- * @returns
+ * @returns {undefined}
  */
 function setWorkspaceSelectMenu() {
   if (curWorkspaceName && modelMap) {
@@ -267,9 +283,10 @@ function setWorkspaceSelectMenu() {
  * ネットワーク領域
  ******************************************************************************/
 /**
- * ネットワーク領域のアコーディオン設定
- * @param networkAreaInfo 領域情報
- * @returns
+ * ネットワーク領域のアコーディオン設定.
+ *
+ * @param {*} networkAreaInfo 領域情報
+ * @returns {undefined}
  */
 function setNetworkAreaInfo(networkAreaInfo) {
   // ネットワーク領域アコーディオンを生成する
@@ -284,8 +301,9 @@ function setNetworkAreaInfo(networkAreaInfo) {
 }
 
 /**
- * 作業領域タブを作成する
- * @returns
+ * 作業領域タブを作成する.
+ *
+ * @returns {undefined}
  */
 function setWorkingAccordionInfo() {
   if ($('#network-panel').children(0).length > 1) {
@@ -335,10 +353,11 @@ function setWorkingAccordionInfo() {
 
 
 /**
- * ネットワーク領域のアコーディオン作成処理
+ * ネットワーク領域のアコーディオン作成処理.
  * 
- * @param 領域情報
- * @param 親領域名称
+ * @param {*} tabs 領域情報
+ * @param {*} parentName 親領域名称
+ * @returns {*} cmpAc
  */
 function createNetworkAccordion(tabs, parentName) {
   // アコーディオン親
@@ -378,11 +397,12 @@ function createNetworkAccordion(tabs, parentName) {
 }
 
 /**
- * ネットワーク領域上にモデルを描画
- * @param name 作成対象のモデル名
- * @param posX X座標
- * @param posY Y座標
- * @returns
+ * ネットワーク領域上にモデルを描画.
+ * 
+ * @param {*} name 作成対象のモデル名
+ * @param {*} posX X座標
+ * @param {*} posY Y座標
+ * @returns {*} model
  */
 function createModelViewObject(name, posX, posY) {
   var fontSize = 14;
@@ -432,12 +452,14 @@ function createModelViewObject(name, posX, posY) {
 }
 
 /**
- * ネットワーク領域・作業領域上にレイヤーを描画
- * @param name 作成対象のレイヤー名
- * @param posX X座標
- * @param posY Y座標
- * @param onWorkspace 対象が作業領域であるかどうか
- * @returns
+ * ネットワーク領域・作業領域上にレイヤーを描画.
+ *
+ * @param {*} name 作成対象のレイヤー名
+ * @param {*} posX X座標
+ * @param {*} posY Y座標
+ * @param {*} onWorkspace 対象が作業領域であるかどうか
+ * @param {*} color 色
+ * @returns {*} layer
  */
 function createLayerViewObject(name, posX, posY, onWorkspace, color) {
   // ネットワークパネル上と作業領域上で描画レイアウトを切り替え
@@ -461,11 +483,7 @@ function createLayerViewObject(name, posX, posY, onWorkspace, color) {
 
     //クラス名・必要プロパティの表示
     var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
-    if (model.class_name == 'Sequential') {
-      labelText = joint.util.breakText(model.config.find(l => l.config.name == name).class_name, { width: 90 });
-    } else {
-      labelText = joint.util.breakText(model.config.layers.find(l => l.config.name == name).class_name, { width: 90 });
-    }
+    labelText = joint.util.breakText(model.config.layers.find(l => l.config.name == name).class_name, { width: 90 });
     labelText += '\n\n[name]\n' + joint.util.breakText(name, { width: 90 });
   }
 
@@ -514,8 +532,12 @@ function createLayerViewObject(name, posX, posY, onWorkspace, color) {
 }
 
 /**
- * ネットワークGraph領域作成処理
- * 
+ * ネットワークGraph領域作成処理.
+ *
+ * @param {*} areaElm Graph領域
+ * @param {*} models モデル
+ * @param {*} layers レイヤー
+ * @returns {undefined}
  */
 function createNetworkGraphArea(areaElm, models, layers) {
   var height = 35;
@@ -547,7 +569,7 @@ function createNetworkGraphArea(areaElm, models, layers) {
   });
 
   if (layers && layers.length > 0) {
-    for (var i = 0; i < layers.length; i++) {
+    for (let i = 0; i < layers.length; i++) {
       var parsedLayer = JSON.parse(layers[i]);
       // mapに保持しておく
       templateLayerMap[parsedLayer.class_name] = parsedLayer;
@@ -568,7 +590,7 @@ function createNetworkGraphArea(areaElm, models, layers) {
   }
 
   if (models && models.length > 0) {
-    for (var i = 0; i < models.length; i++) {
+    for (let i = 0; i < models.length; i++) {
       // mapに保持しておく
       templateModelMap[models[i].modelName] = models[i];
       // 描画オブジェクト作成
@@ -578,13 +600,13 @@ function createNetworkGraphArea(areaElm, models, layers) {
 }
 
 /**
- * ネットワーク領域から作業領域へのドラッグ処理
- * 
- * @param cellView
- * @param e
- * @param x
- * @param y
- * @returns
+ * ネットワーク領域から作業領域へのドラッグ処理.
+ *
+ * @param {*} cellView cellView
+ * @param {*} e イベント
+ * @param {*} x x
+ * @param {*} y y
+ * @returns {undefined}
  */
 function dragLayer(cellView, e, x, y) {
   // Drag用のオブジェクトを追加する
@@ -627,17 +649,18 @@ function dragLayer(cellView, e, x, y) {
     flyShape.remove();
     $('#flyPaper').remove();
   });
-};
+}
 
 /**
- * ネットワーク領域から作業領域へのドロップ処理
- * 
- * @param x
- * @param y
- * @param offset
- * @param target
- * @param modelId
- * @returns
+ * ネットワーク領域から作業領域へのドロップ処理.
+ *
+ * @param {*} x x
+ * @param {*} y y
+ * @param {*} offset offset
+ * @param {*} target target
+ * @param {*} name 名前
+ * @param {*} type 型
+ * @returns {undefined}
  */
 function dropLayer(x, y, offset, target, name, type) {
   if (type == 'Model') {
@@ -689,12 +712,13 @@ function dropLayer(x, y, offset, target, name, type) {
     // レイヤーのプロパティを表示
     setPropertyAreaForLayer();
   }
-};
+}
 
 /**
- * 作業領域へのレイヤー追加
- * @param layerName
- * @returns
+ * 作業領域へのレイヤー追加.
+ *
+ * @param {*} layerName レイヤー名
+ * @returns {undefined}
  */
 function addLayer(layerName) {
   // 画面をロック
@@ -702,12 +726,7 @@ function addLayer(layerName) {
 
   // 現在のモデルが指定されていない場合は新規モデルを作成
   var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
-  var layers = [];
-  if (model.class_name == 'Sequential') {
-    layers = model.config;
-  } else {
-    layers = model.config.layers;
-  }
+  var layers = model.config.layers;
 
   // レイヤー名称からレイヤーを取得し、モデルに追加
   var className = layerName.replace(/_template/g, '');
@@ -731,12 +750,10 @@ function addLayer(layerName) {
         newLayer.inbound_nodes[0].push([model.config.output_layers[0][0], 0, 0, {}]);
       }
     }
-    // モデルにレイヤーを追加
-    model.config.layers.push(newLayer);
-  } else {
-    // モデルにレイヤーを追加
-    model.config.push(newLayer);
   }
+  // モデルにレイヤーを追加
+  model.config.layers.push(newLayer);
+
   // 入出力レイヤーを再設定
   model = reconfigureInputAndOutputLayers(model);
 
@@ -751,9 +768,9 @@ function addLayer(layerName) {
  * 作業領域
  ******************************************************************************/
 /**
- * 作業Graph領域作成処理
+ * 作業Graph領域作成処理.
  * 
- * @param 親DIVタグ
+ * @returns {undefined}
  */
 function createMainGraphArea() {
   mainGraph = new joint.dia.Graph;
@@ -799,14 +816,15 @@ function createMainGraphArea() {
 }
 
 /**
- * 作業領域イベント関連付
+ * 作業領域イベント関連付.
  * 
- * @returns
+ * @returns {undefined}
  */
 function setEventMainPaper() {
   // コンポーネントクリック
   mainPaper.off('cell:pointerclick');
   mainPaper.on('cell:pointerclick', function (cellView, e, x, y) {
+    
     // 矢印を引っ張ってきたときの動作
     if (onDragging) {
       if (cellView.model.attributes.type == 'Layer') {
@@ -850,7 +868,9 @@ function setEventMainPaper() {
     // クリック情報を保持する
     selectedCellViews.push(cellView);
     // ハイライト表示
-    cellView.highlight();
+    if (onDragging !== true) {
+      cellView.highlight();
+    }
 
     if (cellView.model.attributes.type == 'link') {
       // リンクのクリック
@@ -913,9 +933,10 @@ function setEventMainPaper() {
 }
 
 /**
- * 作業領域をすべて展開する
- * 
- * @returns
+ * 作業領域をすべて展開する.
+ *
+ * @param {*} modelList モデルリスト
+ * @returns {undefined}
  */
 function loadAllPackagesWorkspace(modelList) {
   // 作業領域フォルダにあるモデルをすべて読み込み
@@ -974,24 +995,18 @@ function loadAllPackagesWorkspace(modelList) {
 }
 
 /**
- * 作業領域を展開する
- * TODO: 整列・重なり回避
+ * 作業領域を展開する.
+ * TODO: 整列・重なり回避.
  * 
- * @param posXDef
- * @param posYDef
- * @param rtsystem
- * @returns
+ * @param {*} model モデル
+ * @returns {undefined}
  */
 function loadPackageWorkspace(model) {
   // 作業領域内のレイヤをすべて削除
   deleteAllLayersViewObject();
   // モデルに含まれるレイヤを展開していく
-  layers = [];
-  if (model.class_name == 'Sequential') {
-    layers = model.config;
-  } else {
-    layers = model.config.layers;
-  }
+  let layers = model.config.layers;
+
   // 奇麗に表示したい
   if (layers && layers.length > 0) {
     // 描画位置を設定
@@ -1092,8 +1107,9 @@ function loadPackageWorkspace(model) {
 }
 
 /**
- * ワークスペース内のレイヤー色変更
- * @returns
+ * ワークスペース内のレイヤー色変更.
+ *
+ * @returns {undefined}
  */
 function repaintLayerColor() {
   // インプットレイヤーはグレー表示
@@ -1115,8 +1131,9 @@ function repaintLayerColor() {
 }
 
 /**
- * すべてのレイヤーを画面から削除する
- * @returns
+ * すべてのレイヤーを画面から削除する.
+ *
+ * @returns {undefined}
  */
 function deleteAllLayersViewObject() {
   if (mainGraph.attributes.cells.models && mainGraph.attributes.cells.models.length > 0) {
@@ -1127,8 +1144,9 @@ function deleteAllLayersViewObject() {
 }
 
 /**
- * 矢印を描画する
- * @returns
+ * 矢印を描画する.
+ *
+ * @returns {undefined}
  */
 function drawArrows() {
   var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
@@ -1136,7 +1154,7 @@ function drawArrows() {
   var count = 0;
 
   if (model.class_name == 'Sequential') {
-    layers = model.config;
+    layers = model.config.layers;
     for (var i = 0; i < layers.length - 1; i++) {
       var link = new joint.dia.Link({
         id: 'connector' + count,
@@ -1196,7 +1214,38 @@ function drawArrows() {
 }
 
 /**
- * レイヤーの右クリックメニュー設定
+ * ドラッグ処理.
+ *
+ * @param {*} evt イベント
+ * @returns {undefined}
+ */
+function onDrag(evt) {
+  // transform client to paper coordinates
+  var p = evt.data.paper.snapToGrid({
+    x: evt.clientX,
+    y: evt.clientY
+  });
+  // manually execute the linkView mousemove handler
+  evt.data.view.pointermove(evt, p.x, p.y);
+}
+
+/**
+ * ドラッグ終了処理.
+ *
+ * @param {*} evt イベント
+ * @returns {undefined}
+ */
+function onDragEnd(evt) {
+  // manually execute the linkView mouseup handler
+  onDragging = true;
+  evt.data.view.pointerclick(evt, evt.clientX, evt.clientY);
+  $(document).off('.addout');
+}
+
+/**
+ * レイヤーの右クリックメニュー設定.
+ * 
+ * @returns {undefined}
  */
 function setLayerContextMenu() {
   $.contextMenu({
@@ -1223,24 +1272,6 @@ function setLayerContextMenu() {
             view: linkView,
             paper: mainPaper
           });
-
-          function onDrag(evt) {
-            // transform client to paper coordinates
-            var p = evt.data.paper.snapToGrid({
-              x: evt.clientX,
-              y: evt.clientY
-            });
-            // manually execute the linkView mousemove handler
-            evt.data.view.pointermove(evt, p.x, p.y);
-          }
-
-          function onDragEnd(evt) {
-            // manually execute the linkView mouseup handler
-            onDragging = true;
-            evt.data.view.pointerclick(evt, evt.clientX, evt.clientY);
-            $(document).off('.addout');
-          }
-
           break;
         default:
           rightClickedCellView = null;
@@ -1262,12 +1293,13 @@ function setLayerContextMenu() {
 }
 
 /**
- * 作業領域上に入力レイヤーを描画
- * @param name 作成対象のレイヤー名
- * @param posX X座標
- * @param posY Y座標
- * @param isButton ボタンかどうか
- * @returns
+ * 作業領域上に入力レイヤーを描画.
+ *
+ * @param {*} name 作成対象のレイヤー名
+ * @param {*} posX X座標
+ * @param {*} posY Y座標
+ * @param {*} isButton ボタンかどうか
+ * @returns {*} layer
  */
 function createInputLayerViewObject(name, posX, posY, isButton) {
   // ネットワークパネル上と作業領域上で描画レイアウトを切り替え
@@ -1297,11 +1329,7 @@ function createInputLayerViewObject(name, posX, posY, isButton) {
   } else {
     // クラス名・必要プロパティの表示
     var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
-    if (model.class_name == 'Sequential') {
-      labelText = joint.util.breakText(model.config.find(l => l.config.name == name).class_name, { width: 90 });
-    } else {
-      labelText = joint.util.breakText(model.config.layers.find(l => l.config.name == name).class_name, { width: 90 });
-    }
+    labelText = joint.util.breakText(model.config.layers.find(l => l.config.name == name).class_name, { width: 90 });
     labelText += '\n\n[name]\n' + joint.util.breakText(name, { width: 90 });
   }
 
@@ -1358,9 +1386,9 @@ function createInputLayerViewObject(name, posX, posY, isButton) {
  ******************************************************************************/
 
 /**
- * JSON領域のレイアウト処理
+ * JSON領域のレイアウト処理.
  * 
- * @returns
+ * @returns {undefined}
  */
 function layoutPanelJson() {
   var pstyle = 'border: none; padding: 0px;';
@@ -1384,8 +1412,9 @@ function layoutPanelJson() {
 }
 
 /**
- * JSONエディタ生成処理
- * 
+ * JSONエディタ生成処理.
+ *
+ * @returns {undefined}
  */
 function createJsonEditor() {
   require.config({
@@ -1412,9 +1441,9 @@ function createJsonEditor() {
 }
 
 /**
- * JSONパネル表示部分
+ * JSONパネル表示部分.
  * 
- * @returns
+ * @returns {*} panel
  */
 function createJsonView() {
   // 背景
@@ -1446,6 +1475,7 @@ function createJsonView() {
   var trMiddle = $('<tr>');
   var tdMiddleLeft = $('<td>');
   var tdMiddleRight = $('<td>');
+  tdMiddleLeft.css('height', '100%');
   tdMiddleLeft.html('Json:');
   tdMiddleLeft.css('width', '120px');
   tdMiddleLeft.css('font-size', '12px');
@@ -1472,9 +1502,9 @@ function createJsonView() {
   return panel;
 }
 /**
- * JSONパネルボタン部分設定
+ * JSONパネルボタン部分設定.
  * 
- * @returns
+ * @returns {*} panel
  */
 function createJsonButtons() {
   // 背景
@@ -1491,9 +1521,11 @@ function createJsonButtons() {
   $(editBtn).on('click', function (event) {
     $('#json-edit-btn').button('disable');
     $('#json-apply-btn').button('enable');
+    /*
     if (JSON.parse(modelMap[curWorkspaceName].jsonString).class_name == 'Sequential') {
       $('#json-view-modelname').attr('readonly', false);
     }
+    */
     jsonEditor.updateOptions({ readOnly: false });
   });
   panel.append(editBtn);
@@ -1508,9 +1540,11 @@ function createJsonButtons() {
     applyJsonData();
     $('#json-edit-btn').button('enable');
     $('#json-apply-btn').button('disable');
+    /*
     if (JSON.parse(modelMap[curWorkspaceName].jsonString).class_name == 'Sequential') {
       $('#json-view-modelname').attr('readonly', true);
     }
+    */
     jsonEditor.updateOptions({ readOnly: true });
   });
   panel.append(applyButton);
@@ -1519,8 +1553,9 @@ function createJsonButtons() {
 }
 
 /**
- * JSON表示部で編集したJSONをワークスペースのモデルに反映
- * @returns
+ * JSON表示部で編集したJSONをワークスペースのモデルに反映.
+ *
+ * @returns {undefined}
  */
 function applyJsonData() {
   if (modelMap[curWorkspaceName] == null) {
@@ -1529,25 +1564,27 @@ function applyJsonData() {
   modelMap[curWorkspaceName].jsonString = jsonEditor.getValue();
   // TODO: エラー処理
   var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
+  /*
   if (model.class_name == 'Sequential') {
     modelMap[curWorkspaceName].modelName = $('#json-view-modelname').val();
-  } else {
+  } else {*/
     modelMap[curWorkspaceName].modelName = model.config.name;
-  }
+  /*}*/
   modelMap[curWorkspaceName].jsonString = JSON.stringify(model, null, '\t');
 
   loadPackageWorkspace(model);
 }
 
 /**
- * ワークスペースのモデルをJSONで表示
- * @returns
+ * ワークスペースのモデルをJSONで表示.
+ *
+ * @returns {undefined}
  */
 function setJsonData() {
   if (jsonEditor == null || jsonEditor == undefined) {
     // TODO: 要解決
     return;
-  };
+  }
   if (modelMap[curWorkspaceName] != null) {
     $('#json-view-modelname').val(modelMap[curWorkspaceName].modelName);
     jsonEditor.setValue(modelMap[curWorkspaceName].jsonString);
@@ -1562,8 +1599,9 @@ function setJsonData() {
 }
 
 /**
- * JSON領域の表示情報をクリア
- * @returns
+ * JSON領域の表示情報をクリア.
+ *
+ * @returns {undefined}
  */
 function clearJsonData() {
   $('#json-view-modelname').val(null);
@@ -1574,9 +1612,10 @@ function clearJsonData() {
  * プロパティ領域
  ******************************************************************************/
 /**
- * プロパティ領域にModelの設定Formを表示する
+ * プロパティ領域にModelの設定Formを表示する.
  * 
- * @returns
+ * @returns {undefined}
+ * }
  */
 function setPropertyAreaForModel() {
   if (curWorkspaceName && modelMap[curWorkspaceName]) {
@@ -1587,49 +1626,71 @@ function setPropertyAreaForModel() {
   }
 }
 
+/**
+ * モデルプロパティ設定フォーム生成.
+ * 
+ * @param {*} modelBase モデルベース
+ * @returns {Map} form
+ */
 function createModelPropertySettingFrom(modelBase) {
   destroySettingForm();
   var model = JSON.parse(modelBase.jsonString);
-
+  let hasMetrics = 'metrics' in model;
   var form = {
     name: 'model-property-setting',
     padding: 0,
     fields: [
       // モデルパラメータ[tab1]
-      { name: 'model_name', type: 'text', required: true, html: { caption: 'Model Name', page: 0, attr: 'style="width:200px"' } },
-      { name: 'class_name', type: 'text', required: true, html: { caption: 'Class Name', page: 0, attr: 'style="width:200px" readonly="readonly"' } },
-      { name: 'backend', type: 'text', required: true, html: { caption: 'Backend', page: 0, attr: 'style="width:200px" readonly="readonly"' } },
-      { name: 'keras_version', type: 'text', required: true, html: { caption: 'Keras Version', page: 0, attr: 'style="width:200px" readonly="readonly"' } },
-      { name: 'dataset', type: 'list', required: false, html: { caption: 'Dataset', page: 0, attr: 'style="width:200px"' }, options: { items: getDatasetChoices() } },
+      { field: 'model_name', type: 'text', required: true, html: { text: 'Model Name', page: 0, attr: 'style="width:200px"' } },
+      { field: 'class_name', type: 'text', required: true, html: { text: 'Class Name', page: 0, attr: 'style="width:200px" readonly="readonly"' } },
+      { field: 'backend', type: 'text', required: true, html: { text: 'Backend', page: 0, attr: 'style="width:200px" readonly="readonly"' } },
+      { field: 'keras_version', type: 'text', required: true, html: { text: 'Keras Version', page: 0, attr: 'style="width:200px" readonly="readonly"' } },
+      { field: 'dataset', type: 'select', required: false, html: { text: 'Dataset', page: 0, attr: 'style="width:200px"' }, options: { items: getDatasetChoices() } },
       // 学習用(compile)[tab1]
-      { name: 'optimizer', type: 'list', required: true, html: { caption: 'Optimizer', page: 0, attr: 'style="width:200px"' } },
-      { name: 'loss', type: 'list', required: true, html: { caption: 'Loss', page: 0, attr: 'style="width:200px"' } },
-      { name: 'metrics', type: 'enum', required: true, html: { caption: 'Metrics', page: 0, attr: 'style="width:200px"' } },
-      { name: 'loss_weights', type: 'text', required: true, html: { caption: 'Loss Weights', page: 0, attr: 'style="width:200px"' } },
-      { name: 'sample_weights', type: 'text', required: true, html: { caption: 'Sample Weights', page: 0, attr: 'style="width:200px"' } },
+      { field: 'optimizer', type: 'select', required: true, html: { text: 'Optimizer', page: 0, attr: 'style="width:200px"' }, options: { items: optimizerListItems } },
+      { field: 'loss', type: 'select', required: true, html: { text: 'Loss', page: 0, attr: 'style="width:200px"' }, options: { items: lossListItems } },
+      { field: 'metrics', type: 'enum', required: true, html: { text: 'Metrics', page: 0, attr: 'style="width:200px"'} },
+      { field: 'loss_weights', type: 'text', required: true, html: { text: 'Loss Weights', page: 0, attr: 'style="width:200px"' } },
+      { field: 'sample_weights', type: 'text', required: true, html: { text: 'Sample Weights', page: 0, attr: 'style="width:200px"' } },
       // 学習用(fit)[tab2]
-      { name: 'fit.batch_size', type: 'int', required: true, html: { caption: 'Batch Size', page: 1, attr: 'style="width:50px"' } },
-      { name: 'fit.epochs', type: 'int', required: true, html: { caption: 'Epochs', page: 1, attr: 'style="width:50px"' } },
-      { name: 'fit.callback', type: 'enum', required: true, html: { caption: 'Callback', page: 1, attr: 'style="width:200px"' } },
-      { name: 'fit.validation_split', type: 'checkbox', required: true, html: { caption: 'Validation Split', page: 1, attr: '' } },
-      { name: 'fit.shuffle', type: 'checkbox', required: true, html: { caption: 'Shuffle', page: 1, attr: '' } },
-      { name: 'fit.x', type: 'text', required: true, html: { caption: 'x', page: 1, attr: 'style="width:200px"' } },
-      { name: 'fit.y', type: 'text', required: true, html: { caption: 'y', page: 1, attr: 'style="width:200px"' } },
-      { name: 'fit.validation_data', type: 'text', required: true, html: { caption: 'Validation Data', page: 1, attr: 'style="width:200px"' } },
-      { name: 'fit.class_weight', type: 'text', required: false, html: { caption: 'Class Weight', page: 1, attr: 'style="width:200px"' } },
-      { name: 'fit.sample_weight', type: 'text', required: false, html: { caption: 'Sample Weight', page: 1, attr: 'style="width:200px"' } },
-      { name: 'fit.initial_epoch', type: 'int', required: false, html: { caption: 'Initial Epoch', page: 1, attr: 'style="width:50px"' } }
+      { field: 'fit.batch_size', type: 'int', required: true, html: { text: 'Batch Size', page: 1, attr: 'style="width:50px"' } },
+      { field: 'fit.epochs', type: 'int', required: true, html: { text: 'Epochs', page: 1, attr: 'style="width:50px"' } },
+      { field: 'fit.callback', type: 'enum', required: true, html: { text: 'Callback', page: 1, attr: 'style="width:200px"' } },
+      { field: 'fit.validation_split', type: 'checkbox', required: true, html: { text: 'Validation Split', page: 1, attr: '' } },
+      { field: 'fit.shuffle', type: 'checkbox', required: true, html: { text: 'Shuffle', page: 1, attr: '' } },
+      { field: 'fit.x', type: 'text', required: true, html: { text: 'x', page: 1, attr: 'style="width:200px"' } },
+      { field: 'fit.y', type: 'text', required: true, html: { text: 'y', page: 1, attr: 'style="width:200px"' } },
+      { field: 'fit.validation_data', type: 'text', required: true, html: { text: 'Validation Data', page: 1, attr: 'style="width:200px"' } },
+      { field: 'fit.class_weight', type: 'text', required: false, html: { text: 'Class Weight', page: 1, attr: 'style="width:200px"' } },
+      { field: 'fit.sample_weight', type: 'text', required: false, html: { text: 'Sample Weight', page: 1, attr: 'style="width:200px"' } },
+      { field: 'fit.initial_epoch', type: 'int', required: false, html: { text: 'Initial Epoch', page: 1, attr: 'style="width:50px"' } }
     ],
     tabs: [
-      { id: 'model-tab1', caption: 'Model' },
-      { id: 'model-tab2', caption: 'Learning' }
+      { id: 'model-tab1', text: 'Model' },
+      { id: 'model-tab2', text: 'Learning' }
     ],
     record: {
       model_name: modelBase.modelName,
       class_name: model.class_name,
       backend: model.backend,
       keras_version: model.keras_version,
-      dataset: modelBase.dataset
+      dataset: modelBase.dataset,
+      optimizer: model.optimizer,
+      loss: model.loss,
+      metrics: hasMetrics ? model.metrics : ['accuracy'],
+      fit: {
+        batch_size: model['fit.batch_size'],
+        epochs: model['fit.epochs'],
+        callback: model['fit.callback'],
+        validation_split: model['fit.validation_split'],
+        shuffle: model['fit.shuffle'],
+        x: model['fit.x'],
+        y:  model['fit.y'],
+        validation_data: model['fit.validation_data'],
+        class_weight: model['fit.class_weight'],
+        sample_weight: model['fit.sample_weight'],
+        initial_epoch: model['fit.initial_epoch']
+      }
     },
     actions: {
       // 値の更新
@@ -1650,37 +1711,71 @@ function createModelPropertySettingFrom(modelBase) {
         modelMap[curWorkspaceName].dataset = this.record.dataset;
 
         var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
+        if (model.fit === undefined) {
+          //model.fit = {};
+        }
 
         // 学習・予測系プロパティの更新
         var currentFields = this.fields.filter(f => f.page == this.page);
-        for (var i in currentFields) {
-          var prop = currentFields[i];
-          if (prop.name != 'model_name' && prop.name != 'class_name' &&
-            prop.name != 'backend' && prop.name != 'keras_version') {
+        // Modelのページなら
+        if (this.page == 0) {
+          for (var i in currentFields) {
+            let prop = currentFields[i];
+            if (prop.field != 'model_name' && prop.field != 'class_name' &&
+              prop.field != 'backend' && prop.field != 'keras_version') {
+              // 値が設定されない場合はそのプロパティを削除
+              if (this.record[prop.field] == null || this.record[prop.field] == '' || this.record[prop.field] == 'null') {
+                delete model[prop.field];
+                continue;
+              }
+              // 評価関数の場合はリストなので設定方法を変える
+              if (prop.field.indexOf('metrics') != -1) {
+                model[prop.field] = [];
+                if (this.record[prop.field].length > 0) {
+                  this.record[prop.field].forEach(function (val) {
+                    model[prop.field].push(val.text);
+                  })
+                }
+              } else {
+                // 数値型以外はすべてテキスト
+                if (prop.type == 'int' || prop.type == 'float' || prop.type == 'hex') {
+                  model[prop.field] = Number(this.record[prop.field]);
+                } else {
+                  model[prop.field] = this.record[prop.field];
+                }
+              }
+            }
+          }
+        // Learningのページなら
+        } else {
+          for (let i in currentFields) {
+            let prop = currentFields[i].field;
+            let recProp = currentFields[i].field.split('.')[1];
+            
             // 値が設定されない場合はそのプロパティを削除
-            if (this.record[prop.name] == null || this.record[prop.name] == '' || this.record[prop.name] == 'null') {
-              delete model[prop.name];
+            if (this.record.fit[recProp] == null || this.record.fit[recProp] == '' || this.record.fit[recProp] == 'null') {
+              delete model[prop];
               continue;
             }
-            // 評価関数・コールバックの場合はリストなので設定方法を変える
-            if (prop.name.indexOf('callback') != -1 ||
-              prop.name.indexOf('metrics') != -1) {
-              model[prop.name] = [];
-              this.record[prop.name].forEach(function (val) {
-                model[prop.name].push(val.text);
-              });
+            // コールバックの場合はリストなので設定方法を変える
+            if (prop.indexOf('callback') != -1) {
+              model[prop] = [];
+              if (this.record.fit[recProp].length > 0) {
+                this.record.fit[recProp].forEach(function (val) {
+                  model[prop].push(val.text);
+                })
+              }
             } else {
-              // 数値型以外はすべてテキスト
-              if (prop.type == 'int' || prop.type == 'float' || prop.type == 'hex') {
-                model[prop.name] = Number(this.record[prop.name]);
+              if (currentFields[i].type == 'int' || currentFields[i].type == 'float' || currentFields[i].type == 'hex') {
+                model[prop] = Number(this.record.fit[recProp]);
               } else {
-                model[prop.name] = this.record[prop.name];
+                model[prop] = this.record.fit[recProp];
               }
             }
           }
         }
-
         modelMap[curWorkspaceName].jsonString = JSON.stringify(model, null, '\t');
+
         loadPackageWorkspace(model);
 
         // ワークスペースセレクタを更新
@@ -1689,45 +1784,46 @@ function createModelPropertySettingFrom(modelBase) {
 
         // プロパティ表示の更新
         setPropertyAreaForModel();
+      }
       },
       'Reset': function () {
         this.record.model_name = curWorkspaceName;
         this.refresh();
       }
     }
-  };
 
   // リスト・Enumアイテムの登録
   form.fields.forEach(function (prop, index) {
-    if (prop.name != 'model_name' && prop.name != 'class_name' &&
-      prop.name != 'backend' && prop.name != 'keras_version') {
-      if (prop.name.indexOf('loss') != -1) {
+    if (prop.field != 'model_name' && prop.field != 'class_name' &&
+      prop.field != 'backend' && prop.field != 'keras_version') {
+      /*if (prop.field.indexOf('loss') != -1) {
         form.fields[index].options = { items: lossListItems };
-        if (model[prop.name] != null) {
-          form.record[prop.name] = model[prop.name];
+        if (model[prop.field] != null) {
+          form.record[prop.field] = model[prop.field];
         }
-      } else if (prop.name.indexOf('optimizer') != -1) {
+      } else if (prop.field.indexOf('optimizer') != -1) {
         form.fields[index].options = { items: optimizerListItems };
-        if (model[prop.name] != null) {
-          form.record[prop.name] = model[prop.name];
+        if (model[prop.field] != null) {
+          console.log(model[prop.field]);
+          form.record[prop.field] = model[prop.field];
         }
-      } else if (prop.name.indexOf('callback') != -1) {
+      } else*/ if (prop.field.indexOf('callback') != -1) {
         form.fields[index].options = { items: callbackListItems };
-        if (model[prop.name] != null) {
-          form.record[prop.name] = model[prop.name];
+        if (model[prop.field] != null) {
+          form.record[prop.field] = model[prop.field];
         } else {
-          form.record[prop.name] = ['TendorBoard'];
+          form.record[prop.field] = ['TendorBoard'];
         }
-      } else if (prop.name.indexOf('metrics') != -1) {
-        form.fields[index].options = { items: metricsListItems };
-        if (model[prop.name] != null) {
-          form.record[prop.name] = model[prop.name];
+      } else if (prop.field.indexOf('metrics') != -1) {
+        form.fields[index].options = {items : metricsListItems};
+        /*if (model[prop.field] != null) {
+          form.record[prop.field] = model[prop.field];
         } else {
-          form.record[prop.name] = ['accuracy'];
-        }
+          form.record[prop.field] = ['accuracy'];
+        }*/
       } else {
         // リストでないプロパティを登録
-        form.record[prop.name] = model[prop.name];
+        form.record[prop.field] = model[prop.field];
       }
     }
   });
@@ -1736,9 +1832,9 @@ function createModelPropertySettingFrom(modelBase) {
 }
 
 /**
- * プロパティ領域にLayerの設定Formを表示する
+ * プロパティ領域にLayerの設定Formを表示する.
  * 
- * @returns
+ * @returns {undefined}
  */
 function setPropertyAreaForLayer() {
   if (modelMap[curWorkspaceName] != null && selectedCellViews.length != 0) {
@@ -1750,31 +1846,27 @@ function setPropertyAreaForLayer() {
 }
 
 /**
- * レイヤーのプロパティの表示・登録画面を作成する
- * @param layerName
- * @returns
+ * レイヤーのプロパティの表示・登録画面を作成する.
+ *
+ * @param {*} layerName レイヤー名
+ * @returns {Map} form
  */
 function createLayerPropertySettingFrom(layerName) {
   destroySettingForm();
 
   var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
-  var layer = {};
-  if (model.class_name == 'Sequential') {
-    layer = model.config.find(l => l.config.name == layerName);
-  } else {
-    layer = model.config.layers.find(l => l.config.name == layerName);
-  }
+  var layer = model.config.layers.find(l => l.config.name == layerName);
 
   var form = {
     name: 'layer-property-setting',
     padding: 0,
     fields: [
-      { name: 'class_name', type: 'text', required: true, html: { caption: 'Class Name', page: 0, attr: 'style="width:200px" readonly="readonly"' } },
-      { name: 'name', type: 'text', required: true, html: { caption: 'Layer Name', page: 0, attr: 'style="width:200px"' } },
-      { name: 'trainable', type: 'checkbox', required: true, html: { caption: 'Trainable', page: 0, attr: '' } },
+      { field: 'class_name', type: 'text', required: true, html: { text: 'Class Name', page: 0, attr: 'style="width:200px" readonly="readonly"' } },
+      { field: 'name', type: 'text', required: true, html: { text: 'Layer Name', page: 0, attr: 'style="width:200px"' } },
+      { field: 'trainable', type: 'checkbox', required: true, html: { text: 'Trainable', page: 0, attr: '' } },
     ],
     tabs: [
-      { id: 'layer-tab1', caption: 'Layer Property' }
+      { id: 'layer-tab1', text: 'Layer Property' }
     ],
     record: {
       class_name: layer.class_name,
@@ -1783,24 +1875,17 @@ function createLayerPropertySettingFrom(layerName) {
       // 値の更新
       'Update': function () {
         var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
-        var layerIndex;
-        var layer = {};
-        if (model.class_name == 'Sequential') {
-          layerIndex = model.config.findIndex(l => l.config.name == editingLayerRecord.name);
-          layer = model.config[layerIndex];
-        } else {
-          layerIndex = model.config.layers.findIndex(l => l.config.name == editingLayerRecord.name);
-          layer = model.config.layers[layerIndex];
-        }
+        let layerIndex = model.config.layers.findIndex(l => l.config.name == editingLayerRecord.name);
+        let layer = model.config.layers[layerIndex];
 
         for (var i in this.fields) {
           var prop = this.fields[i];
-          if (model.class_name == 'Model' && prop.name == 'name') {
+          if (model.class_name == 'Model' && prop.field == 'name') {
             // 名前はconfigより上にも登録
-            var oldName = layer.config[prop.name];
-            var newName = this.record[prop.name];
-            layer[prop.name] = newName;
-            layer.config[prop.name] = newName;
+            var oldName = layer.config[prop.field];
+            var newName = this.record[prop.field];
+            layer[prop.field] = newName;
+            layer.config[prop.field] = newName;
             // 入出力レイヤーに変更したレイヤーがある場合レイヤー名変更を適用
             model.config.input_layers.filter(l => l[0] == oldName).forEach(l => l[0] = newName);
             model.config.output_layers.filter(l => l[0] == oldName).forEach(l => l[0] = newName);
@@ -1811,24 +1896,24 @@ function createLayerPropertySettingFrom(layerName) {
               }
               layer.inbound_nodes[0].filter(n => n[0] == oldName).forEach(n => n[0] = newName);
             });
-          } else if (prop.name != 'class_name') {
+          } else if (prop.field != 'class_name') {
             // 値が設定されない場合はそのプロパティを削除
-            if (this.record[prop.name] == null || this.record[prop.name] == '' || this.record[prop.name] == 'null') {
-              delete layer.config[prop.name];
+            if (this.record[prop.field] == null || this.record[prop.field] == '' || this.record[prop.field] == 'null') {
+              delete layer.config[prop.field];
               continue;
             }
 
-            if (prop.name == 'batch_input_shape' ||
-              prop.name == 'target_shape' ||
-              prop.name == 'kernel_size' ||
-              prop.name == 'strides' ||
-              prop.name == 'pool_size') {
-              if (Array.isArray(this.record[prop.name])) {
-                layer.config[prop.name] = this.record[prop.name];
+            if (prop.field == 'batch_input_shape' ||
+              prop.field == 'target_shape' ||
+              prop.field == 'kernel_size' ||
+              prop.field == 'strides' ||
+              prop.field == 'pool_size') {
+              if (Array.isArray(this.record[prop.field])) {
+                layer.config[prop.field] = this.record[prop.field];
               } else {
                 // 配列として処理
                 var tmp = [];
-                this.record[prop.name].split(',').forEach(function (numString, index, array) {
+                this.record[prop.field].split(',').forEach(function (numString, index, array) {
                   var num = Number(numString);
                   if (numString == null || numString == '' || isNaN(num)) {
                     tmp.push(null);
@@ -1836,50 +1921,46 @@ function createLayerPropertySettingFrom(layerName) {
                     tmp.push(num);
                   }
                 });
-                layer.config[prop.name] = tmp;
+                layer.config[prop.field] = tmp;
               }
-            } else if (prop.name.indexOf('initializer') != -1) {
+            } else if (prop.field.indexOf('initializer') != -1) {
               // 初期化の場合はオブジェクトなので設定方法を変える
-              if (layer.config[prop.name] == null || layer.config[prop.name]['class_name'] == null) {
-                layer.config[prop.name] = new Object();
+              if (layer.config[prop.field] == null || layer.config[prop.field]['class_name'] == null) {
+                layer.config[prop.field] = new Object();
               }
-              if (initializerMap[this.record[prop.name]] != null && initializerMap[this.record[prop.name]] != undefined) {
-                layer.config[prop.name] = initializerMap[this.record[prop.name]];
+              if (initializerMap[this.record[prop.field]] != null && initializerMap[this.record[prop.field]] != undefined) {
+                layer.config[prop.field] = initializerMap[this.record[prop.field]];
               } else {
-                layer.config[prop.name]['class_name'] = this.record[prop.name];
+                layer.config[prop.field]['class_name'] = this.record[prop.field];
                 // configの値に既存の値があれば変えない
-                if (layer.config[prop.name]['config'] == null) {
-                  layer.config[prop.name]['config'] = {};
+                if (layer.config[prop.field]['config'] == null) {
+                  layer.config[prop.field]['config'] = {};
                 }
               }
-            } else if (prop.name.indexOf('regularizer') != -1 ||
-              prop.name.indexOf('constraint') != -1) {
+            } else if (prop.field.indexOf('regularizer') != -1 ||
+              prop.field.indexOf('constraint') != -1) {
               // 正規化・制約の場合はオブジェクトなので設定方法を変える
-              if (layer.config[prop.name] == null || layer.config[prop.name]['class_name'] == null) {
-                layer.config[prop.name] = new Object();
+              if (layer.config[prop.field] == null || layer.config[prop.field]['class_name'] == null) {
+                layer.config[prop.field] = new Object();
               }
-              layer.config[prop.name]['class_name'] = this.record[prop.name];
+              layer.config[prop.field]['class_name'] = this.record[prop.field];
               // configの値に既存の値があれば変えない
-              if (layer.config[prop.name]['config'] == null) {
-                layer.config[prop.name]['config'] = {};
+              if (layer.config[prop.field]['config'] == null) {
+                layer.config[prop.field]['config'] = {};
               }
             } else {
               // 数値型以外はすべてテキスト
               if (prop.type == 'int' || prop.type == 'float' || prop.type == 'hex') {
-                layer.config[prop.name] = Number(this.record[prop.name]);
+                layer.config[prop.field] = Number(this.record[prop.field]);
               } else {
-                layer.config[prop.name] = this.record[prop.name];
+                layer.config[prop.field] = this.record[prop.field];
               }
             }
           }
         }
 
         // モデルを更新
-        if (model.class_name == 'Sequential') {
-          model.config[layerIndex] = layer;
-        } else {
-          model.config.layers[layerIndex] = layer;
-        }
+        model.config.layers[layerIndex] = layer;
 
         modelMap[curWorkspaceName].jsonString = JSON.stringify(model, null, '\t');
         loadPackageWorkspace(model);
@@ -1900,55 +1981,55 @@ function createLayerPropertySettingFrom(layerName) {
   // インプットレイヤーの場合はここでプロパティを追加
   if (layer.class_name == 'InputLayer') {
     var inputLayerProperty = [
-      { name: 'batch_input_shape', type: 'text', required: true, html: { caption: 'Batch Input Shape', page: 0, attr: '' } },
-      { name: 'dtype', type: 'list', required: true, html: { caption: 'Dtype', page: 0, attr: '' } },
+      { field: 'batch_input_shape', type: 'text', required: true, html: { text: 'Batch Input Shape', page: 0, attr: '' } },
+      { field: 'dtype', type: 'list', required: true, html: { text: 'Dtype', page: 0, attr: '' } },
     ];
     form.fields = form.fields.concat(inputLayerProperty);
   }
 
   // フィールドに対応したレコードを登録
   form.fields.forEach(function (prop, index) {
-    if (prop.name != 'class_name') {
+    if (prop.field != 'class_name') {
       // プロパティ登録・選択リストの項目を設定
-      if (prop.name.indexOf('initializer') != -1) {
+      if (prop.field.indexOf('initializer') != -1) {
         // 初期化関数の場合は中身がオブジェクトなので、クラス名だけを取り出して設定する
         form.fields[index].options = { items: initializerListItems };
-        if (layer.config[prop.name] != null && layer.config[prop.name]['class_name'] != null) {
-          form.record[prop.name] = layer.config[prop.name].class_name;
+        if (layer.config[prop.field] != null && layer.config[prop.field]['class_name'] != null) {
+          form.record[prop.field] = layer.config[prop.field].class_name;
         }
-      } else if (prop.name.indexOf('regularizer') != -1) {
+      } else if (prop.field.indexOf('regularizer') != -1) {
         form.fields[index].options = { items: regularizerListItems };
-        if (layer.config[prop.name] != null && layer.config[prop.name]['class_name'] != null) {
-          form.record[prop.name] = layer.config[prop.name].class_name;
+        if (layer.config[prop.field] != null && layer.config[prop.field]['class_name'] != null) {
+          form.record[prop.field] = layer.config[prop.field].class_name;
         }
-      } else if (prop.name.indexOf('constraint') != -1) {
+      } else if (prop.field.indexOf('constraint') != -1) {
         form.fields[index].options = { items: constraintListItems };
-        if (layer.config[prop.name] != null && layer.config[prop.name]['class_name'] != null) {
-          form.record[prop.name] = layer.config[prop.name].class_name;
+        if (layer.config[prop.field] != null && layer.config[prop.field]['class_name'] != null) {
+          form.record[prop.field] = layer.config[prop.field].class_name;
         }
-      } else if (prop.name.indexOf('activation') != -1) {
+      } else if (prop.field.indexOf('activation') != -1) {
         form.fields[index].options = { items: activationListItems };
-        if (layer.config[prop.name] != null) {
-          form.record[prop.name] = layer.config[prop.name];
+        if (layer.config[prop.field] != null) {
+          form.record[prop.field] = layer.config[prop.field];
         }
-      } else if (prop.name.indexOf('dtype') != -1) {
+      } else if (prop.field.indexOf('dtype') != -1) {
         form.fields[index].options = { items: dtypeListItems };
-        if (layer.config[prop.name] != null) {
-          form.record[prop.name] = layer.config[prop.name];
+        if (layer.config[prop.field] != null) {
+          form.record[prop.field] = layer.config[prop.field];
         }
-      } else if (prop.name.indexOf('padding') != -1) {
+      } else if (prop.field.indexOf('padding') != -1) {
         form.fields[index].options = { items: paddingListItems };
-        if (layer.config[prop.name] != null) {
-          form.record[prop.name] = layer.config[prop.name];
+        if (layer.config[prop.field] != null) {
+          form.record[prop.field] = layer.config[prop.field];
         }
-      } else if (prop.name.indexOf('data_format') != -1) {
+      } else if (prop.field.indexOf('data_format') != -1) {
         form.fields[index].options = { items: dataFormatListItems };
-        if (layer.config[prop.name] != null) {
-          form.record[prop.name] = layer.config[prop.name];
+        if (layer.config[prop.field] != null) {
+          form.record[prop.field] = layer.config[prop.field];
         }
       } else {
         // プロパティを登録
-        form.record[prop.name] = layer.config[prop.name];
+        form.record[prop.field] = layer.config[prop.field];
       }
     }
   });
@@ -1960,7 +2041,9 @@ function createLayerPropertySettingFrom(layerName) {
 }
 
 /**
- * 設定用Formのインスタンスを開放する
+ * 設定用Formのインスタンスを開放する.
+ * 
+ * @returns {undefined}
  */
 function destroySettingForm() {
   // 同一名は作成する前に一度破棄する
@@ -1976,7 +2059,11 @@ function destroySettingForm() {
  ******************************************************************************/
 
 /**
- * パネルの表示・非表示を切り替える
+ * パネルの表示・非表示を切り替える.
+ * 
+ * @param {*} id ID
+ * @param {*} field フィールド
+ * @returns {undefined}
  */
 function toggleNetworkPanel(id, field) {
   $('#' + id + ' > span').removeClass('ui-icon-circlesmall-plus');
@@ -1996,9 +2083,9 @@ function toggleNetworkPanel(id, field) {
  * 全般
  *******************************************************************************/
 /**
- * 画面をロックする
+ * 画面をロックする.
  * 
- * @returns
+ * @returns {undefined}
  */
 function lockScreen() {
   if (lockCnt === 0) {
@@ -2008,9 +2095,9 @@ function lockScreen() {
 }
 
 /**
- * 画面のロックを解除する
+ * 画面のロックを解除する.
  * 
- * @returns
+ * @returns {undefined}
  */
 function unlockScreen() {
   lockCnt--;
@@ -2021,9 +2108,9 @@ function unlockScreen() {
 }
 
 /**
- * 選択状態を解除する
+ * 選択状態を解除する.
  * 
- * @returns
+ * @returns {undefined}
  */
 function unHighLightAll() {
   for (var i = 0; i < selectedCellViews.length; i++) {
@@ -2033,8 +2120,9 @@ function unHighLightAll() {
 }
 
 /**
- * キーボード押下時のイベントを登録する
- * @returns
+ * キーボード押下時のイベントを登録する.
+ * 
+ * @returns {undefined}
  */
 function setKeyboardEvent() {
   if (document.addEventListener) {
@@ -2049,8 +2137,10 @@ function setKeyboardEvent() {
 }
 
 /**
- * キーボード押下時のイベント処理
- * @returns
+ * キーボード押下時のイベント処理.
+ *
+ * @param {*} e イベント
+ * @returns {undefined}
  */
 function onKeydownEvent(e) {
   if (e.key == 'Delete') {
@@ -2074,7 +2164,6 @@ function onKeydownEvent(e) {
       if (cell.model.attributes.type == 'link') {
         if (model.class_name == 'Sequential') {
           // シーケンシャルモデルでは矢印を削除させない
-          console.log('here');
           return;
         }
         removeConnectors.push(cell);
@@ -2091,12 +2180,8 @@ function onKeydownEvent(e) {
     // レイヤー削除処理
     if (removeLayerNames.length != 0) {
       // モデルを再構築
-      if (model.class_name == 'Sequential') {
-        model.config = model.config.filter(l => removeLayerNames == l.config.name);
-      } else {
-        // TODO: 1個に固定しているので、複数選択可能にしたら要変更
-        model = deleteLayer(model, removeLayerNames[0]);
-      }
+      // TODO: 1個に固定しているので、複数選択可能にしたら要変更
+      model = deleteLayer(model, removeLayerNames[0]);
     }
 
     // 矢印削除処理
@@ -2127,9 +2212,11 @@ function onKeydownEvent(e) {
 }
 
 /**
- * モデル上からレイヤーを削除する
- * @param name 削除するレイヤー名
- * @returns
+ * モデル上からレイヤーを削除する.
+ *
+ * @param {*} model モデル
+ * @param {*} name 名前
+ * @returns {*} model
  */
 function deleteLayer(model, name) {
   var deletingLayer = model.config.layers.find(l => l.config.name == name);
@@ -2137,7 +2224,8 @@ function deleteLayer(model, name) {
 
   // inbound_nodesの再構築
   model.config.layers.forEach(function (layer, index) {
-    if (layer.inbound_nodes.length == 0) {
+
+    if (layer.inbound_nodes == undefined) {
       return;
     }
     layer.inbound_nodes[0].forEach(function (node, node_index) {
@@ -2155,7 +2243,10 @@ function deleteLayer(model, name) {
 }
 
 /**
- * input_layerとoutput_layerの再設定
+ * input_layerとoutput_layerの再設定.
+ *
+ * @param {*} model モデル
+ * @returns {*} model
  */
 function reconfigureInputAndOutputLayers(model) {
   if (model.class_name == 'Model') {
@@ -2172,7 +2263,7 @@ function reconfigureInputAndOutputLayers(model) {
     model.config.layers.forEach(function (layer, index) {
       var isInbounded = false;
       model.config.layers.forEach(function (layer2, index2) {
-        if (layer2.inbound_nodes.length > 0
+        if (!(layer2.inbound_nodes.undefined)
           && layer2.inbound_nodes[0].filter(n => n[0] == layer.config.name).length != 0) {
           isInbounded = true;
         }
@@ -2195,9 +2286,10 @@ function reconfigureInputAndOutputLayers(model) {
 }
 
 /**
- * マウス押下イベント処理
- * @param e
- * @returns
+ * マウス押下イベント処理.
+ *
+ * @param {*} e イベント
+ * @returns {undefined}
  */
 function onMousedownEvent(e) {
   unHighLightAll();
@@ -2205,8 +2297,9 @@ function onMousedownEvent(e) {
 }
 
 /**
- * 入力レイヤーをモデルに追加する
- * @returns
+ * 入力レイヤーをモデルに追加する.
+ * 
+ * @returns {undefined}
  */
 function addInputLayer() {
   var model = JSON.parse(modelMap[curWorkspaceName].jsonString);
@@ -2225,7 +2318,6 @@ function addInputLayer() {
     },
     'inbound_nodes': [[]]
   };
-
   // レイヤー名称からレイヤーを取得し、モデルに追加
   var sameClassLayers = model.config.layers.filter(l => l.class_name == 'InputLayer');
   var classCount = 1 + sameClassLayers.length;
@@ -2249,9 +2341,9 @@ function addInputLayer() {
 }
 
 /**
- * コンソールを表示する
+ * コンソールを表示する.
  * 
- * @returns
+ * @returns {undefined}
  */
 function openConsoleLog() {
   // ログ監視を開始する

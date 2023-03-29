@@ -41,6 +41,14 @@ public class Const {
 			static final String APP_JAVA_LOG = "rtc_java.log";
 			/** wasanbon.log */
 			static final String WASANBON_LOG = "wasanbon.log";
+			/** ホスト定義ファイル */
+			static final String WASANBON_HOST_CONFIG = "wasanbonHostConfig.yaml";
+			/** ホスト定義ファイル */
+			static final String AIRGRAPH_HOST_CONFIG = "AirGraphHostConfig.yaml";
+			/** GitHub設定ファイル */
+			static final String GITHUB_CONFIG = "gitHubConfig.yaml";
+			/** Basic認証設定ファイル */
+			static final String BASIC_AUTH = "user_info.yml";
 		}
 
 		/**
@@ -522,4 +530,22 @@ public class Const {
 			static final String RECENT = "Recent";
 		}
 	}
+	
+	/**
+	 * Airgraphバージョン定義
+	 */
+	public interface AIRGRAPH_VERSION {
+		/** airgraph_version */
+		static final String AIRGRAPH_VERSION = "2.0.0";
+
+	}
+
+	/**
+	 * ホスト定義
+	 */
+	public interface HOST_CONFIG {
+		/** ローカルホストのID */
+		static final String LOCALHOST_ID = "local";
+	}
+
 }

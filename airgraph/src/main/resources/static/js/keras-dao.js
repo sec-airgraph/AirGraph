@@ -2,7 +2,9 @@
  * 作業領域・Package関連
  *************************************************************************/
 /**
- * モデル・レイヤー情報を取得し展開する
+ * モデル・レイヤー情報を取得し展開する.
+ *
+ * @returns {undefined}
  */
 function loadAllNetworkArea() {
   // 画面をロック
@@ -40,7 +42,9 @@ function loadAllNetworkArea() {
 }
 
 /**
- * レイヤープロパティ設定情報を取得し展開する
+ * レイヤープロパティ設定情報を取得し展開する.
+ *
+ * @returns {undefined}
  */
 function loadAllLayerPropertyTemplates() {
   // 画面をロック
@@ -62,8 +66,9 @@ function loadAllLayerPropertyTemplates() {
 
 
 /**
- * 作業領域を取得し展開する
- * @returns
+ * 作業領域を取得し展開する.
+ *
+ * @returns {undefined}
  */
 function loadAllWorkspace() {
   $.ajax({
@@ -85,8 +90,9 @@ function loadAllWorkspace() {
 }
 
 /**
- * 現在編集中のモデルを保存する
- * @returns
+ * 現在編集中のモデルを保存する.
+ *
+ * @returns {undefined}
  */
 function saveModel() {
   $.ajax({
@@ -100,8 +106,9 @@ function saveModel() {
 }
 
 /**
- * 現在編集中のモデルを削除する
- * @returns
+ * 現在編集中のモデルを削除する.
+ *
+ * @returns {undefined}
  */
 function deleteModel() {
   $.ajax({
@@ -122,62 +129,61 @@ function deleteModel() {
 }
 
 /**
- * データセットの一覧を取得する
+ * データセットの一覧を取得する.
  * 
- * @returns
+ * @returns {json} レスポンス
  */
 function getDatasetChoices() {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlDatasetChoices(),
     async: false
   }).responseJSON;
-  return result;
 }
 
 /**
- * ロボットの一覧を取得する
- * 
- * @returns
+ * AirGraphホストの一覧を取得する.
+ *
+ * @returns {json} レスポンス
  */
-function getRobotChoices() {
-  var result = $.ajax({
+function getAirGraphHostChoices() {
+  return $.ajax({
     type: 'POST',
-    url: getUrlRobotChoices(),
+    url: getUrlAirGraphHostChoices(),
     async: false
   }).responseJSON;
-  return result;
 }
 
 /**
- * 指定されたロボットのデータセットの一覧を取得する
- * 
- * @returns
+ * 指定されたロボットのデータセットの一覧を取得する.
+ *
+ * @param {*} robotHostName ホスト名
+ * @returns {json} レスポンス
  */
 function getRobotDatasetChoices(robotHostName) {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlRobotDatasetChoices(),
     data: {"robotHostName" : robotHostName},
     async: false
   }).responseJSON;
-  return result;
 }
 
 /**
- * 指定されたロボットのデータセットを取得する
- * 
- * @returns
+ * 指定されたロボットのデータセットを取得する.
+ *
+ * @param {*} robotHostName ホスト名
+ * @param {*} datasetName データセット名
+ * @returns {undefined}
  */
-function getRobotDatasets(robotHostName, datasetName, targetDate) {
+function getRobotDatasets(robotHostName, datasetName) {
   lockScreen();
   $.ajax({
     type: 'POST',
     url: getUrlRobotDatasets(),
     data: {
       "robotHostName" : robotHostName,
-      "datasetName" : datasetName,
-      "targetDate" : targetDate
+      "datasetName" : datasetName
     }
   }).done(function () {
     // データセット名の一覧を取得
@@ -193,8 +199,9 @@ function getRobotDatasets(robotHostName, datasetName, targetDate) {
  * Keras実行
  *************************************************************************/
 /**
- * Kerasで学習を実行する
- * @returns
+ * Kerasで学習を実行する.
+ *
+ * @returns {undefined}
  */
 function runKerasFit() {
   openConsoleLog();
@@ -210,9 +217,9 @@ function runKerasFit() {
 }
 
 /**
- * DataMakerファイルをアップロードする
- * 
- * @returns
+ * DataMakerファイルをアップロードする.
+ *
+ * @returns {undefined}
  */
 function uploadDataMakerFile() {
   var formData = new FormData(
@@ -234,8 +241,9 @@ function uploadDataMakerFile() {
 }
 
 /**
- * Datasetをアップロードする
- * @returns
+ * Datasetをアップロードする.
+ *
+ * @returns {undefined}
  */
 function uploadDataset() {
   var formData = new FormData(
@@ -260,24 +268,28 @@ function uploadDataset() {
  * ログ監視・モニタ監視
  *************************************************************************/
 /**
- * ログ監視開始
+ * ログ監視開始.
+ *
+ * @returns {undefined}
  */
 function startTailLog() {
   tailTimerID = setInterval(tailLog, 1000);
 }
 
 /**
- * ログ監視終了
- * @returns
+ * ログ監視終了.
+ *
+ * @returns {undefined}
  */
 function stopTailLog() {
   clearInterval(tailTimerID);
 }
 
 /**
- * 最下部までスクロール
- * @param obj
- * @returns
+ * 最下部までスクロール.
+ *
+ * @param {*} obj object
+ * @returns {undefined}
  */
 function scrollBottom(obj) {
   if (obj[0]) {
@@ -286,8 +298,10 @@ function scrollBottom(obj) {
 }
 
 /**
- * ログ監視
- * TODO: keras用に改変
+ * ログ監視.
+ * TODO: keras用に改変.
+ *
+ * @returns {undefined}
  */
 function tailLog() {
   if ($('[name=console-scroll-check]').prop("checked") === true) {
@@ -297,7 +311,7 @@ function tailLog() {
       data: { 'workPackageName': curWorkspaceName }
     }).done(function (log) {
       if (log) {
-        $('#console-text').html(log['keras']);
+        $('#console-text').html(log['keras'].replace(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/g, ' '));
         scrollBottom($('#console-text'));
       }
     });

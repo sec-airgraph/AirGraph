@@ -1,6 +1,6 @@
 {
 	"class_name": "LeakyReLU",
 	"fields": [
-		{ "name": "alpha",	"type": "float",	"required": true,	"html": { "caption": "Alpha",	"page": 0,	"attr": "style=\"width:50px\"" } }
+		{ "field": "alpha",	"type": "float",	"required": true,	"html": { "label": "Alpha",	"page": 0,	"attr": "style=\"width:50px\"" } }
 	]
 }

@@ -61,11 +61,11 @@
   :width: 50%
   :align: center
 
-3. AirGraph(RTM Editor)では，データセット保存先に出力される画像ファイルをシステム実行中に確認することが可能です
+3. AirGraph(RTM Editor)では，データセット保存先に出力される画像ファイルをシステム実行中に確認することが可能です．
 
 - 画面上部の[Tools]-[Dataset Viewer]を押下する．
-- [Dataset Name]にて表示したいデータセットを選択する.
-- 選択したデータセット保存ディレクトリの最新画像が表示されます.システム実行中の場合は定期的に画像が更新されます.
+- [Dataset Name]にて表示したいデータセットを選択する．
+- 選択したデータセット保存ディレクトリの最新画像が表示されます.システム実行中の場合は定期的に画像が更新されます．
 
 .. image:: ../img/dataset_viewer.png
   :width: 50%
@@ -119,11 +119,11 @@ Deep Learning開発からロボット開発への連携機能
 		self._dnn_model_path = ['/opt/AirGraph/data/keras_models/MnistSample/MnistSample.json']
 		# </rtc-template>
 
-2. AirGraph(Keras Editor)でも，データセット保存先に保存されている画像ファイルを一覧することが可能です.
+2. AirGraph(Keras Editor)でも，データセット保存先に保存されている画像ファイルを一覧することが可能です．
 
 - 画面上部の[Tools]-[Dataset Viewer]を押下する．
-- 表示されたダイアログ上部の[Dataset Name]にて表示したいデータセットを選択する.
-- 選択したデータセット保存ディレクトリの画像が一覧表示されます.
+- 表示されたダイアログ上部の[Dataset Name]にて表示したいデータセットを選択する．
+- 選択したデータセット保存ディレクトリの画像が一覧表示される．
 
 .. image:: ../img/dataset_downloader.png
   :width: 50%
@@ -133,25 +133,22 @@ Deep Learning開発からロボット開発への連携機能
 ----------------------------------------
 
 ロボットにAirGraphをインストールすることで，ロボット・Deep Learningの両方の開発が可能ですが，
-Deep Learningの学習自体は高スペックなマシンで実行した方が良い場合もあります.
-AirGraphは複数マシン間でのデータセットの連携が可能です.
+Deep Learningの学習自体は高スペックなマシンで実行した方が良い場合もあります．
+AirGraphは複数マシン間でのデータセットの連携が可能です．
+複数マシン間でデータセットの連携を行うためには，それぞれのマシンでAirGraphを起動しておく必要があります．
 
-連携を行うためには、あらかじめapplication.propertiesファイルに連携先のホスト名を定義しておく必要があります
+連携を行うためには，あらかじめAirGraph(RTM Editor)上で，ホストの登録が必要となります．
 
-.. code-block:: none
+.. warning::
 
-  # Airgraph for Robot Hostname (comma separated)
-  airgraph.rtm_editor.server.uri=localhost:8080
-
-  # Airgraph for Keras Hostname
-  airgraph.keras_editor.server.uri=localhost:8080
+  複数のホストでAirGraphを使用する際，RTM Editorでのパッケージ・コンポーネント編集や実行を行うと，最新のソースコードが配置されているホストがどこになるか混乱が生じるため，開発用ホスト以外におけるRTM Editorの機能はホスト定義のみの利用にしておくことを推奨します．
 
 
-1. AirGraph(Keras Editor)では別マシン上のAirGraphからデータセットを取得することが可能です.
+1. AirGraph(Keras Editor)では別マシン上のAirGraphからデータセットを取得することが可能です．
 
 - 画面上部の[Tools]-[Dataset Viewer]を押下する．
-- 表示されたダイアログ下部の[Robot Name][Dataset Name]にて取得したいロボットのホスト名，データセット名を選択する.
-- [Donwload]ボタンを押下すると選択したロボットから選択したデータセットの内容をダウンロードします.
+- 表示されたダイアログ下部の[Host Name][Dataset Name]にて取得したいロボットが配置されているホスト名，データセット名を選択する．
+- [Donwload]ボタンを押下すると選択したホストから選択したデータセットの内容をダウンロードする．
 
 .. image:: ../img/dataset_downloader_2.png
   :width: 50%
@@ -159,9 +156,18 @@ AirGraphは複数マシン間でのデータセットの連携が可能です.
 
 2. AirGraph(RTM Editor)では別マシン上のAirGraphから学習済のモデルを取得することが可能です．
 
+- コンポーネントプロパティ領域の[Keras Editor Host]から，ダウンロードしたいDNNモデルをもつAirGraphサーバーのホストを選択する．
 - コンポーネントにDNNモデルが設定された状態で，コンポーネントのプロパティ設定エリアの[Update DNN Model]ボタンを押下する．
-- 定義されているAirGraphから設定されているDNNモデルをダウンロードします
 
 .. image:: ../img/update_dnn_model.png
   :width: 50%
   :align: center
+
+.. note::
+
+  コンポーネントをデプロイするだけでは，DNNモデルは配布されていないため，上記の手順を行う必要があります．
+
+
+.. note::
+
+  デプロイ先のパッケージのマシン上で，RTM Editorを用いてパッケージを編集することは推奨しません．そのため，デプロイ先のマシンのKeras EditorでDNNモデルを編集する場合は，ターミナル上でscpコマンド等を用いてDNNモデルを転送してください．

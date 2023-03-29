@@ -1,0 +1,7 @@
+  - !!com.sec.rtc.entity.yaml.HostSettingYaml
+    hostName: localhost
+    id: local
+    ip: 127.0.0.1
+    nsport: 2809
+    wwport: 8000
+    password: pass

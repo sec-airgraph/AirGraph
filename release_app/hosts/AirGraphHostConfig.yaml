@@ -1,0 +1,5 @@
+  - !!com.sec.rtc.entity.yaml.AirGraphHostYaml
+    hostName: localhost
+    id: local
+    ip: 127.0.0.1
+    port: 8080

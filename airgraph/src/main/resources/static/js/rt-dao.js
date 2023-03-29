@@ -1,3 +1,10 @@
+/**
+ * ajaxでエラーが帰ってきた場合、alertを表示する.
+ */
+$(document).ajaxError( function (eo, jqXHR, settings){
+	//alert(jqXHR.responseJSON.message);
+});
+
 /*************************************************************************
  * 作業領域・Package関連
  *************************************************************************/
@@ -5,17 +12,21 @@
 /**
  * 作業領域を再取得し展開する
  * 
- * @returns
+ * @returns {undefined}
  */
 function reloadAllWorkspace() {
   // 一旦画面からすべてを削除
   deleteAllComponentsViewObject();
+  
+  resetPropertyAreaHostProfile();
   // 作業領域再読み込み
   loadAllWorkspace();
 }
 
 /**
  * コンポーネント情報を取得し展開する
+ * 
+ * @returns {undefined}
  */
 function loadAllComponentArea() {
   // コンポーネント領域を空にする
@@ -25,7 +36,10 @@ function loadAllComponentArea() {
   lockScreen();
   $.ajax({
     type: 'GET',
-    url: getUrlLoadComponentArea()
+    url: getUrlLoadComponentArea(),
+    data: {
+    'hostId': 'local',
+  }
   }).done(function (resData) {
     if (resData) {
       // コンポーネント領域取得
@@ -44,7 +58,8 @@ function loadAllComponentArea() {
 
 /**
  * 作業領域を取得し展開する
- * @returns
+ *
+ * @returns {undefined}
  */
 function loadAllWorkspace() {
   // 作業領域を空にする
@@ -72,7 +87,8 @@ function loadAllWorkspace() {
 
 /**
  * 作業領域の数を取り直す
- * @returns
+ * 
+ * @returns {undefined}
  */
 function updateWorkspaceCount() {
   $.ajax({
@@ -88,14 +104,16 @@ function updateWorkspaceCount() {
 /**
  * Packageを追加して読み込み直す
  * 
- * @param x
- * @param y
- * @param offset
- * @param target
- * @param modelId
- * @returns
+ * @param {*} modelId modelId
+ * @param {*} id id
+ * @param {*} sabstract sabstract
+ * @param {*} version version
+ * @param {*} remoteUrl remoteUrl
+ * @param {*} packageName packageName
+ * @param {*} hostId hostId
+ * @returns {undefined}
  */
-function addPackage(modelId, id, sabstract, version, remoteUrl) {
+function addPackage(modelId, id, sabstract, version, remoteUrl, packageName, hostId) {
   // 画面をロック
   lockScreen();
 
@@ -104,12 +122,14 @@ function addPackage(modelId, id, sabstract, version, remoteUrl) {
     type: 'POST',
     url: getUrlDropRts(),
     data: {
-      'workPackageName': curWorkspaceName, // idは先頭にrts_が含まれている
-      'dropedRtsName': modelId,
-      'newId': id,
-      'newSAbstruct': sabstract,
-      'newVersion': version,
-      'newRemoteUrl': remoteUrl,
+      workPackageName: curWorkspaceName, // idは先頭にrts_が含まれている
+      dropedRtsName: modelId,
+      newId: id,
+      newSAbstruct: sabstract,
+      newVersion: version,
+      newRemoteUrl: remoteUrl,
+      newPackageName: packageName,
+      hostId: hostId
     }
   }).done(function (resData) {
     if (resData) {
@@ -127,7 +147,8 @@ function addPackage(modelId, id, sabstract, version, remoteUrl) {
 /**
  * 編集したRTSの情報をサーバに通知する
  * 
- * @returns
+ * @param {*} isReload isReload
+ * @returns {undefined}
  */
 function updatePackage(isReload) {
   // 位置情報を保存する
@@ -140,7 +161,6 @@ function updatePackage(isReload) {
     url: getUrlUpdatePackage(),
     data: JSON.stringify(mainRtsMap[curWorkspaceName]),
     contentType: 'application/json',
-    dataType: 'json',
     scriptCharset: 'utf-8',
   }).done(function () {
     // 編集情報を削除する
@@ -158,14 +178,15 @@ function updatePackage(isReload) {
 
 /**
  * 指定したPackageを削除する
- * @param id
- * @returns
+ *
+ * @param {*} id id
+ * @returns {undefined}
  */
 function deletePackage(id) {
   // 画面をロック
   lockScreen();
   $.ajax({
-    type: 'POST',
+    type: 'DELETE',
     url: getUrlDeletePackage(),
     data: { 'rtsName': id } // idは先頭にrts_が含まれている
   }).done(function () {
@@ -192,8 +213,8 @@ function deletePackage(id) {
 /**
  * コンポーネントを追加する
  * 
- * @param modelId
- * @returns
+ * @param {*} modelId modelId
+ * @returns {undefined}
  */
 function addComponent(modelId) {
   // 画面をロック
@@ -227,8 +248,8 @@ function addComponent(modelId) {
 /**
  * 新規コンポーネントを追加する
  * 
- * @param componentData
- * @returns
+ * @param {*} componentData componentData
+ * @returns {undefined}
  */
 function createNewComponentAjax(componentData) {
   // 画面をロック
@@ -242,7 +263,6 @@ function createNewComponentAjax(componentData) {
     url: getUrlCreateNewComponent(),
     data: JSON.stringify(componentData),
     contentType: 'application/json',
-    dataType: 'json',
     scriptCharset: 'utf-8'
   }).done(function () {
     // 作業領域再読み込み
@@ -256,11 +276,11 @@ function createNewComponentAjax(componentData) {
 /**
  * コンポーネントを削除する
  * 
- * @param componentId
- * @param modelId
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} modelId modelId
+ * @returns {undefined}
  */
-function deleteComponent(componentId, modelId) {
+function deleteComponent(componentId) {
   // 画面をロック
   lockScreen();
 
@@ -300,13 +320,11 @@ function deleteComponent(componentId, modelId) {
 /**
  * ロガーを追加する
  * 
- * @param id
- * @param modelId
- * @param portName
- * @param dataType
- * @param logging
- * @param loggerVisible
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} modelId modelId
+ * @param {*} portName portName
+ * @param {*} dataType dataType
+ * @returns {undefined}
  */
 function addLogger(componentId, modelId, portName, dataType) {
   // 画面をロック
@@ -351,11 +369,11 @@ function addLogger(componentId, modelId, portName, dataType) {
  * データ型がロギング可能な型かを調べる<br>
  * 同期処理なので注意
  * 
- * @param dataType
- * @returns
+ * @param {*} dataType dataType
+ * @returns {undefined}
  */
 function canLogging(dataType) {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlCanLogging(),
     data: {
@@ -363,54 +381,53 @@ function canLogging(dataType) {
     },
     async: false
   }).responseText;
-  return (result === 'OK');
 }
 
 /**
  * パッケージ名が使用可能かを調べる
  * 
- * @param name
- * @returns
+ * @param {*} name name
+ * @returns {boolean} result
  */
 function isAvailablePackageName(name) {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlAvailablePackageName(),
     data: {
-      'name': name
+      name: name,
+      hostId: 'local'
     },
     async: false
-  }).responseText;
-  return (result === 'OK');
+  });
 }
 
 /**
  * コンポーネント名が使用可能かを調べる
  * 
- * @param componentName
- * @returns
+ * @param {*} componentName componentName
+ * @returns {boolean} result
  */
 function isAvailableComponentName(componentName) {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlAvailableComponentName(),
     data: {
-      'workPackageName': curWorkspaceName,
-      'componentName': componentName
+      workPackageName: curWorkspaceName,
+      componentName: componentName,
+      hostId: 'local'
     },
     async: false
-  }).responseText;
-  return (result === 'OK');
+  });
 }
 
 /**
  * IDLファイルの一覧を取得する
  * 
- * @param componentName
- * @returns
+ * @param {*} componentName componentName
+ * @returns {*} IDLファイルの一覧
  */
 function getIdlFileChoices(componentName) {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getURLIdlFileChoices(),
     data: {
@@ -419,17 +436,16 @@ function getIdlFileChoices(componentName) {
     },
     async: false
   }).responseJSON;
-  return result;
 }
 
 /**
  * DataType型の一覧を取得する
  * 
- * @param componentName
- * @returns
+ * @param {*} componentName componentName
+ * @returns {*} DataType型の一覧
  */
 function getDataTypeChoices(componentName) {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getURLDataTypeChoices(),
     data: {
@@ -438,18 +454,17 @@ function getDataTypeChoices(componentName) {
     },
     async: false
   }).responseJSON;
-  return result;
 }
 
 /**
  * インタフェース型の一覧を取得する
  * 
- * @param componentName
- * @param idlFileName
- * @returns
+ * @param {*} componentName componentName
+ * @param {*} idlFileName idlFileName
+ * @returns {*} インタフェース型の一覧
  */
 function getInterfaceTypeChoices(componentName, idlFileName) {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getURLInterfaceTypeChoices(),
     data: {
@@ -459,13 +474,12 @@ function getInterfaceTypeChoices(componentName, idlFileName) {
     },
     async: false
   }).responseJSON;
-  return result;
 }
 
 /**
  * IDLファイルをアップロードする
  * 
- * @returns
+ * @returns {undefined}
  */
 function uploadIdlFile() {
   var formData = new FormData(
@@ -479,9 +493,9 @@ function uploadIdlFile() {
     processData: false,
     contentType: false,
     cache: false
-  }).done(function (data, status, jqxhr) {
+  }).done(function () {
 
-  }).fail(function (data, status, jqxhr) {
+  }).fail(function () {
 
   });
 }
@@ -489,29 +503,27 @@ function uploadIdlFile() {
 /**
  * Kerasモデルの一覧を取得する
  * 
- * @returns
+ * @returns {*} Kerasモデルの一覧
  */
 function getKerasModelChoices() {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlKerasModelChoices(),
     async: false
   }).responseJSON;
-  return result;
 }
 
 /**
  * データセットの一覧を取得する
  * 
- * @returns
+ * @returns {*} データセットの一覧
  */
 function getDatasetChoices() {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlDatasetChoices(),
     async: false
   }).responseJSON;
-  return result;
 }
 
 /*************************************************************************
@@ -521,15 +533,20 @@ function getDatasetChoices() {
 /**
  * 編集したRTSの情報をサーバに通知する
  * 
- * @returns
+ * @param {*} dnnModelName dnnModelName
+ * @param {*} isReload isReload
+ * @param {*} pathuri pathUri
+ * @returns {undefined}
  */
-function updateDnnModels(dnnModelName, isReload) {
+function updateDnnModels(dnnModelName, isReload, pathuri) {
   // 画面をロック
   lockScreen();
   $.ajax({
     type: 'GET',
     url: getUrlUpdateDnnModels(),
-    data: { 'dnnModelName': dnnModelName }
+    data: { 'dnnModelName': dnnModelName,
+            'pathUri': pathuri 
+          }
   }).done(function (resData) {
     if (resData && isReload && isReload === true) {
       // 作業領域再読み込み
@@ -548,11 +565,11 @@ function updateDnnModels(dnnModelName, isReload) {
 /**
  * パッケージをCommitする
  * 
- * @param commitMessage
- * @returns
+ * @param {*} commitMessage commitMessage
+ * @returns {string} コミットの結果
  */
 function commitPackage(commitMessage) {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlCommitPackage(),
     data: {
@@ -561,19 +578,18 @@ function commitPackage(commitMessage) {
     },
     async: false
   }).responseText;
-  return result;
 }
 
 /**
  * パッケージをPushする
  * 
- * @param user
- * @param pass
- * @param commitMessage
- * @returns
+ * @param {*} user user
+ * @param {*} pass pass
+ * @param {*} commitMessage commitMessage
+ * @returns {string} push結果
  */
 function pushPackage(user, pass, commitMessage) {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlPushPackage(),
     data: {
@@ -584,18 +600,17 @@ function pushPackage(user, pass, commitMessage) {
     },
     async: false
   }).responseText;
-  return result;
 }
 
 /**
  * パッケージをPullする
  * 
- * @param user
- * @param pass
- * @returns
+ * @param {*} user user
+ * @param {*} pass pass
+ * @returns {string} pull結果
  */
 function pullPackage(user, pass) {
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlPullPackage(),
     data: {
@@ -605,21 +620,20 @@ function pullPackage(user, pass) {
     },
     async: false
   }).responseText;
-  return result;
 }
 
 /**
  * コンポーネントをCommitする
  * 
- * @param componentId
- * @param commitMessage
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} commitMessage commitMessage
+ * @returns {string} commit結果
  */
 function commitComponent(componentId, commitMessage) {
   // コンポーネント名称とGitのリポジトリ名称を取得する
   var component = getComponentInPackage(componentId);
 
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlCommitComponent(),
     data: {
@@ -630,23 +644,22 @@ function commitComponent(componentId, commitMessage) {
     },
     async: false
   }).responseText;
-  return result;
 }
 
 /**
  * コンポーネントをPushする
  * 
- * @param componentId
- * @param user
- * @param pass
- * @param commitMessage
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} user user
+ * @param {*} pass pass
+ * @param {*} commitMessage commitMessage
+ * @returns {*} result
  */
 function pushComponent(componentId, user, pass, commitMessage) {
   // コンポーネント名称とGitのリポジトリ名称を取得する
   var component = getComponentInPackage(componentId);
 
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlPushComponent(),
     data: {
@@ -659,22 +672,21 @@ function pushComponent(componentId, user, pass, commitMessage) {
     },
     async: false
   }).responseText;
-  return result;
 }
 
 /**
  * コンポーネントをPullする
  * 
- * @param componentId
- * @param user
- * @param pass
- * @returns
+ * @param {*} componentId componentId
+ * @param {*} user user
+ * @param {*} pass pass
+ * @returns {*} result
  */
 function pullComponent(componentId, user, pass) {
   // コンポーネント名称とGitのリポジトリ名称を取得する
   var component = getComponentInPackage(componentId);
 
-  var result = $.ajax({
+  return $.ajax({
     type: 'POST',
     url: getUrlPullComponent(),
     data: {
@@ -686,128 +698,489 @@ function pullComponent(componentId, user, pass) {
     },
     async: false
   }).responseText;
-  return result;
 }
+
+/**
+ * コミットハッシュを取得する
+ * 
+ * @param {*} packageName packageName
+ * @returns {*} result
+ */
+function getCommitHash(packageName) {
+
+  return $.ajax({
+    type: 'GET',
+    url: getUrlGetCommitHash(),
+    data: {
+       'packageName': packageName
+    },
+    async: false
+  }).responseText;
+}
+
+/**
+ * Airgraphのバージョンを確認する
+ * 
+ * @returns {*} result
+ */
+function getAirgraphVersion() {
+  
+  return $.ajax({
+    type: 'GET',
+    url: getUrlAitgraphVersion(),
+    async: false
+  }).responseText;
+}
+
+/**
+ * Wasanbonのバージョンを確認する
+ * 
+ * @param {*} hostId hostId
+ * @returns {*} result
+ */
+function getWasanbonVersion(hostId) {
+  
+  return $.ajax({
+    type: 'GET',
+    url: getUrlWasanbonVersion(),
+    data: {
+    hostId: hostId
+  },
+    async: false
+  }).responseText;
+}
+
+/**
+* packageの状態を確認する
+* 
+* @param {*} ws ws
+* @param {*} rtsName rtsName
+* @returns {*} result
+*/
+function checkPackageStatus(ws, rtsName) {
+
+  return $.ajax({
+    type: 'GET',
+    url: getUrlCheckPackageStatus(),
+    data: {
+      'ws': ws,
+       'rtsName': rtsName
+    },
+  })
+ }
+ 
+ /**
+ * RTCの状態を確認する
+ * 
+ * @param {*} ws ws
+ * @param {*} rtsName rtsName
+ * @returns {*} result
+ */
+function checkRtcsStatus(ws, rtsName) {
+
+  return $.ajax({
+    type: 'GET',
+    url: getUrlCheckRtcsStatus(),
+    data: {
+      'ws': ws,
+       'rtsName': rtsName
+    },
+  })
+ }
+
+ /**
+ * nameserverの状態を確認する
+ * 
+ * @param {*} hostId hostId
+ * @returns {*} result
+ */
+function checkNameserverStatus(hostId) {
+
+  return $.ajax({
+    type: 'GET',
+    url: getUrlCheckNameserverStatus(),
+    data: {
+      hostId: hostId
+    },
+  })
+ }
+
 
 /*************************************************************************
  * ビルド・実行関連
  *************************************************************************/
-/**
- * Packageをすべてビルドする
- * @param id
- * @returns
+ /**
+ * 複数のajax通信をする.すべてが終了した段階で、コンソールログを表示する
+ * 
+ * @param {*} ws ws
+ * @param {*} ajaxList ajaxList
+ * @returns {undefined}
  */
-function buildPackageAll(id) {
-  // // 一度保存する
-  // updatePackage(false);
-  // 実行中に移行
-  setState(STATE.EXEC);
-  $.ajax({
-    type: 'POST',
-    url: getUrlBuildAll(),
-    data: { 'rtsName': id } // idは先頭にrts_が含まれている
-  }).done(function () {
+function multipleAjax(ws, ajaxList) {
+  // 非同期処理を実行
+  $.when.apply($, ajaxList).done(function () {
+  }).always(function () {
     // 編集中に移行
     setState(STATE.EDIT);
+    if (ws === 'dev') {
+      openLocalConsoleLog();
+    } else {
+      openRemoteConsoleLog();
+    }
+    // 画面ロック解除
+    unlockScreen();
   });
+}
+
+ /**
+ * 複数のajax通信をする.すべてが終了した段階で、コンソールログを表示する
+ * RTCアイコンの色も変更する
+ *
+ * @param {*} ws ws
+ * @param {*} ajaxList ajaxList
+ * @param {*} id id
+ * @param {*} assignedHostList assignedHostList
+ * @returns {undefined}
+ */
+function multipleAjaxAndChangeColors(ws, ajaxList, id, assignedHostList) {
+  // 非同期処理を実行
+  $.when.apply($, ajaxList).done(function () {
+  }).always(function () {
+    // RTCアイコンの色を変更
+    for (let i = 0; i < assignedHostList.length; i++) {
+      changeRTCIconColor(isRunningPackage(ws, id, assignedHostList[i]));
+    }
+
+    if (ws === 'dev') {
+      openLocalConsoleLog();
+    } else {
+      openRemoteConsoleLog();
+    }
+    // 画面ロック解除
+    unlockScreen();
+  });
+}
+
+/**
+ * デプロイする
+ *
+ * @param {*} assignedHostList assignedHostList
+ * @param {*} ws ws
+ * @param {*} remoteRepositoryUrl remoteRepositoryUrl
+ * @param {*} commitHash commitHash
+ * @returns {*} result
+ */
+function deploy(assignedHostList, ws, remoteRepositoryUrl, commitHash) {
+  // 実行中に移行
+  setState(STATE.EXEC);
+  lockScreen();
+
+  let ajaxList = [];
+  for (let i = 0; i < assignedHostList.length; i++) {
+    ajaxList.push(
+      $.ajax({
+        type: 'POST',
+        url: getUrlDeploy(),
+        data: {
+          hostId: assignedHostList[i],
+          ws: ws,
+          remoteRepositoryUrl: remoteRepositoryUrl,
+          commitHash: commitHash
+        }
+      }));
+  }
+
+  // 非同期処理を実行
+  $.when.apply($, ajaxList).done(function () {
+    openCreateDeployPopup('All RTCs are Deployed.');
+  }).fail(function (jqXHR, textStatus, errorThrown) {
+    let msg = 'status: ' + textStatus + '<br>';
+    msg += 'body: ' + jqXHR.responseText + '<br>';
+    openCreateDeployErrPopup(msg);
+  }).always(function () {
+    // 画面ロック解除
+    unlockScreen();
+    setState(STATE.EDIT);
+  });
+
+}
+
+/**
+ * Packageをすべてビルドする
+ * 
+ * @param {*} ws ws
+ * @param {*} id id
+ * @param {*} assignedHostList assignedHostList
+ * @returns {undefined}
+ */
+function buildPackageAll(ws, id, assignedHostList) {
+
+  // 実行中に移行
+  setState(STATE.EXEC);
+  lockScreen();
+
+  clearExecuteWasanbonLog();
+
+  let ajaxList = [];
+  for (let i = 0; i < assignedHostList.length; i++) {
+    ajaxList.push(
+      $.ajax({
+        type: 'POST',
+        url: getUrlBuildAll(),
+        data: {
+          ws: ws,
+          rtsName: id, // idは先頭にrts_が含まれている
+          hostId: assignedHostList[i]
+        }
+      }));
+  }
+  multipleAjax(ws, ajaxList);
 }
 /**
  * Packageをすべてクリーンする
- * @param id
- * @returns
+ *
+ * @param {*} ws ws
+ * @param {*} id id
+ * @param {*} assignedHostList assignedHostList
+ * @returns {undefined}
  */
-function cleanPackageAll(id) {
-  // // 一度保存する
-  // updatePackage(false);
+function cleanPackageAll(ws, id, assignedHostList) {
   // 実行中に移行
   setState(STATE.EXEC);
-  $.ajax({
-    type: 'POST',
-    url: getUrlCleanAll(),
-    data: { 'rtsName': id } // idは先頭にrts_が含まれている
-  }).done(function () {
-    // 編集中に移行
-    setState(STATE.EDIT);
-  });
+  lockScreen();
+
+  clearExecuteWasanbonLog();
+
+  let ajaxList = [];
+  for (let i = 0; i < assignedHostList.length; i++) {
+    ajaxList.push(
+      $.ajax({
+        type: 'POST',
+        url: getUrlCleanAll(),
+        data: {
+          ws: ws,
+          rtsName: id, // idは先頭にrts_が含まれている
+          hostId: assignedHostList[i]
+        }
+      }));
+  }
+  multipleAjax(ws, ajaxList);
 }
 
 /**
  * Packageを実行する
- * @param id
- * @returns
+ * 
+ * @param {*} ws ws
+ * @param {*} id id
+ * @param {*} assignedHostList assignedHostList
+ * @returns {undefined}
  */
-function runPackage(id) {
+function runSystem(ws, id, assignedHostList) {
   // 実行中に移行
   setState(STATE.EXEC);
+  lockScreen();
+
+  clearExecuteWasanbonLog();
+
+  let ajaxList = [];
+  for (let i = 0; i < assignedHostList.length; i++) {
+    ajaxList.push(
+      $.ajax({
+        type: 'POST',
+        url: getUrlRunSystem(),
+        data: {
+          ws: ws,
+          rtsName: id,// idは先頭にrts_が含まれている
+          hostId: assignedHostList[i]
+        }
+      }));
+  }
+  multipleAjaxAndChangeColors(ws, ajaxList, id, assignedHostList);
+}
+
+/**
+ * スタート
+ * 
+ * @param {*} ws ws
+ * @param {*} id id
+ * @param {*} assignedHostList assignedHostList
+ * @returns {undefined}
+ */
+function startRtcs(ws, id, assignedHostList) {
+  // 実行中に移行
+  setState(STATE.EXEC);
+  lockScreen();
+
+  clearExecuteWasanbonLog();
+
+  let ajaxList = [];
+  for (let i = 0; i < assignedHostList.length; i++) {
+    ajaxList.push(
+      $.ajax({
+        type: 'POST',
+        url: getUrlStartRTCs(),
+        data: {
+          ws: ws,
+          rtsName: id,
+          hostId: assignedHostList[i]
+        }
+      }));
+  }
+  multipleAjaxAndChangeColors(ws, ajaxList, id, assignedHostList);
+}
+
+/**
+ * コネクトする
+ * 
+ * @param {*} ws ws
+ * @param {*} id id
+ * @param {*} hostId hostId
+ * @returns {undefined}
+ */
+function connectPorts(ws, id, hostId) {
+  // 実行中に移行
+  setState(STATE.EXEC);
+  clearExecuteWasanbonLog();
+
   $.ajax({
     type: 'POST',
-    url: getUrlRunPackage(),
-    data: { 'rtsName': id } // idは先頭にrts_が含まれている
+    url: getUrlConnectPorts(),
+    data: {
+      ws: ws,
+      rtsName: id,// idは先頭にrts_が含まれている
+      hostId: hostId
+    },
   }).done(function () {
-    // NOP
+    reloadPackageWorkspace(100, 100, mainRtsMap[curWorkspaceName]);
+    changeRTCIconColor(isRunningPackage(ws, id, hostId));
   });
+}
 
-  // 再描画する
-  reloadPackageWorkspace(100, 100, mainRtsMap[curWorkspaceName]);
+/**
+ * アクティベイトかディアクティベイトをする
+ * 
+ * @param {*} isActivate isActivate
+ * @param {*} ws ws
+ * @param {*} id id
+ * @param {*} hostId hostId
+ * @returns {undefined}
+ */
+function activateOrDeactivateRtcs(isActivate, ws, id, hostId) {
+  // 実行中に移行
+  setState(STATE.EXEC);
+  clearExecuteWasanbonLog();
+
+  $.ajax({
+    type: 'POST',
+    url: getUrlActivateOrDeactivateRTCs(),
+    data: {
+      isActivate: isActivate,
+      ws: ws,
+      rtsName: id,// idは先頭にrts_が含まれている
+      hostId: hostId
+    },
+  }).done(function () {
+    reloadPackageWorkspace(100, 100, mainRtsMap[curWorkspaceName]);
+    changeRTCIconColor(isRunningPackage(ws, id, hostId));
+  });
 }
 
 /**
  * Packageを停止する
- * @param id
- * @returns
+ * 
+ * @param {*} ws ws
+ * @param {*} id id
+ * @param {*} assignedHostList assignedHostList
+ * @returns {undefined}
  */
-function terminatePackage(id) {
+function terminateSystem(ws, id, assignedHostList) {
   // 編集中に移行
   setState(STATE.EDIT);
-  $.ajax({
-    type: 'POST',
-    url: getUrlTerminatePackage(),
-    data: { 'rtsName': id } // idは先頭にrts_が含まれている
-  }).done(function (result) {
-    // NOP
-  });
+  lockScreen();
 
-  // 再描画する
-  reloadPackageWorkspace(100, 100, mainRtsMap[curWorkspaceName]);
+  clearExecuteWasanbonLog();
+
+  let ajaxList = [];
+  for (let i = 0; i < assignedHostList.length; i++) {
+    ajaxList.push(
+      $.ajax({
+        type: 'POST',
+        url: getUrlTerminateSystem(),
+        data: {
+          ws: ws,
+          rtsName: id,// idは先頭にrts_が含まれている
+          hostId: assignedHostList[i]
+        },
+      }));
+  }
+  multipleAjaxAndChangeColors(ws, ajaxList, id, assignedHostList);
 }
 
 /**
  * Packageの実行状況を確認する
- * @param id
- * @returns
+ * 
+ * @param {*} ws ws
+ * @param {*} curWorkspaceName curWorkspaceName
+ * @param {*} hostId hostId
+ * @returns {*} result
  */
-function isRunningPackage(id) {
-  var result = $.ajax({
+function isRunningPackage(ws, curWorkspaceName, hostId) {
+  return $.ajax({
     type: 'POST',
     url: getUrlIsRunningPackage(),
-    data: { 'rtsName': id }, // idは先頭にrts_が含まれている
+    data: { 
+    ws: ws,
+    rtsName: curWorkspaceName,// idは先頭にrts_が含まれている
+    hostId: hostId
+     }, 
     async: false
-  }).responseText;
-  return 'true' === result;
+  }).responseJSON;
 }
 
 /*************************************************************************
  * ログ監視・モニタ監視
  *************************************************************************/
 /**
- * ログ監視開始
+ * ログ監視開始(keras用)
+ * 
+ * @returns {undefined}
  */
 function startTailLog() {
   tailTimerID = setInterval(tailLog, 1000);
 }
 
 /**
- * ログ監視終了
- * @returns
+ * ログ監視開始(local rt-system用)
+ * 
+ * @returns {undefined}
+ */
+function startLocalTailLog() {
+  tailTimerID = setInterval(localTailLog, 1000);
+}
+
+/**
+ * ログ監視終了(keras用)
+ * 
+ * @returns {undefined}
  */
 function stopTailLog() {
   clearInterval(tailTimerID);
 }
 
 /**
+ * ログ監視終了(local rt-system用)
+ * 
+ * @returns {undefined}
+ */
+function stopLocalTailLog() {
+  clearInterval(tailTimerID);
+}
+
+/**
  * 最下部までスクロール
- * @param obj
- * @returns
+ * 
+ * @param {*} obj obj
+ * @returns {undefined}
  */
 function scrollBottom(obj) {
   if (obj[0]) {
@@ -816,26 +1189,440 @@ function scrollBottom(obj) {
 }
 
 /**
- * ログ監視
+ * ローカルログ監視
+ * 
+ * @returns {undefined}
  */
-function tailLog() {
+function localTailLog() {
   if ($('[name=console-scroll-check]').prop("checked") === true) {
-    $.ajax({
-      type: 'GET',
-      url: getUrlTailLog(),
-      data: { 'workPackageName': curWorkspaceName }
-    }).done(function (log) {
-      if (log) {
-        if (log['wasanbon']) {
-          wasanbonLogViewer.setValue(log['wasanbon'].replace(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/g, ''));
-        }
-        if (log['python']) {
-          pythonLogViewer.setValue(log['python']);
-        }
-
-        wasanbonLogViewer.setScrollTop(wasanbonLogViewer.getScrollHeight())
-        pythonLogViewer.setScrollTop(pythonLogViewer.getScrollHeight())
-      }
+    // 実行時のwasanbon.logを表示
+    getExecuteWasanbonLog(function (content) {
+      wasanbonLogViewer.setValue(content.replace(/[\x00-\x09\x0b-\x1f\x7f-\x9f]/g, ''));
+      wasanbonLogViewer.setScrollTop(wasanbonLogViewer.getScrollHeight())
     });
+
+    var url = getUrlTailLog();
+    var xhr = new XMLHttpRequest();
+    var param = 'ws=dev&hostId=local&workPackageName=' + curWorkspaceName;
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.responseType = 'blob';
+    xhr.onload = function () {
+      if (this.status == 200) {
+        var blob = this.response;//レスポンス
+        unzipFiles(blob, function (unzipped) {
+          var importFileList = unzipped.getFilenames();
+
+          for (var i in importFileList) {
+            var logFileContent = new TextDecoder().decode(unzipped.decompress(importFileList[i]));
+            if (importFileList[i] == 'rtc_py.log') {
+              pythonLogViewer.setValue(logFileContent);
+            }
+          }
+          pythonLogViewer.setScrollTop(pythonLogViewer.getScrollHeight(), logFileContent)
+        });
+      }
+    };
+    xhr.send(param);
   }
+}
+
+/**
+ * リモートログ監視
+ * 
+ * @param {*} hostId hostId
+ * @returns {undefined}
+ */
+function remoteTailLog(hostId) {
+  var url = getUrlTailLog();
+  var xhr = new XMLHttpRequest();
+  var param = 'ws=exec&hostId=' + hostId + '&workPackageName=' + curWorkspaceName;
+  xhr.open('POST', url, true);
+  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+  xhr.responseType = 'blob';
+  xhr.onload = function () {
+    if (this.status == 200) {
+      var blob = this.response;//レスポンス
+      unzipFiles(blob, function (unzipped) {
+        var importFileList = unzipped.getFilenames();
+
+        for (var i in importFileList) {
+          var logFileContent = new TextDecoder().decode(unzipped.decompress(importFileList[i]));
+          // ログファイルの中身が空でなければ、ダイアログに表示
+          if (logFileContent != '') {
+            addRemoteLogTab(hostId, importFileList[i], logFileContent);
+          }
+        }
+      });
+    }
+  };
+  xhr.send(param);
+}
+ 
+/**
+ * 実行時のwasanbon.logを取得する
+ * 
+ * @returns {*} result
+ */
+function getExecuteWasanbonLog(callback) {
+  $.ajax({
+    type: 'GET',
+    url: getUrlGetExecuteWasanbonLog(),
+    async: false,
+  }).done(function (content) {
+    if (content) {
+      callback(content);
+    }
+  });
+}
+
+/**
+ * 実行時のwasanbon.logをクリアする
+ *
+ * @returns {*} result
+ */
+function clearExecuteWasanbonLog() {
+  $.ajax({
+    type: 'POST',
+    url: getUrlClearExecuteWasanbonLog(),
+    async: false,
+  });
+}
+
+
+/*************************************************************************
+ * ホスト関連
+ *************************************************************************/
+/**
+ * ホスト名、または(IP, Port)が重複しないか判定する
+ * 
+ * @param {*} isWasanbon isWasanbon
+ * @param {*} hostname hostname
+ * @param {*} ip ip
+ * @param {*} nsport nsport
+ * @returns {*} result
+ */
+ function isHostNameUnique(isWasanbon, hostname, ip, nsport) {
+  return $.ajax({
+    type: 'POST',
+    url: getUrlIsHostNameUnique(),
+    data: { 
+            isWasanbon: isWasanbon,
+            'hostname': hostname,
+            'ip': ip,
+            'nsport': nsport,
+          },
+    async: false,
+  }).responseText;
+}
+
+
+/**
+ *  ホストIDが重複しないか判定する
+ * 
+ * @param {*} id id
+ * @returns {boolean} ホストIDが重複しないか
+ */
+ function isHostIdUnique(id) {
+  return $.ajax({
+    type: 'POST',
+    url: getUrlIsHostIdUnique(),
+    data: { id: id },
+    async: false,
+  }).responseText;
+}
+
+/**
+ * ホスト定義ファイルに新規ホストを追加する
+ * 
+ * @param {*} hostname hostname
+ * @param {*} ip ip
+ * @param {*} nsport nsport
+ * @param {*} wwport wwport
+ * @param {*} id id
+ * @param {*} password password
+ * @returns {*} ホストファイルに書き込みできたかどうか
+ */
+function registerHostToConfigFile(hostname, ip, nsport, wwport, id, password) {
+
+  return $.ajax({
+    type: 'POST',
+    url: getUrlregisterHostToConfigFile(),
+    data: { 'hostname': hostname,
+            'IP': ip,
+            'nsport': nsport,
+            'wwport': wwport,
+            'ID': id,
+            'password': password
+          },
+    async: false,
+
+  }).responseText;
+
+}
+
+/**
+ * AirGraph用ホストを追加する
+ * 
+ * @param {*} hostname hostname
+ * @param {*} ip ip
+ * @param {*} port port
+ * @returns {*} ホストファイルに書き込みできたかどうか
+ */
+function addAirGraphHost(hostname, ip, port) {
+
+  return $.ajax({
+    type: 'POST',
+    url: getUrlAddAirGraphHost(),
+    data: { 'hostname': hostname,
+            'ip': ip,
+            'port': port,
+          },
+    async: false,
+  }).responseText;
+
+}
+/**
+ * ホスト定義ファイルを更新する
+ * 
+ @param {*} requestBody requestBody
+ @returns {boolean} 正常終了できたかどうか
+ */
+function updateHostConfigFile(requestBody) {
+
+  return $.ajax({
+    type: 'POST',
+    url: getUrlUpdateHostConfigFile(),
+    data: JSON.stringify(requestBody),
+    contentType: 'application/json',
+    dataType: 'json',
+    scriptCharset: 'utf-8',
+    async: false,
+  }).responseText;
+
+}
+
+/**
+ * ホスト定義ファイルを読み込む
+ * 
+ * @returns {*} result
+ */
+function loadHostList() {
+
+  return $.ajax({
+    type: 'GET',
+    url: getUrlloadHostList(),
+    async: false,
+  }).responseJSON;
+
+}
+
+/**
+ * GitHub設定ファイルを読み込む
+ * 
+ * @returns {*} result
+ */
+function getGitHubConfigFile(){
+
+  return $.ajax({
+    type: 'GET',
+    url: getUrlGetGitHubConfigFile(),
+    async: false,
+
+  }).responseJSON;
+
+}
+
+/**
+ * nameserverを起動する
+ * 
+ * @param {*} hostId hostId
+ * @returns {*} result
+ */
+function startNameserver(hostId){
+
+  return $.ajax({
+    type: 'POST',
+    url: getUrlStartNameserver(),
+    data: {
+    hostId: hostId,
+  },
+
+  }).responseJSON; 
+
+}
+
+/*************************************************************************
+ * Binder関連
+ *************************************************************************/
+/**
+ * Binderを作成する
+ * 
+ * @param {*} username username
+ * @param {*} token token
+ * @returns {*} result
+ */
+function createBinder(username, token){
+
+  return $.ajax({
+    type: 'POST',
+    url: getUrlCreateBinder(),
+    data: {
+    username: username,
+    token: token
+  },
+    async: false,
+
+  }).responseJSON;
+
+}
+
+/**
+ * Binderを更新する
+ * 
+ * @returns {undefined}
+ */
+function updateBinder() {
+  $.ajax({
+    type: 'POST',
+    url: getUrlUpdateBinder(),
+    async: false,
+  });
+}
+
+/**
+ * Binderにパッケージを追加する
+ * @param {*} packageName packageName
+ * @param {*} binderName binderName
+ * @returns {*} result
+ */
+function addPackageToBinder(packageName, binderName) {
+
+  return $.ajax({
+    type: 'POST',
+    url: getUrlAddPackageToBinder(),
+    data: { packageName: packageName,
+         binderName: binderName,
+         hostId: 'local'
+          },
+    async: false,
+
+  }).responseText;
+
+}
+
+/**
+ * Binderのパッケージを更新する
+ * @param {*} ws ws
+ * @param {*} packageName packageName
+ * @param {*} binderName binderName
+ * @returns {*} result
+ */
+function updatePackageToBinder(ws, packageName, binderName) {
+
+  return $.ajax({
+    type: 'PUT',
+    url: getUrlUpdatePackageToBinder(),
+    data: {ws: ws, 
+      packageName: packageName,
+         binderName: binderName
+          },
+    async: false,
+
+  }).responseText;
+
+}
+
+/**
+ * BinderにRTCを追加する
+ * 
+ * @param {*} ws ws
+ * @param {*} packageName packageName
+ * @param {*} rtcName rtcName
+ * @param {*} binderName binderName
+ * @returns {*} result
+ */
+function addRtcToBinder(ws, packageName, rtcName, binderName) {
+
+  return $.ajax({
+    type: 'POST',
+    url: getUrlAddRTCToBinder(),
+    data: {ws: ws,  
+        packageName: packageName,
+      rtcName: rtcName,
+       binderName: binderName  
+          },
+    async: false,
+
+  }).responseText;
+
+}
+
+/**
+ * BinderのRTCを更新する
+ * 
+ * @param {*} ws ws
+ * @param {*} packageName packageName
+ * @param {*} rtcName rtcName
+ * @param {*} binderName binderName
+ * @returns {*} result
+ */
+function updateRtcToBinder(ws, packageName, rtcName, binderName) {
+
+  return $.ajax({
+    type: 'PUT',
+    url: getUrlUpdateRTCToBinder(),
+    data: { ws: ws, 
+      packageName: packageName,
+         rtcName: rtcName,
+         binderName: binderName
+          },
+    async: false,
+
+  }).responseText;
+
+}
+
+/**
+ * Binderをcommitする
+ * 
+ * @param {*} binderName binderName
+ * @param {*} comment comment
+ * @returns {*} result
+ */
+function commitBinder(binderName, comment) {
+
+  return $.ajax({
+    type: 'POST',
+    url: getUrlCommitBinder(),
+    data: {
+    binderName: binderName,
+    comment: comment
+          },
+    async: false,
+
+  }).responseText;
+
+}
+
+/**
+ * BinderをPushする
+ * 
+ * @param {*} binderName binderName
+ * @param {*} comment comment
+ * @returns {*} result
+ */
+function pushBinder(binderName, comment) {
+
+  return $.ajax({
+    type: 'POST',
+    url: getUrlPushBinder(),
+    data: {
+    binderName: binderName,
+    comment: comment
+          },
+    async: false,
+
+  }).responseText;
+
 }

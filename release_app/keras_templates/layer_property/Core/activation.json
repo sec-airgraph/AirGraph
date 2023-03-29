@@ -1,6 +1,6 @@
 {
 	"class_name": "Activation",
 	"fields":[
-		{ "name": "activation",	"type": "list",	"required": true,	"html": { "caption": "Activation",	"page": 0,	"attr": "style=\"width:200px\"" } }
+		{ "name": "activation",	"type": "list",	"required": true,	"html": { "label": "Activation",	"page": 0,	"attr": "style=\"width:200px\"" } }
 	]	
 }

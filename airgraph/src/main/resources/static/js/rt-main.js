@@ -3,6 +3,8 @@
  *************************************************************************/
 /**
  * 全体初期レイアウト処理
+ *
+ * @returns {undefined}
  */
 function layoutPanelAll() {
   var pstyle = 'border: 1px solid #dfdfdf; padding: 0px;';
@@ -14,7 +16,7 @@ function layoutPanelAll() {
       { type: 'left', size: 300, resizable: true, style: pstyle, content: createComponentPanel() },
       { type: 'main', style: pstyle, content: createMainPanel() },
       { type: 'preview', size: '30%', resizable: true, style: pstyle, content: createConfigulationPanel() },
-      { type: 'right', size: 460, resizable: true, style: pstyle, content: createPropertyPanel(), hidden: true },
+      { type: 'right', size: 460, resizable: true, style: pstyle, content: createPropertyPanel() },
       { type: 'bottom', size: 30, resizable: false, style: pstyle, content: createFooterPanel() }
     ]
   });
@@ -22,6 +24,8 @@ function layoutPanelAll() {
 
 /**
  * 作業領域作成処理
+ *
+ * @returns {undefined}
  */
 function createMainPanel() {
   // 背景
@@ -35,11 +39,63 @@ function createMainPanel() {
   jointArea.css('position', 'absolute').css('width', '100%').css('height', '100%').css('overflow', 'hidden');
   panel.append(jointArea);
 
+  // main-panel上のpackage, RTCの変更保存状態を10秒ごとに監視する
+  window.setInterval(async function () {
+
+    if (mainRtsMap[curWorkspaceName]) {
+      // packageのstatusを確認する
+      checkPackageStatus('dev', curWorkspaceName).done(function (res) {
+        let msg = 'Unknown';
+        if (res.indexOf('Untracked') >= 0) {
+          msg = 'Untracked';
+        }
+        else if (res.indexOf('Up-to-date') >= 0) {
+          msg = 'Up-to-date';
+        }
+        else if (res.indexOf('Modified') >= 0) {
+          msg = 'Modified';
+        }
+        let target = w2ui["toolbar"].items.find((item) => {return item.id === "package-sync"});
+        target.text = 'Package: ' + msg;
+        target.tooltip = res;
+        w2ui["toolbar"].refresh();
+      });
+
+      let isRtcExistInPackage = (document.getElementsByTagName('rect').length > 0);
+      if (isRtcExistInPackage) {
+        // rtcのstatusを確認する
+        checkRtcsStatus('dev', curWorkspaceName).done(function (res) {
+          let msg = 'Unknown';
+          if (res.indexOf('Untracked') >= 0) {
+            msg = 'Untracked';
+          }
+          else if (res.indexOf('Modified') >= 0) {
+            msg = 'Modified';
+          }
+          else if (res.indexOf('Up-to-date') >= 0) {
+            msg = 'Up-to-date';
+          }
+          let target = w2ui["toolbar"].items.find((item) => {return item.id === "rtc-sync"});
+          target.text = 'RTCs: ' + msg;
+          let tooltipMsg = 'Unknown';
+          if (res && res != "null") {
+            tooltipMsg = res.replace(', ', '<br>').replace('{', '').replace('}', '');
+          }
+          target.tooltip = tooltipMsg;
+          w2ui["toolbar"].refresh();
+        });
+      }
+    }
+
+  }, 10000);
+
   return panel;
 }
 
 /**
  * ツールバー領域作成処理
+ *
+ * @returns {*} panel
  */
 function createToolBarPanel() {
   // 背景
@@ -53,6 +109,8 @@ function createToolBarPanel() {
 
 /**
  * コンポーネント領域作成処理
+ *
+ * @returns {*} panel
  */
 function createComponentPanel() {
   // 背景
@@ -83,18 +141,24 @@ function createComponentPanel() {
 
 /**
  * プロパティ領域作成処理
+ *
+ * @returns {*} panel
  */
 function createPropertyPanel() {
   // 背景
   var panel = $('<div>');
   panel.attr('class', 'panel');
   panel.attr('id', 'property-panel');
+  panel.attr('isHost', "true");
+  panel.css('width', '100%').css('height', '100%');
   return panel;
 }
 
 /**
  * コンフィギュレーション領域作成処理
- */
+ *
+ * @returns {*} panel
+*/
 function createConfigulationPanel() {
   // 背景
   var panel = $('<div>');
@@ -107,6 +171,8 @@ function createConfigulationPanel() {
 
 /**
  * フッター領域作成処理
+ * 
+ * @returns {*} panel
  */
 function createFooterPanel() {
   // 背景
@@ -131,8 +197,22 @@ function createFooterPanel() {
   propertyBtn.html('Property')
   propertyBtn.addClass('ui-button').addClass('ui-widget').addClass('ui-corner-all').css('padding', '5px').css('margin-left', '5px').css('margin-right', '5px').css('width', '110px');
   $('<span>').addClass('ui-icon').addClass('ui-icon-circlesmall-plus').appendTo(propertyBtn);
-  $(propertyBtn).on('click', function (event) {
-    toggleComponentPanel('property-button', 'right');
+  $(propertyBtn).on('click', function () {
+    if (w2ui['layout-panel'].get('right').hidden === true && $('#property-panel').attr("isHost") == "false") {
+      // 隠れているプロパティを表示する
+      destroySettingForm();
+      setPropertyAreaRtsProfile();
+      toggleComponentPanel('property-button', 'right');
+
+    } else if (w2ui['layout-panel'].get('right').hidden === false && $('#property-panel').attr("isHost") == "false") {
+      // プロパティを隠す
+      toggleComponentPanel('property-button', 'right');
+    } else if (w2ui['layout-panel'].get('right').hidden === false && $('#property-panel').attr("isHost") == "true") {
+      // ホストパネルを削除し、プロパティにしたい
+      resetPropertyAreaHostProfile();
+      setPropertyAreaRtsProfile();
+      $('#property-panel').attr('isHost', 'false');
+    }
   });
   panel.append(propertyBtn);
 
@@ -142,10 +222,42 @@ function createFooterPanel() {
   configBtn.html('Configuration')
   configBtn.addClass('ui-button').addClass('ui-widget').addClass('ui-corner-all').css('padding', '5px').css('margin-left', '5px').css('margin-right', '5px').css('width', '110px');
   $('<span>').addClass('ui-icon').addClass('ui-icon-circlesmall-minus').appendTo(configBtn);
-  $(configBtn).on('click', function (event) {
+  $(configBtn).on('click', function () {
     toggleComponentPanel('configuration-button', 'preview');
   });
   panel.append(configBtn);
+
+  // ホスト釦追加
+  var HostBtn = $('<button type="button">');
+  HostBtn.attr('id', 'host-button');
+  HostBtn.html('Host');
+  HostBtn.addClass('ui-button').addClass('ui-widget').addClass('ui-corner-all').css('padding', '5px').css('margin-left', '5px').css('margin-right', '5px').css('width', '110px');
+  $('<span>').addClass('ui-icon').addClass('ui-icon-circlesmall-minus').appendTo(HostBtn);
+  $(HostBtn).on('click', function () {
+    $(HostBtn).attr('disabled', true);
+    if (w2ui['layout-panel'].get('right').hidden === true && $('#property-panel').attr("isHost") == "false") {
+      // 隠れているホストパネルを表示する
+      $('#property-panel').attr('isHost', 'true');
+      destroySettingForm();
+      setPropertyAreaHostProfile();
+      toggleComponentPanel('host-button', 'right');
+    } else if (w2ui['layout-panel'].get('right').hidden === false && $('#property-panel').attr("isHost") == "false") {
+      // パネルはそのままでホストの内容にしたい
+      $('#property-panel').attr('isHost', 'true');
+      destroySettingForm();
+      setPropertyAreaHostProfile();
+    } else if (w2ui['layout-panel'].get('right').hidden === false && $('#property-panel').attr("isHost") == "true") {
+      // ホストパネルを削除する
+      toggleComponentPanel('host-button', 'right');
+      resetPropertyAreaHostProfile();
+      setPropertyAreaRtsProfile();
+      $('#property-panel').attr('isHost', 'false');
+    }
+    $(HostBtn).attr('disabled', false);
+
+  });
+  panel.append(HostBtn);
+
 
   // 作業領域選択
   var workspaceSelect = $('<select>');
@@ -163,6 +275,40 @@ function createFooterPanel() {
   return panel;
 }
 
+/**
+ * RTCアイコンの色を判断し、変更する処理
+ *
+ * @param {*} rtcs isRTCrunningの実行結果
+ * @returns {boolean} result
+ */
+function changeRTCIconColor(rtcs) {
+  let result = false;
+  let RtcIcons = document.getElementById('main-panel').getElementsByTagName('rect');
+  for (let i = 0; i < RtcIcons.length; i++) {
+    let breakFlag = false;
+    let RtcName = RtcIcons[i].parentNode.parentNode.getAttribute('model-id');
+    let successRtcs = rtcs['successful_RTCs'];
+    if (successRtcs !== undefined) {
+      for (let j = 0; j < successRtcs.length; j++) {
+        if (successRtcs[j].indexOf(RtcName) != -1) {
+          // 緑色にする
+          RtcIcons[i].setAttribute('fill', 'url(#GradientExec)');
+          result = true;
+          // このRTCではループ抜ける
+          breakFlag = true;
+          break;
+        }
+      }
+      if (breakFlag) {
+        continue;
+      }
+    }
+    // 成功していないRTCは青色にする
+    RtcIcons[i].setAttribute('fill', 'url(#GradientEdit)');
+  }
+  return result;
+}
+
 
 /*******************************************************************************
  * ツールバー領域
@@ -170,43 +316,80 @@ function createFooterPanel() {
 
 /**
  * ツールバーを生成する
+ * 
+ * @returns {undefined}
  */
 function setToolbarComponent() {
   $('#toolbar-panel').w2toolbar({
     name: 'toolbar',
     items: [
       {
-        type: 'menu', id: 'file-menu', caption: 'File', icon: 'fa fa-files-o',
+        type: 'menu', id: 'file-menu', text: 'File', icon: 'fa fa-files-o',
         items: [
-          { type: 'menu', id: 'save-menu', caption: 'Save All', icon: 'fa fa-floppy-o' },
-          { type: 'menu', id: 'git-menu', caption: 'Git Reposity Link', icon: 'fa fa-cloud-upload' }
+          { type: 'menu', id: 'save-menu', text: 'Save Locally', icon: 'fa fa-floppy-o' },
+          { type: 'menu', id: 'git-menu', text: 'Git Reposity Link', icon: 'fa fa-cloud-upload' }
         ]
       },
       {
-        type: 'menu', id: 'component-menu', caption: 'Component', icon: 'fa fa-laptop',
+        type: 'menu', id: 'local_component-menu', text: 'Local Component', icon: 'fa fa-laptop',
         items: [
-          { type: 'menu', id: 'build-menu', caption: 'Buid All', icon: 'fa fa-link' },
-          { type: 'menu', id: 'clean-menu', caption: 'Clean All', icon: 'fa fa-chain-broken' },
-          { type: 'menu', id: 'run-menu', caption: 'Run Package', icon: 'fa fa-play' },
-          { type: 'menu', id: 'terminate-menu', caption: 'Terminate Package', icon: 'fa fa-stop' }
+          { type: 'menu', id: 'local-build-menu', text: 'Build All', icon: 'fa fa-link' },
+          { type: 'menu', id: 'local-clean-menu', text: 'Clean All', icon: 'fa fa-chain-broken' },
+          { type: 'menu', id: 'local-run-menu', text: 'Run System', icon: 'fa fa-play' },
+          { type: 'menu', id: 'local-start-menu', text: 'Start RTCs', icon: 'fa fa-play' },
+          { type: 'menu', id: 'local-connect-menu', text: 'Connect Ports', icon: 'fa fa-arrows-h' },
+          { type: 'menu', id: 'local-activate-menu', text: 'Activate RTCs', icon: 'fa fa-play-circle' },
+          { type: 'menu', id: 'local-deactivate-menu', text: 'Deactivate RTCs', icon: 'fa fa-pause-circle' },
+          { type: 'menu', id: 'local-terminate-menu', text: 'Terminate System', icon: 'fa fa-stop' }
         ]
       },
       {
-        type: 'menu', id: 'tool-menu', caption: 'Tools', icon: 'fa fa-tasks',
+        type: 'menu', id: 'remote_component-menu', text: 'Remote Component', icon: 'fa fa-laptop',
         items: [
-          { type: 'menu', id: 'console-menu', caption: 'Open Console', icon: 'fa fa-television' },
-          { type: 'menu', id: 'dataset-menu', caption: 'Open Dataset Monitor', icon: 'fa fa-television' },
-          { type: 'menu', id: 'rtsprofile-setting', caption: 'Package Setting', icon: 'fa fa-cog' }
+          { type: 'menu', id: 'deploy-menu', text: 'Deploy', icon: 'fa fa-clone' },
+          { type: 'menu', id: 'remote-build-menu', text: 'Build All', icon: 'fa fa-link' },
+          { type: 'menu', id: 'remote-clean-menu', text: 'Clean All', icon: 'fa fa-chain-broken' },
+          { type: 'menu', id: 'remote-run-menu', text: 'Run System', icon: 'fa fa-play' },
+          { type: 'menu', id: 'remote-start-menu', text: 'Start RTCs', icon: 'fa fa-play' },
+          { type: 'menu', id: 'remote-connect-menu', text: 'Connect Ports', icon: 'fa fa-arrows-h' },
+          { type: 'menu', id: 'remote-activate-menu', text: 'Activate RTCs', icon: 'fa fa-play-circle' },
+          { type: 'menu', id: 'remote-deactivate-menu', text: 'Deactivate RTCs', icon: 'fa fa-pause-circle' },
+          { type: 'menu', id: 'remote-terminate-menu', text: 'Terminate System', icon: 'fa fa-stop' }
         ]
       },
       {
-        type: 'menu', id: 'keras-menu', caption: 'Frameworks', icon: 'fa fa-external-link',
+        type: 'menu', id: 'tool-menu', text: 'Tools', icon: 'fa fa-tasks',
         items: [
-          { type: 'menu', id: 'keras-menu', caption: 'Open Keras Editor', icon: 'fa fa-external-link' },
+          { type: 'menu', id: 'local-console-menu', text: 'Open Local Console', icon: 'fa fa-television' },
+          { type: 'menu', id: 'remote-console-menu', text: 'Open Remote Console', icon: 'fa fa-television' },
+          { type: 'menu', id: 'dataset-menu', text: 'Open Dataset Monitor', icon: 'fa fa-television' },
+          { type: 'menu', id: 'rtsprofile-setting', text: 'Package Setting', icon: 'fa fa-cog' }
+        ]
+      },
+      {
+        type: 'menu', id: 'keras-menu', text: 'Frameworks', icon: 'fa fa-external-link',
+        items: [
+          { type: 'menu', id: 'keras-menu', text: 'Open Keras Editor', icon: 'fa fa-external-link' },
+        ]
+      },
+      {
+        type: 'menu', id: 'binder-menu', text: 'Binder', icon: 'fa fa-external-link',
+        items: [
+          { type: 'menu', id: 'create-binder', text: 'Create Binder', icon: 'fa fa-plus' },
+        ]
+      },
+      {
+        type: 'menu', id: 'help-menu', text: 'Help', icon: 'fa fa-external-link',
+        items: [
+          { type: 'menu', id: 'airgraph-version', text: 'AirGraph Version', icon: 'fa fa-info' },
+          { type: 'menu', id: 'wasanbon-version', text: 'wasanbon Version', icon: 'fa fa-info' },
+
         ]
       },
       { type: 'spacer' },
-      { type: 'button', id: 'current-state', caption: 'Mode : Edit', icon: 'fa fa-info-circle' }
+      { type: 'button', id: 'package-sync', text: 'Package: Unknown', icon: 'fa fa-info-circle', tooltip: 'Unknown' },
+      { type: 'button', id: 'rtc-sync', text: 'RTCs: Unknown', icon: 'fa fa-info-circle', tooltip: 'Unknown' },
+      { type: 'button', id: 'current-state', text: 'Mode : Edit', icon: 'fa fa-info-circle' }
     ],
     onClick: function (event) {
       // クリックされた時のイベント
@@ -215,41 +398,175 @@ function setToolbarComponent() {
           case 'save-menu':
             // 保存
             updatePackage(true);
+            //textタグを表示
+            reloadAssignedHostName(true);
             break;
           case 'git-menu':
             // Git連携
             openPackageGitCommitPushPopup();
             break;
-          case 'build-menu':
+          case 'local-build-menu':
             // ビルド
             if (mainRtsMap[curWorkspaceName]) {
-              buildPackageAll(curWorkspaceName);
-              // コンソール表示
-              openConsoleLog();
+              // defaultSystem.xmlのpathuriの値をローカルに変更する
+              changeAllPathUriIntoLocalhost();
+              buildPackageAll('dev', curWorkspaceName, ['local']);
             }
             break;
-          case 'clean-menu':
+          case 'local-clean-menu':
             // ビルド
             if (mainRtsMap[curWorkspaceName]) {
-              cleanPackageAll(curWorkspaceName);
-              // コンソール表示
-              openConsoleLog();
+              cleanPackageAll('dev', curWorkspaceName, ['local']);
             }
             break;
-          case 'run-menu':
+          case 'local-run-menu':
             // 実行
             if (mainRtsMap[curWorkspaceName]) {
-              runPackage(curWorkspaceName);
-              // コンソール表示
-              openConsoleLog();
+              changeAllPathUriIntoLocalhost();
+              runSystem('dev', curWorkspaceName, ['local']);
             }
             break;
-          case 'terminate-menu':
+          case 'local-start-menu':
+            // 起動
+            if (mainRtsMap[curWorkspaceName]) {
+              changeAllPathUriIntoLocalhost();
+              startRtcs('dev', curWorkspaceName, ['local']);
+            }
+            break;
+          case 'local-connect-menu':
+            // ポート接続
+            if (mainRtsMap[curWorkspaceName]) {
+              connectPorts('dev', curWorkspaceName, 'local');
+              // コンソール表示
+              openLocalConsoleLog();
+
+            }
+            break;
+          case 'local-activate-menu':
+            // アクティベイト
+            if (mainRtsMap[curWorkspaceName]) {
+              activateOrDeactivateRtcs(true, 'dev', curWorkspaceName, 'local');
+              // コンソール表示
+              openLocalConsoleLog();
+
+            }
+            break;
+          case 'local-deactivate-menu':
+            // ディアクティベイト
+            if (mainRtsMap[curWorkspaceName]) {
+              activateOrDeactivateRtcs(false, 'dev', curWorkspaceName, 'local');
+              // コンソール表示
+              openLocalConsoleLog();
+            }
+            break;
+          case 'local-terminate-menu':
             // 停止
             if (mainRtsMap[curWorkspaceName]) {
-              terminatePackage(curWorkspaceName);
+              terminateSystem('dev', curWorkspaceName, ['local']);
+            }
+            break;
+          case 'deploy-menu':
+            // デプロイ
+            deployAllRtcs();
+            break;
+          case 'remote-build-menu':
+            // ビルド
+            if (mainRtsMap[curWorkspaceName]) {
+              buildPackageAll('exec', curWorkspaceName, gatherAssignedHost());
+            }
+            break;
+          case 'remote-clean-menu':
+            // クリーン
+            if (mainRtsMap[curWorkspaceName]) {
+              cleanPackageAll('exec', curWorkspaceName, gatherAssignedHost());
+            }
+            break;
+          case 'remote-run-menu':
+            // 実行
+            if (mainRtsMap[curWorkspaceName]) {
+              runSystem('exec', curWorkspaceName, gatherAssignedHost());
+            }
+            break;
+          case 'remote-start-menu':
+            // 起動
+            if (mainRtsMap[curWorkspaceName]) {
+              startRtcs('exec', curWorkspaceName, gatherAssignedHost());
+            }
+            break;
+          case 'remote-connect-menu':
+            // ポート接続
+            if (mainRtsMap[curWorkspaceName]) {
+
+              // main-panelからrtcを一つ選び、それに割り当てられているホストを確認する
+              let rtc = document.getElementById('main-panel').getElementsByTagName('rect')[0];
+              let assignedHost = rtc.parentElement.getElementsByClassName('AssignedHost')[0];
+
+              let hostId;
+
+              // 割り当てられていなかったら、hostId = 'local'
+              if (assignedHost.textContent == 'Host: null') {
+                hostId = 'local';
+              }
+              else {
+                // hostIDを取得
+                let splitedId = assignedHost.getAttribute('id').split('-');
+                hostId = splitedId[5];
+              }
+
+              connectPorts('exec', curWorkspaceName, hostId);
+
               // コンソール表示
-              openConsoleLog();
+              openRemoteConsoleLog();
+            }
+            break;
+          case 'remote-activate-menu':
+            // アクティベイト
+            if (mainRtsMap[curWorkspaceName]) {
+              let hostId;
+
+              // main-pamelからRTCを一つ取り出し、それから割り当てられたホストの情報を取得する
+              let rtc = document.getElementById('main-panel').getElementsByTagName('rect')[0];
+              let assignedHost = rtc.parentElement.getElementsByClassName('AssignedHost')[0];
+              // 割り当てられていなかったら、hostId = 'local'
+              if (assignedHost.textContent == 'Host: null') {
+                hostId = 'local';
+              }
+              else {
+                // hostIDを取得
+                let splitedId = assignedHost.getAttribute('id').split('-');
+                hostId = splitedId[5];
+              }
+              activateOrDeactivateRtcs(true, 'exec', curWorkspaceName, hostId);
+              // コンソール表示
+              openRemoteConsoleLog();
+            }
+            break;
+          case 'remote-deactivate-menu':
+            // ディアクティベイト
+            if (mainRtsMap[curWorkspaceName]) {
+              let hostId;
+
+              // main-pamelからRTCを一つ取り出し、それから割り当てられたホストの情報を取得する
+              let rtc = document.getElementById('main-panel').getElementsByTagName('rect')[0];
+              let assignedHost = rtc.parentElement.getElementsByClassName('AssignedHost')[0];
+              // 割り当てられていなかったら、hostId = 'local'
+              if (assignedHost.textContent == 'Host: null') {
+                hostId = 'local';
+              }
+              else {
+                // hostIDを取得
+                let splitedId = assignedHost.getAttribute('id').split('-');
+                hostId = splitedId[5];
+              }
+              activateOrDeactivateRtcs(false, 'exec', curWorkspaceName, hostId);
+              // コンソール表示
+              openRemoteConsoleLog();
+            }
+            break;
+          case 'remote-terminate-menu':
+            // 停止
+            if (mainRtsMap[curWorkspaceName]) {
+              terminateSystem('exec', curWorkspaceName, gatherAssignedHost());
             }
             break;
           case 'rtsprofile-setting':
@@ -258,9 +575,13 @@ function setToolbarComponent() {
               openPackageProfileSetting();
             }
             break;
-          case 'console-menu':
+          case 'local-console-menu':
             // コンソール表示
-            openConsoleLog();
+            openLocalConsoleLog();
+            break;
+          case 'remote-console-menu':
+            // コンソール表示
+            openRemoteConsoleLog();
             break;
           case 'dataset-menu':
             // データセットモニタ
@@ -269,6 +590,18 @@ function setToolbarComponent() {
           case 'keras-menu':
             // Keras表示
             openKerasEditor();
+            break;
+          case 'create-binder':
+            // Create Binderダイアログ表示
+            openCreateBinderPopup();
+            break;
+          case 'airgraph-version':
+            //airgraphサーバーにversionを確認する
+            w2alert('AirGraph Version: ' + getAirgraphVersion());
+            break;
+          case 'wasanbon-version':
+            //APIを実行しwasanbon versionを確認する
+            w2alert('wasanbon Version: ' + getWasanbonVersion('local'));
             break;
           default:
             // NOP
@@ -280,9 +613,43 @@ function setToolbarComponent() {
 }
 
 /**
+ * デプロイする
+ * 
+ * @returns {undefined}
+ */
+function deployAllRtcs() {
+  // rtsProfileのremote repositoryを取得する
+  if (mainRtsMap[curWorkspaceName]) {
+    checkPackageStatus('dev', curWorkspaceName).done(function (res) {
+      if (!res || res.indexOf('Up-to-date') == -1) {
+        let msg = 'Deploy cannot be done because changes remain in this Package(Status: ' + res + ').<br><br>Push your changes to the repository.';
+        openCreateDeployPopup(msg);
+        return;
+      }
+      let remoteRepositoryUrl = mainRtsMap[curWorkspaceName].modelProfile.remoteUrl;
+
+      let packageName = curWorkspaceName.replace('rts_', '');
+      // airgraphサーバーのpackageディレクトリ内の.gitディレクトリから、commit_hashを取り出す
+      let commitHash = getCommitHash(packageName);
+
+      // 改行文字を削除する
+      commitHash = commitHash.replace('\n', '');
+      remoteRepositoryUrl = remoteRepositoryUrl.replace('\n', '');
+
+      // rtcに割り当てられているホストのIDをすべて集める
+      let assignedHostList = gatherAssignedHost();
+
+      //すべてのホストに対して、実行する
+      deploy(assignedHostList, 'exec', remoteRepositoryUrl, commitHash);
+    });
+  }
+  setState(STATE.EDIT);
+}
+
+/**
  * 作業領域の選択肢を設定する
  * 
- * @returns
+ * @returns {undefined}
  */
 function setWorkspaceSelectMenu() {
   if (curWorkspaceName && mainRtsMap) {
@@ -301,13 +668,16 @@ function setWorkspaceSelectMenu() {
 }
 
 /**
- * コンソールを表示する
+ * ローカルコンソールを表示する
  * 
- * @returns
+ * @returns {undefined}
  */
-function openConsoleLog() {
+function openLocalConsoleLog() {
+
+  destroySettingForm();
+
   // ログ監視を開始する
-  startTailLog();
+  startLocalTailLog();
 
   // コードエディタをポップアップ表示する
   w2popup.open({
@@ -319,7 +689,7 @@ function openConsoleLog() {
     onOpen: function (event) {
       event.onComplete = function () {
         $('#w2ui-popup #console-viewer-div').w2layout({
-          name: 'layout-panel-console-viewer',
+          name: 'layout-panel-local-console-viewer',
           padding: 0,
           panels: [
             { type: 'left', size: '50%', resizable: true, overflow: 'hidden', content: $('#wasanbon-log') },
@@ -331,29 +701,29 @@ function openConsoleLog() {
     },
     onMax: function (event) {
       event.onComplete = function () {
-        w2ui['layout-panel-console-viewer'].resize();
+        w2ui['layout-panel-local-console-viewer'].resize();
       }
     },
     onMin: function (event) {
       event.onComplete = function () {
-        w2ui['layout-panel-console-viewer'].resize();
+        w2ui['layout-panel-local-console-viewer'].resize();
       }
     },
     onClose: function (event) {
       // ログ監視を停止する
-      stopTailLog();
+      stopLocalTailLog();
 
-      w2ui['layout-panel-console-viewer'].destroy();
+      w2ui['layout-panel-local-console-viewer'].destroy();
 
       var wasanbonLogDiv = $('<div>');
       wasanbonLogDiv.attr('id', 'wasanbon-log');
       wasanbonLogDiv.css('height', '100%').css('width', '99%');
       wasanbonLogDiv.appendTo('#wasanbon-log-parent');
 
-      var wasanbonLogDiv = $('<div>');
-      wasanbonLogDiv.attr('id', 'python-log');
-      wasanbonLogDiv.css('height', '100%').css('width', '99%');
-      wasanbonLogDiv.appendTo('#python-log-parent');
+      var pythonLogDiv = $('<div>');
+      pythonLogDiv.attr('id', 'python-log');
+      pythonLogDiv.css('height', '100%').css('width', '99%');
+      pythonLogDiv.appendTo('#python-log-parent');
 
       createLogViewer();
     },
@@ -367,10 +737,156 @@ function openConsoleLog() {
 }
 
 /**
+ * リモートコンソールを表示する
+ * 
+ * @returns {undefined}
+ */
+function openRemoteConsoleLog() {
+
+  // コードエディタをポップアップ表示する
+  w2popup.open({
+    title: 'Remote Log Console',
+    width: 800,
+    height: 600,
+    showMax: true,
+    body: '<div id="remote-log-console-viewer-div" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px;"></div>',
+    onOpen: function (event) {
+      event.onComplete = function () {
+        $('#w2ui-popup #remote-log-console-viewer-div').w2layout({
+          name: 'layout-panel-console-viewer',
+          padding: 0,
+          panels: [
+            {
+              type: 'top', size: '5%', overflow: 'hidden',
+              tabs: [
+              ],
+            },
+            {
+              type: 'main', size: '50%', resizable: true, overflow: 'hidden',
+              content: createRemoteLogLayout(),
+            },
+            { type: 'bottom', size: 30, content: '<button id="remote-log-update-button" type="button" onclick="updateRemoteLog()">Update</button>' }
+          ]
+        });
+
+        // 釦を変更する
+        $('#remote-log-update-button').addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('width', '90px').css('font-size', '1.0em');
+
+        // 実行時のwasanbon.logを表示
+        getExecuteWasanbonLog(function(content){
+          // 実行時のwasanbon.logを表示
+          addRemoteLogTab("", "wasanbon.log", content);
+        });
+
+        // rtcに割り当てられているホストのIDをすべて集める
+        let assignedHostList = gatherAssignedHost();
+
+        //すべてのホストに対して、ログを取得する
+        for (let i = 0; i < assignedHostList.length; i++) {
+          remoteTailLog(assignedHostList[i]);
+        }
+      }
+    },
+    onMax: function (event) {
+      event.onComplete = function () {
+        w2ui['layout-panel-console-viewer'].resize();
+      }
+    },
+    onMin: function (event) {
+      event.onComplete = function () {
+        w2ui['layout-panel-console-viewer'].resize();
+      }
+    },
+    onClose: function () {
+      // ログ監視を停止する
+      stopTailLog();
+
+      w2ui['layout-panel-console-viewer'].destroy();
+    },
+    onKeydown: function (event) {
+      // ESCAPE key pressed
+      if (event.originalEvent.keyCode == 27) {
+        event.preventDefault()
+      }
+    }
+  });
+}
+
+/**
+ * ログ表示部分作成
+ * 
+ * @returns {*} panel
+ */
+function createRemoteLogLayout() {
+  var panel = $('<div>');
+  panel.attr('class', 'panel');
+  panel.attr('id', 'log-panel');
+  panel.css('width', '100%').css('height', '100%').css('background-color', '#fff');
+  return panel;
+}
+
+/**
  * Keras表示
+ * 
+ * @returns {undefined}
  */
 function openKerasEditor() {
   window.open(getUrlKerasMain());
+}
+
+/**
+ * 全リモートホストからログを取得
+ * 
+ * @returns {undefined}
+ */
+function updateRemoteLog() {
+
+  // リモートログダイアログの要素をすべて破棄
+  while (document.getElementById('log-panel').firstChild) {
+    document.getElementById('log-panel').removeChild(document.getElementById('log-panel').firstChild);
+  }
+  let remoteLogTabs = document.getElementsByName('layout-panel-console-viewer_top_tabs')[0].children[0].children;
+  for (let i = 1; i < remoteLogTabs.length - 1; i++) {
+    remoteLogTabs[i].remove();
+  }
+  w2ui['layout-panel-console-viewer'].refresh();
+  // 釦を変更する
+  $('#remote-log-update-button').addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('width', '90px').css('font-size', '1.0em');
+
+  // 実行時のwasanbon.logを表示
+  getExecuteWasanbonLog(function(content){
+    // 実行時のwasanbon.logを表示
+    addRemoteLogTab("", "wasanbon.log", content);
+  });
+
+  // rtcに割り当てられているホストのIDをすべて集める
+  let assignedHostList = gatherAssignedHost();
+
+  //すべてのホストに対して、ログを取得する
+  for (let i = 0; i < assignedHostList.length; i++) {
+    remoteTailLog(assignedHostList[i]);
+  }
+
+}
+
+/**
+ * rtcに割り当てられているホストのIDをすべて集める
+ * 
+ * @returns {Array} rtcに割り当てられているホストのID
+ */
+function gatherAssignedHost() {
+  let assignedHostList = [];
+  let RTCs = document.getElementById('main-panel').getElementsByTagName('rect');
+  for (let i = 0; i < RTCs.length; i++) {
+    let assignedHost = RTCs[i].parentElement.getElementsByClassName('AssignedHost')[0];
+    let ids = assignedHost.getAttribute('id').split('-');
+    let hostId = ids[5];
+    // 重複していなければ追加
+    if (!assignedHostList.includes(hostId)) {
+      assignedHostList.push(hostId);
+    }
+  }
+  return assignedHostList;
 }
 
 /*******************************************************************************
@@ -380,6 +896,7 @@ function openKerasEditor() {
 /**
  * コンポーネント領域設定処理
  * 
+ * @returns {undefined}
  */
 function setComponentAreaInfo() {
   // 検索用文字列取得
@@ -403,7 +920,7 @@ function setComponentAreaInfo() {
   searchBtn.attr('id', 'component-search-button');
   searchBtn.addClass('ui-button').addClass('ui-widget').addClass('ui-corner-all').css('padding', '3px');
   $('<span>').addClass('ui-icon').addClass('ui-icon-search').appendTo(searchBtn);
-  $(searchBtn).on('click', function (event) {
+  $(searchBtn).on('click', function () {
     setComponentAreaInfo();
   });
   searchDiv.append(searchBtn);
@@ -443,7 +960,7 @@ function setComponentAreaInfo() {
   }
   var rtss = $('#component-panel rect[model-type = RTS]');
   if (rtss && rtss.length > 0) {
-    for (var i = 0; i < rtss.length; i++) {
+    for (let i = 0; i < rtss.length; i++) {
 
       if ($($(rtss[i]).parents('#graph-component-workspace')).length > 0) {
         // workspace
@@ -452,7 +969,7 @@ function setComponentAreaInfo() {
           $(rtss[i]).attr('fill', 'pink');
         }
       } else {
-        var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', 4);
         text.setAttribute('y', 15);
         text.setAttribute('font-size', 16);
@@ -466,7 +983,7 @@ function setComponentAreaInfo() {
 
   // UbuntuChrome対応でポートの位置を再描画する
   if ($('.joint-port', '#graph-Rtc')) {
-    for (var i = 0; i < $('.joint-port', '#graph-Rtc').length; i++) {
+    for (let i = 0; i < $('.joint-port', '#graph-Rtc').length; i++) {
       $('.joint-port', '#graph-Rtc')[i].setAttribute('transform', $('.joint-port', '#graph-Rtc')[i].getAttribute('transform'));
     }
   }
@@ -475,9 +992,10 @@ function setComponentAreaInfo() {
 /**
  * コンポーネント領域のアコーディオン作成処理
  * 
- * @param 領域情報
- * @param 親領域名称
- * @param 検索文字列
+ * @param {*} tabs 領域情報
+ * @param {*} parentName 親領域名称
+ * @param {*} targetName 検索文字列
+ * @returns {*} コンポーネント領域のアコーディオン
  */
 function createCompornentAccordion(tabs, parentName, targetName) {
   // アコーディオン親
@@ -520,6 +1038,8 @@ function createCompornentAccordion(tabs, parentName, targetName) {
 
 /**
  * 作業領域情報からコンポーネント領域のアコーディオン作成処理
+ * 
+ * @returns {*} コンポーネント領域のアコーディオン
  */
 function createCompornentAccordionForWorkspace() {
   // アコーディオン親
@@ -548,13 +1068,19 @@ function createCompornentAccordionForWorkspace() {
 /**
  * コンポーネントGraph領域作成処理
  * 
- * @param 親DIVタグ
+ * @param {*} areaElm areaElm
+ * @param {*} rtsystems rtsystems
+ * @param {*} rtcomponents rtcomponents
+ * @param {*} isWork すでに作成したワークスペースかどうか
+ * @param {*} isNew 新規作成か
+ * @param {*} targetName targetName
+ * @returns {undefined}
  */
 function createComponentGraphArea(areaElm, rtsystems, rtcomponents, isWork, isNew, targetName) {
   // 不正なデータを除外する
   var rtss = [];
   if (rtsystems && rtsystems.length > 0) {
-    for (var i = 0; i < rtsystems.length; i++) {
+    for (let i = 0; i < rtsystems.length; i++) {
       if (rtsystems[i].modelProfile.modelId) {
         rtss.push(rtsystems[i]);
       }
@@ -562,7 +1088,7 @@ function createComponentGraphArea(areaElm, rtsystems, rtcomponents, isWork, isNe
   }
   var rtcs = [];
   if (rtcomponents && rtcomponents.length > 0) {
-    for (var i = 0; i < rtcomponents.length; i++) {
+    for (let i = 0; i < rtcomponents.length; i++) {
       if (rtcomponents[i].modelProfile.modelId) {
         rtcs.push(rtcomponents[i]);
       }
@@ -575,7 +1101,7 @@ function createComponentGraphArea(areaElm, rtsystems, rtcomponents, isWork, isNe
 
   // 表示対象のものだけ表示するため、個数を調べる
   if (rtss && rtss.length > 0) {
-    for (var i = 0; i < rtss.length; i++) {
+    for (let i = 0; i < rtss.length; i++) {
       if (isWork || isNew || targetName == '' || rtss[i].modelProfile.modelName.toUpperCase().indexOf(targetName.toUpperCase()) >= 0) {
         rtssSize++;
         allSize++;
@@ -583,7 +1109,7 @@ function createComponentGraphArea(areaElm, rtsystems, rtcomponents, isWork, isNe
     }
   }
   if (rtcs && rtcs.length > 0) {
-    for (var i = 0; i < rtcs.length; i++) {
+    for (let i = 0; i < rtcs.length; i++) {
       if (isNew || targetName == '' || rtcs[i].modelProfile.modelName.toUpperCase().indexOf(targetName.toUpperCase()) >= 0) {
         allSize++;
       }
@@ -603,7 +1129,7 @@ function createComponentGraphArea(areaElm, rtsystems, rtcomponents, isWork, isNe
 
   var rtcCounter = 0;
   if (rtcs && rtcs.length > 0) {
-    for (var i = 0; i < rtcs.length; i++) {
+    for (let i = 0; i < rtcs.length; i++) {
       if (isNew || targetName == '' || rtcs[i].modelProfile.modelName.toUpperCase().indexOf(targetName.toUpperCase()) >= 0) {
         // 表示対象
 
@@ -622,15 +1148,15 @@ function createComponentGraphArea(areaElm, rtsystems, rtcomponents, isWork, isNe
 
   var rtsCounter = 0;
   if (rtss && rtss.length > 0) {
-    for (var i = 0; i < rtss.length; i++) {
+    for (let i = 0; i < rtss.length; i++) {
       if (isWork || isNew || targetName == '' || rtss[i].modelProfile.modelName.toUpperCase().indexOf(targetName.toUpperCase()) >= 0) {
         // 表示対象
 
         // 描画オブジェクト作成
         if (isWork) {
-          graph.addCell(createRtsystemViewObject(rtss[i].modelProfile.modelId, rtss[i].rtsProfile.id.split(':')[2], 10, rtsCounter * 35 + 10));
+          graph.addCell(createRtsystemViewObject(rtss[i].modelProfile.modelId, rtss[i].modelProfile.modelName, 10, rtsCounter * 35 + 10, isWork));
         } else {
-          graph.addCell(createRtsystemViewObject(rtss[i].modelProfile.modelId, rtss[i].modelProfile.modelName, 10, rtsCounter * 35 + 10));
+          graph.addCell(createRtsystemViewObject(rtss[i].modelProfile.modelId, rtss[i].modelProfile.modelName, 10, rtsCounter * 35 + 10, isWork));
         }
 
         if (isWork === false) {
@@ -657,7 +1183,7 @@ function createComponentGraphArea(areaElm, rtsystems, rtcomponents, isWork, isNe
 /**
  * 作業Graph領域作成処理
  * 
- * @param 親DIVタグ
+ * @returns {*} 作業Graph領域作成
  */
 function createMainGraphArea() {
   mainGraph = new joint.dia.Graph;
@@ -709,11 +1235,11 @@ function createMainGraphArea() {
 /**
  * 接続可能なポートかをチェックする
  * 
- * @param cellViewS
- * @param magnetS
- * @param cellViewT
- * @param magnetT
- * @returns
+ * @param {*} cellViewS cellViewS
+ * @param {*} magnetS magnetS
+ * @param {*} cellViewT cellViewT
+ * @param {*} magnetT magnetT
+ * @returns {boolean} 接続可能なポートかどうか
  */
 function validateConnection(cellViewS, magnetS, cellViewT, magnetT) {
   var result = true;
@@ -744,7 +1270,7 @@ function validateConnection(cellViewS, magnetS, cellViewT, magnetT) {
 /**
  * 作業領域イベント関連付
  * 
- * @returns
+ * @returns {undefined}
  */
 function setEventMainPaper() {
   // コンポーネントマウスダウン
@@ -782,6 +1308,12 @@ function setEventMainPaper() {
       setPropertyAreaRtsProfile();
     } else {
       // コンポーネントのクリック
+
+      //ホスト領域のブロック削除
+      if ($('#property-panel').attr("isHost") == "true") {
+        resetPropertyAreaHostProfile();
+        $('#property-panel').attr('isHost', 'false');
+      }
       // コンフィギュレーション設定
       setComponentGridData(cellView.model.attributes.componentId);
       // RtcProfile設定エリア表示
@@ -823,6 +1355,11 @@ function setEventMainPaper() {
     // コンフィギュレーション設定の削除
     clearComponentGridData();
     clearConfigurationGridData();
+    //ホスト領域のブロック削除
+    if ($('#property-panel').attr("isHost") == "true") {
+      resetPropertyAreaHostProfile();
+      $('#property-panel').attr('isHost', 'false');
+    }
     // RtsProfile設定エリア表示
     setPropertyAreaRtsProfile();
   });
@@ -855,8 +1392,8 @@ function setEventMainPaper() {
 /**
  * 作業領域をすべて展開する
  * 
- * @param rtsList
- * @returns
+ * @param {*} rtsList rtsのリスト
+ * @returns {undefined}
  */
 function loadAllPackagesWorkspace(rtsList) {
   for (var i = 0; i < rtsList.length; i++) {
@@ -870,14 +1407,15 @@ function loadAllPackagesWorkspace(rtsList) {
     if (curWorkspaceName === rtsList[i].modelProfile.modelId) {
       // 現在の作業領域と同じ場合は展開する
 
+      loadPackageWorkspace(100, 100, rtsList[i]);
       // 実行状況を確認しておく
-      if (isRunningPackage(curWorkspaceName)) {
+      if (changeRTCIconColor(isRunningPackage('dev', curWorkspaceName, 'local'))) {
+        // 一つでも起動中のRTCがあるなら
         setState(STATE.EXEC);
-      } else {
+      }
+      else {
         setState(STATE.EDIT);
       }
-
-      loadPackageWorkspace(100, 100, rtsList[i]);
     } else {
       // それ以外の場合はMapに追加するのみ
       mainRtsMap[rtsList[i].modelProfile.modelId] = $.extend(true, {}, rtsList[i]);
@@ -886,7 +1424,7 @@ function loadAllPackagesWorkspace(rtsList) {
   // 作業領域選択コンボ設定
   setWorkspaceSelectMenu();
   // RtsProfile設定領域表示
-  setPropertyAreaRtsProfile();
+  setPropertyAreaHostProfile();
   // コンポーネント領域再描画
   setComponentAreaInfo();
 }
@@ -894,25 +1432,31 @@ function loadAllPackagesWorkspace(rtsList) {
 /**
  * 作業領域を再展開する
  * 
- * @param posXDef
- * @param posYDef
- * @param rtsystem
- * @returns
+ * @param {*} posXDef posXDef
+ * @param {*} posYDef posYDef
+ * @param {*} rtsystem rtsystem
+ * @returns{*} null
  */
 function reloadPackageWorkspace(posXDef, posYDef, rtsystem) {
   // 一旦画面からすべてを削除
   deleteAllComponentsViewObject();
   // 作業領域再読み込み
   loadPackageWorkspace(posXDef, posYDef, rtsystem);
+
+  // RTC割り当て領域を更新
+  updateRTCDataToHostAssignArea();
+
+  // セレクトボックス・RTCアイコン上のホスト名を更新する
+  reloadAssignedHostName(true);
 }
 
 /**
  * 作業領域を展開する
  * 
- * @param posXDef
- * @param posYDef
- * @param rtsystem
- * @returns
+ * @param {*} posXDef posXDef
+ * @param {*} posYDef posYDef
+ * @param {*} rtsystem rtsystem
+ * @returns{*} null
  */
 function loadPackageWorkspace(posXDef, posYDef, rtsystem) {
   // Mapに追加する
@@ -992,11 +1536,11 @@ function loadPackageWorkspace(posXDef, posYDef, rtsystem) {
 /**
  * コンポーネント領域から作業領域へのドラッグ処理
  * 
- * @param cellView
- * @param e
- * @param x
- * @param y
- * @returns
+ * @param {*}  cellView cellView
+ * @param {*} e e
+ * @param {*} x x
+ * @param {*} y y
+ * @returns {undefined}
  */
 function dragComponent(cellView, e, x, y) {
   // Drag用のオブジェクトを追加する
@@ -1012,6 +1556,7 @@ function dragComponent(cellView, e, x, y) {
   var pos = cellView.model.position();
   var offset = { x: x - pos.x, y: y - pos.y };
   var targetId = cellView.model.id;
+  var isWork = cellView.model.attributes.isWork;
 
   flyShape.position(10, 10);
   flyGraph.addCell(flyShape);
@@ -1030,7 +1575,7 @@ function dragComponent(cellView, e, x, y) {
 
     if (x > target.left && x < target.left + $('#main-joint-area').width() && y > target.top && y < target.top + $('#main-panel').height()) {
       // 対象の領域内でマウスが離された場合
-      dropComponent(x, y, offset, target, targetId);
+      dropComponent(x, y, offset, target, targetId, isWork);
     }
     // イベントを解除
     $('body').off('mousemove.fly').off('mouseup.fly');
@@ -1039,37 +1584,39 @@ function dragComponent(cellView, e, x, y) {
     flyShape.remove();
     $('#flyPaper').remove();
   });
-};
+}
 
 /**
  * コンポーネント領域から作業領域へのドロップ処理
  * 
- * @param x
- * @param y
- * @param offset
- * @param target
- * @param modelId
- * @returns
+ * @param {*} x x
+ * @param {*} y y
+ * @param {*} offset offset
+ * @param {*} target target
+ * @param {*} modelId modelId
+ * @param {*} isWork すでに作成したワークスペースかどうか
+ * @returns {undefined}
  */
-function dropComponent(x, y, offset, target, modelId) {
-  if (modelId.indexOf('rts_work') == 0) {
-    // 作業領域をドロップされた場合
+function dropComponent(x, y, offset, target, modelId, isWork) {
+
+  // 作業領域をドロップした
+  if (isWork) {
     curWorkspaceName = modelId;
     // 作業領域再読み込み
     reloadAllWorkspace();
-  } else if (modelId.indexOf('rts') == 0) {
-    // RTSをドロップされた場合
-
+  }
+  // packageをドロップした
+  else if (systemMap[modelId] != undefined) {
     // 新規パッケージ作成
     openNewPackageProfileSetting(modelId);
-
-  } else if (modelId.indexOf('rtc') == 0) {
+  }
+  // RTCをドロップした
+  else if (modelId.indexOf('rtc') == 0) {
     // RTCをドロップされた場合
     if (curState != STATE.EDIT) {
       w2alert('実行中はシステム構成を変更できません');
       return;
     }
-
     if (modelId.indexOf('rtc_blank') == 0) {
       // 新規コンポーネント作成
       openNewRtcProfileSettingPopup(modelId);
@@ -1078,13 +1625,13 @@ function dropComponent(x, y, offset, target, modelId) {
       addComponent(modelId);
     }
   }
-};
+}
 
 /**
  * 次の作業領域名を取得する
  * 
- * @param workspaceName
- * @returns
+ * @param {*} workspaceName ワークスペース名
+ * @returns {string} ワークスペース名
  */
 function getNextWorkspaceName(workspaceName) {
   var result = workspaceName;
@@ -1098,8 +1645,8 @@ function getNextWorkspaceName(workspaceName) {
 /**
  * 作業エリアの状態を設定する
  * 
- * @param nextState
- * @returns
+ * @param {*} nextState 現在の作業エリアの状態
+ * @returns {undefined}
  */
 function setState(nextState) {
   // 状態を更新
@@ -1122,18 +1669,18 @@ function setState(nextState) {
 
   // 表記を変更
   if (curState === STATE.INIT) {
-    w2ui['toolbar'].set('current-state', { caption: 'Mode : Init' });
+    w2ui['toolbar'].set('current-state', { text: 'Mode : Init' });
   } else if (curState === STATE.EDIT) {
-    w2ui['toolbar'].set('current-state', { caption: 'Mode : Edit' });
+    w2ui['toolbar'].set('current-state', { text: 'Mode : Edit' });
   } else if (curState === STATE.EXEC) {
-    w2ui['toolbar'].set('current-state', { caption: 'Mode : Exec' });
+    w2ui['toolbar'].set('current-state', { text: 'Mode : Exec' });
   }
 }
 
 /**
  * 選択状態を解除する
  * 
- * @returns
+ * @returns {undefined}
  */
 function unHighLightAll() {
   for (var i = 0; i < selectedCellViews.length; i++) {
@@ -1145,7 +1692,7 @@ function unHighLightAll() {
 /**
  * 画面をロックする
  * 
- * @returns
+ * @returns {undefined}
  */
 function lockScreen() {
   if (lockCnt === 0) {
@@ -1157,7 +1704,7 @@ function lockScreen() {
 /**
  * 画面のロックを解除する
  * 
- * @returns
+ * @returns {undefined}
  */
 function unlockScreen() {
   lockCnt--;
@@ -1170,9 +1717,10 @@ function unlockScreen() {
 /**
  * プロパティ領域にRtsProfileの設定Formを表示する
  * 
- * @returns
+ * @returns {undefined}
  */
 function setPropertyAreaRtsProfile() {
+  destroySettingForm();
   if (curWorkspaceName && mainRtsMap) {
     // RtsProfile設定Formを設定する
     $('#property-panel').w2form(createRtsProfileSettingForm(mainRtsMap[curWorkspaceName].rtsProfile, mainRtsMap[curWorkspaceName].modelProfile, true, true));
@@ -1184,10 +1732,11 @@ function setPropertyAreaRtsProfile() {
 /**
  * プロパティ領域にRtcProfileの設定Formを表示する
  * 
- * @param componentId
- * @returns
+ * @param {*} componentId コンポーネントID コンポーネントID
+ * @returns {undefined}
  */
 function setPropertyAreaRtcProfile(componentId) {
+  destroySettingForm();
   // RtsProfile設定Formを設定する
   var rtc = null;
   var rtcIndex = 0;
@@ -1202,8 +1751,121 @@ function setPropertyAreaRtcProfile(componentId) {
   }
   $('#property-panel').w2form(createRtcProfileSettingForm(rtc, rtcIndex, true, true));
   // 釦を変更する
-  $($('.w2ui-buttons').children()[0]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('width', '120px').css('font-size', '1.2em');
-  $($('.w2ui-buttons').children()[1]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('width', '140px').css('font-size', '1.2em');
+  $($('.w2ui-buttons').children()[0]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('width', '150px').css('font-size', '1.2em');
+  $($('.w2ui-buttons').children()[1]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('width', '150px').css('font-size', '1.2em');
+}
+
+/**
+ * プロパティ領域にHost設定画面を表示する
+ * 
+ * @returns {undefined}
+ */
+function setPropertyAreaHostProfile() {
+  destroySettingForm();
+
+  $('#property-panel').attr('isHost', 'true');
+  // ホスト追加領域
+  let propertyAddHostDiv = $('<div>');
+  propertyAddHostDiv.attr('id', 'property-add-host-div');
+  propertyAddHostDiv.addClass('host-area-div');
+  propertyAddHostDiv.css('position', 'relative');
+  $('#property-panel').append(propertyAddHostDiv);
+
+  // ホスト一覧領域
+  let propertyHostListDiv = $('<div>');
+  propertyHostListDiv.attr('id', 'property-host-list-div');
+  propertyHostListDiv.addClass('host-area-div');
+  propertyHostListDiv.css('position', 'relative');
+  $('#property-panel').append(propertyHostListDiv);
+
+  // ホスト割り当て領域
+  let propertyHostAssignDiv = $('<div>');
+  propertyHostAssignDiv.attr('id', 'property-host-assign-div');
+  propertyHostAssignDiv.addClass('host-area-div');
+  propertyHostAssignDiv.css('position', 'relative');
+  $('#property-panel').append(propertyHostAssignDiv);
+
+  // HostProfile設定Formを設定する
+  $('#property-add-host-div').w2form(createHostSettingForm());
+  
+  //Host List を設定する
+  $('#property-host-list-div').w2form(createHostListForm());
+
+  //Assign Host to RTCs を設定する
+  $('#property-host-assign-div').w2form(createRTCSettingForm());
+
+  let iconPlus = $('<span>').addClass('ui-icon').addClass('ui-icon-plus').css('margin-left', '2px');
+  let iconEdit = $('<span>').addClass('ui-icon').addClass('ui-icon-pencil').css('margin-left', '2px');
+  let iconSave = $('<span>').addClass('fa fa-floppy-o').css('margin-left', '2px');
+  $($('#property-panel .w2ui-buttons').children()[0]).addClass('ui-button ui-widget ui-corner-all').css('height', '28px').css('font-size', '1.2em').css('padding-top', '5px').append(iconPlus);
+  $($('#property-panel .w2ui-buttons').children()[1]).addClass('w2ui-btn ui-button ui-widget ui-corner-all').css('height', '28px').css('font-size', '1.2em').css('padding-top', '5px').append(iconEdit);
+  $($('#property-panel .w2ui-buttons').children()[2]).addClass('w2ui-btn ui-button ui-widget ui-corner-all').css('height', '28px').css('font-size', '1.2em').css('padding-top', '5px').append(iconSave);
+
+  // ホストリストにホスト定義ファイルの内容を反映する
+  updateHostList(loadHostList());
+
+  // RTC割り当て領域を更新
+  updateRTCDataToHostAssignArea();
+
+  // セレクトボックス・RTCアイコン上のホスト名を更新する
+  reloadAssignedHostName(true);
+
+  // nameserver statusを10秒ごとにチェックする
+  window.setInterval(async function () {
+
+    if (document.getElementById('host-list')) {
+      // ホストリストの各ホストに対して実行
+      let hosts = document.getElementById('host-list').children;
+      for (let i = 0; i < hosts.length; i += 2) {
+        // nameserverのstatusを確認し、画像を変える
+        let hostId = hosts[i].getAttribute('id').replace('host-', '');
+        checkNameserverStatus(hostId).done(function (res) {
+          if (res == true) {
+            hosts[i].getElementsByTagName('img')[0].setAttribute('src', '../img/NS_running.png');
+            hosts[i + 1].getElementsByTagName('img')[0].setAttribute('src', '../img/NS_running.png');
+          }
+          else {
+            hosts[i].getElementsByTagName('img')[0].setAttribute('src', '../img/NS_not_running.png');
+            hosts[i + 1].getElementsByTagName('img')[0].setAttribute('src', '../img/NS_not_running.png');
+          }
+        });
+      }
+    }
+  }, 10000);
+}
+
+/**
+ * プロパティ領域からHost設定画面を削除する
+ * 
+ * @returns {undefined}
+ */
+function resetPropertyAreaHostProfile() {
+  while (document.getElementById('property-panel').firstChild) {
+    document.getElementById('property-panel').removeChild(document.getElementById('property-panel').firstChild);
+  }
+
+  if (w2ui['host-setting']) {
+    w2ui['host-setting'].destroy();
+  }
+  if (w2ui['host-list']) {
+    w2ui['host-list'].destroy();
+  }
+  if (w2ui['host-assign']) {
+    w2ui['host-assign'].destroy();
+  }
+}
+
+/**
+ * Keras Editor用ホストの一覧を返す
+ * 
+ * @returns {Array} Keras Editor用ホストの一覧
+ */
+function getKerasEditorHost() {
+  let ary = [];
+  airGraphHostMap.forEach(element => {
+    ary.push(element.hostName + ' (' + element.ip + ':' + element.port + ')'); 
+  })
+  return ary;
 }
 
 /*******************************************************************************
@@ -1213,7 +1875,7 @@ function setPropertyAreaRtcProfile(componentId) {
 /**
  * コンフィギュレーション領域のレイアウト処理
  * 
- * @returns
+ * @returns {undefined}
  */
 function layoutPanelConfiguration() {
   var pstyle = 'border: none; padding: 0px;';
@@ -1249,7 +1911,7 @@ function layoutPanelConfiguration() {
 /**
  * コンフィギュレーション領域左部分
  * 
- * @returns
+ * @returns {*} panel
  */
 function createConfiguretionComponent() {
   // 背景
@@ -1301,7 +1963,7 @@ function createConfiguretionComponent() {
   cloneBtn.attr('id', 'component-grid-clone-btn');
   cloneBtn.addClass('ui-button').addClass('ui-widget').addClass('ui-corner-all').css('padding', '5px').css('margin-left', '5px').css('margin-right', '5px').css('width', '70px');
   $('<span>').addClass('ui-icon').addClass('ui-icon-copy').appendTo(cloneBtn);
-  $(cloneBtn).on('click', function (event) {
+  $(cloneBtn).on('click', function () {
     copyConfigurationGridData($('#configuration-component-text').val(), $('#configuration-setting-text').val());
   });
   btnDiv.append(cloneBtn);
@@ -1312,7 +1974,7 @@ function createConfiguretionComponent() {
   addBtn.attr('id', 'component-grid-add-btn');
   addBtn.addClass('ui-button').addClass('ui-widget').addClass('ui-corner-all').css('padding', '5px').css('margin-left', '5px').css('margin-right', '5px').css('width', '70px');
   $('<span>').addClass('ui-icon').addClass('ui-icon-plus').appendTo(addBtn);
-  $(addBtn).on('click', function (event) {
+  $(addBtn).on('click', function () {
     addConfigurationGridData($('#configuration-component-text').val(), $('#configuration-setting-text').val());
   });
   btnDiv.append(addBtn);
@@ -1323,7 +1985,7 @@ function createConfiguretionComponent() {
   delBtn.attr('id', 'component-grid-delete-btn');
   delBtn.addClass('ui-button').addClass('ui-widget').addClass('ui-corner-all').css('padding', '5px').css('margin-left', '5px').css('margin-right', '5px').css('width', '70px');
   $('<span>').addClass('ui-icon').addClass('ui-icon-trash').appendTo(delBtn);
-  $(delBtn).on('click', function (event) {
+  $(delBtn).on('click', function () {
     deleteConfigurationGridData($('#configuration-component-text').val(), $('#configuration-setting-text').val());
   });
   btnDiv.append(delBtn);
@@ -1345,7 +2007,7 @@ function createConfiguretionComponent() {
 /**
  * コンフィギュレーション領域右部分
  * 
- * @returns
+ * @returns {*} panel
  */
 function createConfiguretionSetting() {
   // 背景
@@ -1424,7 +2086,7 @@ function createConfiguretionSetting() {
 /**
  * コンフィギュレーション設定
  * 
- * @returns
+ * @returns {*} panel
  */
 function createConfiguretionButtons() {
   // 背景
@@ -1457,7 +2119,7 @@ function createConfiguretionButtons() {
   cancelBtn.attr('id', 'configuraiton-cancel-btn');
   cancelBtn.addClass('ui-button').addClass('ui-widget').addClass('ui-corner-all').css('padding', '5px').css('margin-top', '10px').css('margin-left', '5px').css('margin-right', '5px').css('width', '70px');
   $('<span>').addClass('ui-icon').addClass('ui-icon-close').appendTo(cancelBtn);
-  $(cancelBtn).on('click', function (event) {
+  $(cancelBtn).on('click', function () {
     reloadConfigurationGridData($('#configuration-component-text').val());
   });
   panel.append(cancelBtn);
@@ -1468,7 +2130,7 @@ function createConfiguretionButtons() {
 /**
  * コンフィギュレーション設定-コンポーネント部分のGrid作成
  * 
- * @returns
+ * @returns {undefined}
  */
 function createComponentGrid() {
   $('#component-grid-panel').w2grid({
@@ -1478,7 +2140,7 @@ function createComponentGrid() {
     },
     multiSelect: false,
     columns: [
-      { field: 'config', caption: 'config', size: '100%', editable: { type: 'text' } }
+      { field: 'config', text: 'config', size: '100%', editable: { type: 'text' } }
     ],
     onChange: function (event) {
       // 設定し直す
@@ -1494,14 +2156,14 @@ function createComponentGrid() {
 /**
  * コンフィギュレーション設定-コンフィギュレーション部分のGrid作成
  * 
- * @returns
+ * @returns {undefined}
  */
 function createConfigurationSetGrid() {
   $('#configuraiton-grid-panel').w2grid({
     name: 'configuration-grid',
     columns: [
-      { field: 'name', caption: 'name', size: '20%', editable: { type: 'text' } },
-      { field: 'value', caption: 'value', size: '80%', editable: { type: 'text' } }
+      { field: 'name', text: 'name', size: '20%', editable: { type: 'text' } },
+      { field: 'value', text: 'value', size: '80%', editable: { type: 'text' } }
     ],
     onChange: function (event) {
       saveConfigurationGridData($('#configuration-component-text').val(), $('#configuration-setting-text').val(), event.input_id.slice(-1) === '1', event.recid, event.value_new, event.value_original);
@@ -1512,8 +2174,8 @@ function createConfigurationSetGrid() {
 /**
  * 選択したコンポーネントの情報を設定する
  * 
- * @param componentId
- * @returns
+ * @param {*} componentId コンポーネントID
+ * @returns {undefined}
  */
 function setComponentGridData(componentId) {
   // 一度クリアする
@@ -1535,16 +2197,16 @@ function setComponentGridData(componentId) {
     var configurationSetMap = mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId][0].editConfigurationSetMap;
     if (configurationSetMap) {
       for (key in configurationSetMap) {
-        var addData = { recid: configurationSetMap[key][0]['id'], config: configurationSetMap[key][0]['id'] };
+        let addData = { recid: configurationSetMap[key][0]['id'], config: configurationSetMap[key][0]['id'] };
         addDataArray.push(addData);
       }
       isExistData = true;
     } else {
-      var addData = { recid: 'default', config: 'default' };
+      let addData = { recid: 'default', config: 'default' };
       addDataArray.push(addData);
     }
   } else {
-    var addData = { recid: 'default', config: 'default' };
+    let addData = { recid: 'default', config: 'default' };
     addDataArray.push(addData);
   }
 
@@ -1568,9 +2230,9 @@ function setComponentGridData(componentId) {
 /**
  * 選択したコンフィギュレーションの情報を設定する
  * 
- * @param componentId
- * @param configurationId
- * @returns
+ * @param {*} componentId コンポーネントID
+ * @param {*} configurationId コンフィグレーションID
+ * @returns {undefined}
  */
 function setConfigurationGridData(componentId, configurationId) {
   // コンフィギュレーション部分をクリア
@@ -1597,9 +2259,9 @@ function setConfigurationGridData(componentId, configurationId) {
 /**
  * 選択したコンフィギュレーションの情報をコピーする
  * 
- * @param componentId
- * @param configurationId
- * @returns
+ * @param {*} componentId コンポーネントID
+ * @param {*} configurationId コンフィグレーションID
+ * @returns {undefined}
  */
 function copyConfigurationGridData(componentId, configurationId) {
   if (componentId && configurationId && mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId]
@@ -1630,9 +2292,9 @@ function copyConfigurationGridData(componentId, configurationId) {
 /**
  * 選択したコンフィギュレーションの情報を元に新規で追加する
  * 
- * @param componentId
- * @param configurationId
- * @returns
+ * @param {*} componentId コンポーネントID
+ * @param {*} configurationId コンフィグレーションID
+ * @returns {undefined}
  */
 function addConfigurationGridData(componentId, configurationId) {
   if (componentId && mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId]
@@ -1649,7 +2311,7 @@ function addConfigurationGridData(componentId, configurationId) {
 
       // コピーする
       newData = [];
-      newData.push($.extend(true, {}, srcData));
+      newData.push($.extend(true, {}, srcData[0]));
       newData[0]['id'] = newConfigurationId;
 
       // すべてのValueを空にする
@@ -1680,11 +2342,11 @@ function addConfigurationGridData(componentId, configurationId) {
 /**
  * 選択したコンフィギュレーションを削除する
  * 
- * @param componentId
- * @param configurationId
- * @returns
+ * @param {*} componentId コンポーネントID
+ * @param {*} configurationId コンフィグレーションID
+ * @returns {undefined}
  */
-function deleteConfigurationGridData(modelId, configurationId) {
+function deleteConfigurationGridData(componentId, configurationId) {
   if (componentId && configurationId && mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId]
     && mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId].length > 0) {
     // 削除する
@@ -1709,8 +2371,8 @@ function deleteConfigurationGridData(modelId, configurationId) {
 /**
  * コンフィギュレーションの設定を戻す
  * 
- * @param componentId
- * @returns
+ * @param {*} componentId コンポーネントID
+ * @returns {undefined}
  */
 function reloadConfigurationGridData(componentId) {
   if (componentId && mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId]
@@ -1731,10 +2393,10 @@ function reloadConfigurationGridData(componentId) {
 /**
  * コンフィギュレーション名を変更する
  * 
- * @param componentId
- * @param oldConfigurationId
- * @param newConfigurationId
- * @returns
+ * @param {*} componentId コンポーネントID
+ * @param {*} oldConfigurationId oldConfigurationId
+ * @param {*} newConfigurationId newConfigurationId
+ * @returns {undefined}
  */
 function saveComponentGridData(componentId, oldConfigurationId, newConfigurationId) {
   if (!newConfigurationId || newConfigurationId === '') {
@@ -1767,11 +2429,13 @@ function saveComponentGridData(componentId, oldConfigurationId, newConfiguration
 /**
  * コンフィギュレーション設定を変更する
  * 
- * @param componentId
- * @param configurationId
- * @param name
- * @param newValue
- * @returns
+ * @param {*} componentId コンポーネントID
+ * @param {*} configurationId コンフィグレーションID
+ * @param {*} isValue isValue
+ * @param {*} name name
+ * @param {*} newValue newValue
+ * @param {*} oldValue oldValue
+ * @returns {undefined}
  */
 function saveConfigurationGridData(componentId, configurationId, isValue, name, newValue, oldValue) {
   if (componentId && configurationId && mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId]
@@ -1790,7 +2454,7 @@ function saveConfigurationGridData(componentId, configurationId, isValue, name, 
       }
     } else {
       // Nameの変更
-      for (var i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId][0].editConfigurationSetMap[configurationId][0].configurationDatas.length; i++) {
+      for (let i = 0; i < mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId][0].editConfigurationSetMap[configurationId][0].configurationDatas.length; i++) {
         if (mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId][0].editConfigurationSetMap[configurationId][0].configurationDatas[i]['name'] === oldValue) {
           mainRtsMap[curWorkspaceName].rtsProfile.componentMap[componentId][0].editConfigurationSetMap[configurationId][0].configurationDatas[i]['name'] = newValue;
         }
@@ -1806,7 +2470,7 @@ function saveConfigurationGridData(componentId, configurationId, isValue, name, 
 /**
  * コンフィギュレーション設定-コンポーネント部分のGridをクリアする
  * 
- * @returns
+ * @returns {undefined}
  */
 function clearComponentGridData() {
   w2ui['component-grid'].clear();
@@ -1820,7 +2484,7 @@ function clearComponentGridData() {
 /**
  * コンフィギュレーション設定-コンフィギュレーション部分のGridをクリアする
  * 
- * @returns
+ * @returns {undefined}
  */
 function clearConfigurationGridData() {
   w2ui['configuration-grid'].clear();
@@ -1835,6 +2499,11 @@ function clearConfigurationGridData() {
 
 /**
  * パネルの表示・非表示を切り替える
+ * 
+ * @param {*} id id
+ * @param {*} field field
+ * @returns {undefined}
+ * 
  */
 function toggleComponentPanel(id, field) {
   $('#' + id + ' > span').removeClass('ui-icon-circlesmall-plus');
@@ -1845,6 +2514,9 @@ function toggleComponentPanel(id, field) {
     $('#' + id + ' > span').addClass('ui-icon-circlesmall-minus');
   } else {
     // 非表示
+    if (id === 'host-button') {
+      destroySettingForm();
+    }
     $('#' + id + ' > span').addClass('ui-icon-circlesmall-plus');
   }
   w2ui['layout-panel'].toggle(field);

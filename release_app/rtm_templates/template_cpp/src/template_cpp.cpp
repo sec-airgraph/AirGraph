@@ -54,20 +54,20 @@ RTC::ReturnCode_t template_cpp::onInitialize()
   // Registration: InPort/OutPort/Service
   // <rtc-template block="registration">
   // Set InPort buffers
-  
+
   // Set OutPort buffer
-  
+
   // Set service provider to Ports
-  
+
   // Set service consumers to Ports
-  
+
   // Set CORBA Service Ports
-  
+
   // </rtc-template>
 
   // <rtc-template block="bind_config">
   // </rtc-template>
-  
+
   return RTC::RTC_OK;
 }
 
@@ -149,7 +149,7 @@ RTC::ReturnCode_t template_cpp::onRateChanged(RTC::UniqueId ec_id)
 
 extern "C"
 {
- 
+
   void template_cppInit(RTC::Manager* manager)
   {
     coil::Properties profile(template_cpp_spec);
@@ -157,7 +157,7 @@ extern "C"
                              RTC::Create<template_cpp>,
                              RTC::Delete<template_cpp>);
   }
-  
+
 };
 
 

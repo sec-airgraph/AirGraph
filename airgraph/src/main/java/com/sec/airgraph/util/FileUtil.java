@@ -23,37 +23,35 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
 import org.apache.tools.zip.ZipOutputStream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * ファイル制御Utility
- * 
+ * ファイル制御Utility.
+ *
  * @author Tsuyoshi Hirose
  *
  */
 public class FileUtil {
 
 	/**
-	 * logger
+	 * logger.
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
 	/**
-	 * ファイルが存在するかを判定する
-	 * 
-	 * @param file
-	 * @return
+	 * ファイルが存在するかを判定する.
+	 *
+	 * @param file ファイル
+	 * @return ファイルが存在するかどうか
 	 */
 	public static boolean exists(File file) {
 		if (file != null && file.exists()) {
@@ -63,10 +61,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * ファイルが存在するかを判定する
-	 * 
-	 * @param path
-	 * @return
+	 * ファイルが存在するかを判定する.
+	 *
+	 * @param path パス
+	 * @return ファイルが存在するかどうか
 	 */
 	public static boolean exists(String path) {
 		File file = new File(path);
@@ -74,10 +72,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * ファイルが存在しないかを判定する
-	 * 
-	 * @param file
-	 * @return
+	 * ファイルが存在しないかを判定する.
+	 *
+	 * @param file ファイル
+	 * @return ファイルが存在しないかどうか
 	 */
 	public static boolean notExists(File file) {
 		if (file != null && !file.exists()) {
@@ -87,10 +85,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * ファイルが存在しないかを判定する
-	 * 
-	 * @param file
-	 * @return
+	 * ファイルが存在しないかを判定する.
+	 *
+	 * @param path パス
+	 * @return ファイルが存在しないかどうか
 	 */
 	public static boolean notExists(String path) {
 		File file = new File(path);
@@ -98,10 +96,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * 文字列を連結しファイルクラスを生成する
-	 * 
-	 * @param strings
-	 * @return
+	 * 文字列を連結しファイルクラスを生成する.
+	 *
+	 * @param strings 文字列
+	 * @return ファイルクラス
 	 */
 	public static File concatenateFilePath(String... strings) {
 		String filePath = concatenateFilePathStr(strings);
@@ -112,9 +110,9 @@ public class FileUtil {
 	}
 
 	/**
-	 * 文字列を連結しファイルパスを生成する
-	 * 
-	 * @param strings
+	 * 文字列を連結しファイルパスを生成する.
+	 *
+	 * @param strings 文字列
 	 * @return
 	 */
 	public static String concatenateFilePathStr(String... strings) {
@@ -126,10 +124,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * ディレクトリを再帰的にコピーする
-	 * 
-	 * @param dirFrom
-	 * @param dirTo
+	 * ディレクトリを再帰的にコピーする.
+	 *
+	 * @param dirFrom コピー元
+	 * @param dirTo コピー先
 	 * @return
 	 */
 	public static Boolean directoryCopy(File dirFrom, File dirTo) {
@@ -138,12 +136,12 @@ public class FileUtil {
 	}
 
 	/**
-	 * コピー先のディレクトリ名を指定して、ディレクトリを再帰的にコピーする
-	 * 
-	 * @param dirFrom
-	 * @param dirTo
-	 * @param dirName
-	 * @return
+	 * コピー先のディレクトリ名を指定して、ディレクトリを再帰的にコピーする.
+	 *
+	 * @param dirFrom コピー元
+	 * @param dirTo コピー先
+	 * @param dirName ディレクトリ名
+	 * @return 正常終了したかどうか
 	 */
 	public static Boolean directoryCopy(File dirFrom, File dirTo, String dirName) {
 		logger.debug("directoryCopy. dirFrom[" + dirFrom.getPath() + "]dirTo[" + dirTo.getPath() + "]dirName[" + dirName + "]");
@@ -171,10 +169,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * ディレクトリを作成する
-	 * 
-	 * @param dir
-	 * @return
+	 * ディレクトリを作成する.
+	 *
+	 * @param dir ディレクトリ
+	 * @return 正常終了したかどうか
 	 */
 	public static Boolean createDirectory(File dir) {
 		logger.debug("createDirectory. dir[" + dir.getPath() + "]");
@@ -185,10 +183,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * ディレクトリを作成する
-	 * 
-	 * @param path
-	 * @return
+	 * ディレクトリを作成する.
+	 *
+	 * @param path パス
+	 * @return 正常終了したかどうか
 	 */
 	public static Boolean createDirectory(String path) {
 		File dir = new File(path);
@@ -196,10 +194,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * ファイルをコピーする
-	 * 
-	 * @param srcFile
-	 * @param destFile
+	 * ファイルをコピーする.
+	 *
+	 * @param srcFile コピー元
+	 * @param destFile コピー先
 	 * @return
 	 */
 	public static Boolean fileCopy(File srcFile, File destFile) {
@@ -246,11 +244,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * Uploadしたファイルを保存する
-	 * 
-	 * @param srcFile
-	 * @param destFile
-	 * @return
+	 * Uploadしたファイルを保存する.
+	 *
+	 * @param srcFile コピー元
+	 * @param destFile コピー先
 	 */
 	public static void saveUploadFile(MultipartFile srcFile, File destFile) {
 		logger.debug("File Upload. src[" + srcFile.getName() + "]dest[" + destFile.getPath() + "]");
@@ -264,11 +261,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * InputStreamを保存する
-	 * 
-	 * @param inputStream
-	 * @param destFile
-	 * @return
+	 * InputStreamを保存する.
+	 *
+	 * @param inputStream inputStream
+	 * @param destFile コピー先
 	 */
 	public static void saveInputStream(InputStream inputStream, File destFile) {
 		logger.debug("File Upload. dest[" + destFile.getPath() + "]");
@@ -281,9 +277,9 @@ public class FileUtil {
 	}
 
 	/**
-	 * ディレクトリの中身も含めて全て削除する
-	 * 
-	 * @param dir
+	 * ディレクトリの中身も含めて全て削除する.
+	 *
+	 * @param dir ディレクトリ
 	 */
 	public static void deleteDirectory(File dir) {
 		if (notExists(dir)) {
@@ -302,9 +298,9 @@ public class FileUtil {
 	}
 
 	/**
-	 * ファイルを削除する
-	 * 
-	 * @param path
+	 * ファイルを削除する.
+	 *
+	 * @param path パス
 	 */
 	public static void deleteFile(String path) {
 		File file = new File(path);
@@ -315,10 +311,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * 指定されたPathのファイルをすべて読み込む
-	 * 
-	 * @param path
-	 * @return
+	 * 指定されたPathのファイルをすべて読み込む.
+	 *
+	 * @param path パス
+	 * @return ファイルの中身
 	 */
 	public static String readAll(String path) {
 		File file = new File(path);
@@ -336,11 +332,11 @@ public class FileUtil {
 	}
 
 	/**
-	 * 指定されたPathのファイルを読み込み、指定された文字列の行をGrepする
-	 * 
-	 * @param path
-	 * @param searchStr
-	 * @return
+	 * 指定されたPathのファイルを読み込み、指定された文字列の行をGrepする.
+	 *
+	 * @param path パス
+	 * @param searchStr 文字列
+	 * @return 実行結果
 	 */
 	public static List<String> readAndSearchStr(String path, String searchStr) {
 		List<String> strList = new ArrayList<String>();
@@ -380,12 +376,13 @@ public class FileUtil {
 	}
 
 	/**
-	 * 指定されたパスに指定されたデータをすべて書き込む
-	 * 
-	 * @param path
-	 * @param data
+	 * 指定されたパスに指定されたデータをすべて書き込む.
+	 *
+	 * @param path パス
+	 * @param data データ
+	 * @param isOverwrite 上書きかどうか
 	 */
-	public static void writeAll(String path, String data) {
+	public static void writeAll(String path, String data, boolean isOverwrite) {
 		File file = new File(path);
 		FileWriter fw = null;
 		BufferedWriter bw = null;
@@ -394,7 +391,7 @@ public class FileUtil {
 				// ファイル新規作成
 				file.createNewFile();
 			}
-			fw = new FileWriter(file);
+			fw = new FileWriter(file, !isOverwrite);
 			bw = new BufferedWriter(fw);
 			bw.write(data);
 
@@ -415,10 +412,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * 指定されたファイルのバックアップを作成する<br>
-	 * バックアップファイルはファイル名yyyymmddhhmmss
-	 * 
-	 * @param filePath
+	 * 指定されたファイルのバックアップを作成する.<br>
+	 * バックアップファイルはファイル名yyyymmddhhmmss.
+	 *
+	 * @param filePath ファイルパス
 	 */
 	public static void createBackup(String filePath) {
 
@@ -436,19 +433,21 @@ public class FileUtil {
 	}
 
 	/**
-	 * Zipファイルを解凍し、指定されたディレクトリ以下に展開する
-	 * 
-	 * @param filePath
-	 * @param targetDirPath
-	 * @return
+	 * Zipファイルを解凍し、指定されたディレクトリ以下に展開する.
+	 *
+	 * @param filePath ファイルパス
+	 * @param targetDirPath 指定されたディレクトリ
+	 * @return 正常終了したかどうか
 	 */
 	public static boolean unzipFile(String filePath, String targetDirPath) {
 		try {
 			File file = new File(filePath);
 			ZipFile zip = new ZipFile(file);
+		
 			for (Enumeration<?> e = zip.getEntries(); e.hasMoreElements();) {
 				ZipEntry entry = (ZipEntry) e.nextElement();
 				if (entry.isDirectory()) {
+
 					new File(targetDirPath + "/" + entry.getName()).mkdirs();
 				} else {
 					File parent = new File(targetDirPath + "/" + entry.getName()).getParentFile();
@@ -464,20 +463,20 @@ public class FileUtil {
 					}
 					out.close();
 					in.close();
-
 				}
 			}
+			zip.close();
 		} catch (IOException e) {
-			logger.error(e.getMessage());
+			logger.error(e.getMessage(), e);
 			return false;
 		}
 		return true;
 	}
 
 	/**
-	 * 指定されたディレクトリ内のファイルを ZIP アーカイブし、指定されたパスに作成する。
+	 * 指定されたディレクトリ内のファイルを ZIP アーカイブし、指定されたパスに作成する.
 	 *
-	 * @param fullPath  圧縮後の出力ファイル名をフルパスで指定 ( 例: C:/sample.zip )
+	 * @param filePath  圧縮後の出力ファイル名をフルパスで指定 ( 例: C:/sample.zip )
 	 * @param directory 圧縮するディレクトリ ( 例; C:/sample )
 	 * @return 処理結果 true:圧縮成功 false:圧縮失敗
 	 */
@@ -551,7 +550,7 @@ public class FileUtil {
 	}
 
 	/**
-	 * ディレクトリ圧縮のための再帰処理
+	 * ディレクトリ圧縮のための再帰処理.
 	 *
 	 * @param outZip   ZipOutputStream
 	 * @param baseFile File 保存先ファイル
@@ -575,13 +574,14 @@ public class FileUtil {
 	}
 
 	/**
-	 * 圧縮処理
+	 * 圧縮処理.
 	 *
 	 * @param outZip     ZipOutputStream
 	 * @param baseFile   File 保存先ファイル
 	 * @param targetFile File 圧縮したいファイル
 	 * @parma entryName 保存ファイル名
 	 * @param enc 文字コード
+	 * @return 正常終了したかどうか
 	 */
 	private static boolean archive(ZipOutputStream outZip, File baseFile, File targetFile, String entryName,
 			String enc) {
@@ -616,15 +616,17 @@ public class FileUtil {
 	}
 
 	/**
-	 * 解凍処理
+	 * 解凍処理.
+	 *
 	 * @param zipFilePath
-	 * @return
+	 * @param targetDirPath 指定されたディレクトリ
+	 * @return 正常終了したかどうか
 	 */
 	public static boolean unzip(String zipFilePath, String targetDirPath) {
 		ZipFile zipFile = null;
 		try {
 			zipFile = new ZipFile(zipFilePath);
-			Enumeration enumeration = zipFile.getEntries();
+			Enumeration<ZipEntry> enumeration = zipFile.getEntries();
 			while (enumeration.hasMoreElements()) {
 				// ZIP内のエントリを取得
 				ZipEntry zipEntry = (ZipEntry) enumeration.nextElement();
@@ -667,6 +669,7 @@ public class FileUtil {
 					}
 				}
 			}
+			zipFile.close();
 		} catch (Exception e) {
 			// ZIP解凍失敗
 			return false;
@@ -675,10 +678,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * ZIPファイルの先頭ディレクトリ名を取得する
-	 * 
-	 * @param filePath
-	 * @return
+	 * ZIPファイルの先頭ディレクトリ名を取得する.
+	 *
+	 * @param filePath ファイルパス
+	 * @return 先頭ディレクトリ名
 	 */
 	public static String getRootDirNameZipFile(String filePath) {
 		String[] result = new String[1];
@@ -702,10 +705,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * ファイル名から拡張子を取得する
-	 * 
-	 * @param fileName
-	 * @return
+	 * ファイル名から拡張子を取得する.
+	 *
+	 * @param fileName ファイル名
+	 * @return 拡張子
 	 */
 	public static String getFileExtension(String fileName) {
 		if (StringUtil.isEmpty(fileName)) {
@@ -719,11 +722,11 @@ public class FileUtil {
 	}
 
 	/**
-	 * 対象のディレクトリにある一番更新時刻が新しい指定拡張子のファイルを取得する
-	 * 
-	 * @param dirPath
-	 * @param extensions
-	 * @return
+	 * 対象のディレクトリにある一番更新時刻が新しい指定拡張子のファイルを取得する.
+	 *
+	 * @param dirPath ディレクトリパス
+	 * @param extensions 指定拡張子
+	 * @return ファイル
 	 */
 	public static File getLatestUpdateFile(String dirPath, List<String> extensions) {
 		File result = null;
@@ -743,12 +746,12 @@ public class FileUtil {
 	}
 
 	/**
-	 * サブディレクトリも含めて指定されたファイルを検索し取得する
-	 * 
-	 * @param dirPath
-	 * @param fileName
-	 * @param suffix
-	 * @return
+	 * サブディレクトリも含めて指定されたファイルを検索し取得する.
+	 *
+	 * @param dirPath ディレクトリパス
+	 * @param fileName ファイル名
+	 * @param suffix suffix
+	 * @return ファイル
 	 */
 	public static File searchFileWithSubDir(String dirPath, String fileName, String suffix) {
 		File result = null;
@@ -773,11 +776,11 @@ public class FileUtil {
 	}
 
 	/**
-	 * サブディレクトリも含めて指定された拡張子に該当するファイルを検索し取得する
-	 * 
-	 * @param dirPath
-	 * @param suffix
-	 * @return
+	 * サブディレクトリも含めて指定された拡張子に該当するファイルを検索し取得する.
+	 *
+	 * @param dirPath ディレクトリパス
+	 * @param suffix suffix
+	 * @return ファイル
 	 */
 	public static List<File> searchFileListWithSubDir(String dirPath, String suffix) {
 		List<File> result = new ArrayList<>();
@@ -798,11 +801,11 @@ public class FileUtil {
 	}
 
 	/**
-	 * 指定されたディレクトリ内のすべてのファイル名・ファイル内容を置換する
-	 * 
-	 * @param targetDirPath
-	 * @param oldName
-	 * @param newName
+	 * 指定されたディレクトリ内のすべてのファイル名・ファイル内容を置換する.
+	 *
+	 * @param targetDirPath 指定されたディレクトリ
+	 * @param oldName 古い名
+	 * @param newName 新しい名
 	 */
 	public static void renameAllFiles(String targetDirPath, String oldName, String newName) {
 		// スクリプトパス
@@ -813,11 +816,11 @@ public class FileUtil {
 	}
 
 	/**
-	 * 指定されたディレクトリ内のすべてのファイル内容を置換する
-	 * 
-	 * @param targetDirPath
-	 * @param oldName
-	 * @param newName
+	 * 指定されたディレクトリ内のすべてのファイル内容を置換する.
+	 *
+	 * @param targetDirPath 指定されたディレクトリ
+	 * @param oldName 古い名
+	 * @param newName 新しい名
 	 */
 	public static void renameAllFilesContent(String targetDirPath, String oldName, String newName) {
 		// スクリプトパス
@@ -828,10 +831,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * 指定されたディレクトリ内のすべてのファイル内容を空に置換する
-	 * 
-	 * @param targetDirPath
-	 * @param oldName
+	 * 指定されたディレクトリ内のすべてのファイル内容を空に置換する.
+	 *
+	 * @param targetDirPath 指定されたディレクトリ
+	 * @param oldName 古い名
 	 */
 	public static void renameAllFilesContentToEmpty(String targetDirPath, String oldName) {
 		// スクリプトパス
@@ -841,11 +844,11 @@ public class FileUtil {
 	}
 
 	/**
-	 * 指定されたファイルの名称を変更する
-	 * 
-	 * @param targetDirPath
-	 * @param oldName
-	 * @param newName
+	 * 指定されたファイルの名称を変更する.
+	 *
+	 * @param targetDirPath 指定されたディレクトリ
+	 * @param oldName 古い名
+	 * @param newName 新しい名
 	 */
 	public static void renameFileName(String targetDirPath, String oldName, String newName) {
 		// スクリプトパス
@@ -856,10 +859,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * データセットのシンボリックリンクを作成する
-	 * 
-	 * @param modelDirPath
-	 * @param datasetName
+	 * データセットのシンボリックリンクを作成する.
+	 *
+	 * @param modelDirPath モデルディレクトリパス 
+	 * @param datasetName データセット名
 	 */
 	public static void createDatasetLink(String modelDirPath, String datasetName) {
 
@@ -917,10 +920,10 @@ public class FileUtil {
 	}
 
 	/**
-	 * データセットのシンボリックリンクからデータセット名を取得する
-	 * 
-	 * @param modelDirPath
-	 * @return
+	 * データセットのシンボリックリンクからデータセット名を取得する.
+	 *
+	 * @param modelDirPath モデルディレクトリパス
+	 * @return データセット名
 	 */
 	public static String getDatasetLink(String modelDirPath) {
 		String targetDatasetDirPath = "";

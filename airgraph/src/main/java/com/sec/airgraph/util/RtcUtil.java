@@ -1,5 +1,16 @@
 package com.sec.airgraph.util;
 
+import com.sec.airgraph.util.Const.RT_COMPONENT.CONFIGURATION_TYPE;
+import com.sec.airgraph.util.Const.RT_COMPONENT.INTERFACE_DIRECTION;
+import com.sec.airgraph.util.Const.RT_COMPONENT.PORT_DATA_TYPE;
+import com.sec.airgraph.util.Const.RT_COMPONENT.PORT_TYPE;
+import com.sec.rtc.entity.rtc.Configuration;
+import com.sec.rtc.entity.rtc.DataPort;
+import com.sec.rtc.entity.rtc.Rtc;
+import com.sec.rtc.entity.rtc.RtcProfile;
+import com.sec.rtc.entity.rtc.ServiceInterface;
+import com.sec.rtc.entity.rtc.ServicePort;
+import com.sec.rtc.entity.rts.Rts;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,31 +21,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sec.rtc.entity.rtc.Configuration;
-import com.sec.rtc.entity.rtc.DataPort;
-import com.sec.rtc.entity.rtc.Rtc;
-import com.sec.rtc.entity.rtc.RtcProfile;
-import com.sec.rtc.entity.rtc.ServiceInterface;
-import com.sec.rtc.entity.rtc.ServicePort;
-import com.sec.rtc.entity.rts.Rts;
-import com.sec.airgraph.util.Const.RT_COMPONENT.CONFIGURATION_TYPE;
-import com.sec.airgraph.util.Const.RT_COMPONENT.INTERFACE_DIRECTION;
-import com.sec.airgraph.util.Const.RT_COMPONENT.PORT_DATA_TYPE;
-import com.sec.airgraph.util.Const.RT_COMPONENT.PORT_TYPE;
 
 /**
- * RTC関連Utility
- * 
+ * RTC関連Utility.
+ *
  * @author Tsuyoshi Hirose
  *
  */
 public class RtcUtil {
 	/**
-	 * logger
+	 * logger.
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(RtcUtil.class);
 
@@ -42,10 +41,10 @@ public class RtcUtil {
 	 * オブジェクト操作関連
 	 ************************************************************/
 	/**
-	 * RtsProfileがNullかどうか判定する
-	 * 
-	 * @param rts
-	 * @return
+	 * RtsProfileがNullかどうか判定する.
+	 *
+	 * @param rts RTS 
+	 * @return Nullかどうか
 	 */
 	public static boolean rtsPorfileIsNotEmpty(Rts rts) {
 		if (rts != null && rts.getRtsProfile() != null) {
@@ -55,10 +54,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * RtcProfileがNullかどうか判定する
-	 * 
-	 * @param rtc
-	 * @return
+	 * RtcProfileがNullかどうか判定する.
+	 *
+	 * @param rtc RTC 
+	 * @return Nullかどうか
 	 */
 	public static boolean rtcPorfileIsNotEmpty(Rtc rtc) {
 		if (rtc != null && rtc.getRtcProfile() != null) {
@@ -68,10 +67,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * データタイプから必要となるロガーのコンポーネント名を取得する
-	 * 
-	 * @param dataType
-	 * @return
+	 * データタイプから必要となるロガーのコンポーネント名を取得する.
+	 *
+	 * @param dataType データタイプ
+	 * @return ロガーのコンポーネント名
 	 */
 	public static String getComponentNameByDataType(String dataType) {
 		String componentName = null;
@@ -86,10 +85,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * データタイプから必要となるロガーのGit名を取得する
-	 * 
-	 * @param dataType
-	 * @return
+	 * データタイプから必要となるロガーのGit名を取得する.
+	 *
+	 * @param dataType データタイプ
+	 * @return ロガーのGit名
 	 */
 	public static String getGitNameByDataType(String dataType) {
 		String componentName = null;
@@ -104,10 +103,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * データタイプから必要となるロガーのGit名を取得する
-	 * 
-	 * @param dataType
-	 * @return
+	 * データタイプから必要となるロガーのGit名を取得する.
+	 *
+	 * @param dataType データタイプ
+	 * @return ロガーのGit名
 	 */
 	public static String getDirectoryNameByDataType(String dataType) {
 		String dirName = null;
@@ -122,10 +121,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * データ型から接続時のデータ型に変換する
-	 * 
-	 * @param portDataType
-	 * @return
+	 * データ型から接続時のデータ型に変換する.
+	 *
+	 * @param portDataType データ型
+	 * @return 接続時のデータ型
 	 */
 	public static String getConnectionPortDataType(String portDataType) {
 		if (portDataType.contains("::")) {
@@ -137,10 +136,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * データポートに設定されたデータ型からPythonのコンストラクタを取得する
-	 * 
-	 * @param dataType
-	 * @return
+	 * データポートに設定されたデータ型からPythonのコンストラクタを取得する.
+	 *
+	 * @param dataType データタイプ
+	 * @return Pythonのコンストラクタ
 	 */
 	private static String getPythonCostructorFromDataPort(String dataType) {
 		String result = null;
@@ -160,10 +159,10 @@ public class RtcUtil {
 	 * ソースコード自動反映処理
 	 ************************************************************/
 	/**
-	 * ModuleSpec用文字列を生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * ModuleSpec用文字列を生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return ModuleSpec用文字列
 	 */
 	private static List<String> createModuleSpec(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -196,11 +195,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * ModuleSpecのコンフィギュレーション用文字列を生成する
-	 * 
-	 * @param configurationList
-	 * @param appendComment
-	 * @return
+	 * ModuleSpecのコンフィギュレーション用文字列を生成する.
+	 *
+	 * @param configurationList コンフィグレーションリスト
+	 * @param appendComment コメント
+	 * @return コンフィギュレーション用文字列
 	 */
 	private static List<String> createModuleSpecConfiguration(List<Configuration> configurationList,
 			boolean appendComment) {
@@ -246,10 +245,10 @@ public class RtcUtil {
 	 * C++用のソースコード自動反映処理（自動反映文字列生成）
 	 ************************************************************/
 	/**
-	 * C++用のModuleSpeを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++用のModuleSpeを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++用のModuleSpe
 	 */
 	public static List<String> createModuleSpecForCpp(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -278,10 +277,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダ用のservice_impl_hを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ヘッダ用のservice_impl_hを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ヘッダ用のservice_impl_h
 	 */
 	public static List<String> createServiceImplementHeaderCppHeader(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -306,10 +305,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダ用のconsumer_stub_hを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ヘッダ用のconsumer_stub_hを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ヘッダ用のconsumer_stub_h
 	 */
 	public static List<String> createConsumerStubHeaderCppHeader(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -334,10 +333,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダ用のport_stub_hを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ヘッダ用のport_stub_hを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ヘッダ用のport_stub_h
 	 */
 	public static List<String> createPortStubHeaderCppHeader(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -354,10 +353,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダ用のインポートの宣言文を生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ヘッダ用のインポートの宣言文を生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ヘッダ用のインポートの宣言文
 	 */
 	public static List<String> createInportDeclareListCppHeader(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -373,10 +372,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダ用のアウトポートの宣言文を生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ヘッダ用のアウトポートの宣言文を生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ヘッダ用のアウトポートの宣言文
 	 */
 	public static List<String> createOutportDeclareListCppHeader(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -392,10 +391,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダ用のサービスポートの宣言文を生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ヘッダ用のサービスポートの宣言文を生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ヘッダ用のサービスポートの宣言文
 	 */
 	public static List<String> createCorbaportDeclareListCppHeader(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -408,10 +407,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダ用のProvidedのサービスインタフェースの宣言文を生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ヘッダ用のProvidedのサービスインタフェースの宣言文を生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ヘッダ用のProvidedのサービスインタフェースの宣言文
 	 */
 	public static List<String> createServiceDeclareListCppHeader(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -433,10 +432,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダ用のRequiredのサービスインタフェースの宣言文を生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ヘッダ用のRequiredのサービスインタフェースの宣言文を生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ヘッダ用のRequiredのサービスインタフェースの宣言文
 	 */
 	public static List<String> createConsumerDeclareListCppHeader(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -458,10 +457,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダ用のコンフィギュレーションの宣言文を生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ヘッダ用のコンフィギュレーションの宣言文を生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ヘッダ用のコンフィギュレーションの宣言文
 	 */
 	public static List<String> craeteConfigDeclareListCppHeader(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -515,10 +514,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースコード用のInitializerを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ソースコード用のInitializerを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ソースコード用のInitializer
 	 */
 	public static List<String> createInitializerCppSource(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -559,10 +558,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースコード用のregistrationを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ソースコード用のregistrationを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ソースコード用のregistration
 	 */
 	public static List<String> createRegistrationCppSource(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -624,10 +623,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースコード用のbind_configを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * C++ソースコード用のbind_configを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return C++ソースコード用のbind_config
 	 */
 	public static List<String> createBindConfigCppSource(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -651,13 +650,13 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダ用のDataPortの宣言文を生成する
-	 * 
-	 * @param portName
-	 * @param valName
-	 * @param dataType
-	 * @param portType
-	 * @return
+	 * C++ヘッダ用のDataPortの宣言文を生成する.
+	 *
+	 * @param portName ポート名
+	 * @param valName 変数名
+	 * @param dataType データタイプ
+	 * @param portType ポート型
+	 * @return C++ヘッダ用のDataPortの宣言文
 	 */
 	private static List<String> createDataPortDeclareCppHeader(String portName, String valName, String dataType,
 			String portType) {
@@ -685,12 +684,12 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースコード用のデータポート用のInitializerを生成する
-	 * 
-	 * @param portName
-	 * @param valName
-	 * @param portType
-	 * @return
+	 * C++ソースコード用のデータポート用のInitializerを生成する.
+	 *
+	 * @param portName ポート名
+	 * @param valName 変数名
+	 * @param portType ポート型
+	 * @return C++ソースコード用のデータポート用のInitializer
 	 */
 	private static String createDataPortInitializerCppSource(String portName, String valName, String portType) {
 		StringBuilder sb = new StringBuilder();
@@ -704,10 +703,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースコード用のデータポート用のInitializerを生成する
-	 * 
-	 * @param portName
-	 * @return
+	 * C++ソースコード用のデータポート用のInitializerを生成する.
+	 *
+	 * @param portName ポート名
+	 * @return C++ソースコード用のデータポート用のInitializer
 	 */
 	private static String createServicePortInitializerCppSource(String portName) {
 		StringBuilder sb = new StringBuilder();
@@ -719,12 +718,12 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースコード用のデータポート用のRegistrationを生成する
-	 * 
-	 * @param portName
-	 * @param valName
-	 * @param portType
-	 * @return
+	 * C++ソースコード用のデータポート用のRegistrationを生成する.
+	 *
+	 * @param portName ポート名
+	 * @param valName 変数名
+	 * @param portType ポート型
+	 * @return C++ソースコード用のデータポート用のRegistration
 	 */
 	private static String createDataPortRegistrationCppSource(String portName, String valName, String portType) {
 		StringBuilder sb = new StringBuilder();
@@ -739,14 +738,15 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースコード用のサービスインタフェース用のRegistrationを生成する
-	 * 
-	 * @param portName
-	 * @param direction
-	 * @param ifType
-	 * @param ifName
-	 * @param valName
-	 * @return
+	 * C++ソースコード用のサービスインタフェース用のRegistrationを生成する.
+	 *
+	 * @param portName ポート名
+	 * @param directon 方向
+	 * @param ifType インターフェース型
+	 * @param ifName インターフェース名
+	 * @param insName インスタンス名
+	 * @param valName 変数名
+	 * @return C++ソースコード用のサービスインタフェース用のRegistration
 	 */
 	private static String createInterfaceRegistrationCppSource(String portName, String directon, String ifType,
 			String ifName, String insName, String valName) {
@@ -765,10 +765,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースコード用のサービスポート用のRegistrationを生成する
-	 * 
-	 * @param portName
-	 * @return
+	 * C++ソースコード用のサービスポート用のRegistrationを生成する.
+	 *
+	 * @param portName ポート名
+	 * @return C++ソースコード用のサービスポート用のRegistration
 	 */
 	private static String createServicePortRegistrationCppSource(String portName) {
 		StringBuilder sb = new StringBuilder();
@@ -779,11 +779,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++用のデータポートのデータ型のインスタンス名を生成する
-	 * 
-	 * @param portName
-	 * @param valName
-	 * @return
+	 * C++用のデータポートのデータ型のインスタンス名を生成する.
+	 *
+	 * @param portName ポート名
+	 * @param valName 変数名
+	 * @return C++用のデータポートのデータ型のインスタンス名
 	 */
 	private static String createPortDataTypeInstanceCpp(String portName, String valName) {
 		if (StringUtil.isNotEmpty(valName)) {
@@ -794,12 +794,12 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++用のデータポートのインスタンス名を生成する
-	 * 
-	 * @param portName
-	 * @param valName
-	 * @param portType
-	 * @return
+	 * C++用のデータポートのインスタンス名を生成する.
+	 *
+	 * @param portName ポート名
+	 * @param valName 変数名
+	 * @param portType ポート型
+	 * @return C++用のデータポートのインスタンス名
 	 */
 	private static String createDataPortInstanceCpp(String portName, String valName, String portType) {
 		if (StringUtil.isNotEmpty(valName)) {
@@ -810,52 +810,52 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++用のサービスポートのインスタンス名を生成する
-	 * 
-	 * @param portName
-	 * @return
+	 * C++用のサービスポートのインスタンス名を生成する.
+	 *
+	 * @param portName ポート名
+	 * @return C++用のサービスポートのインスタンス名
 	 */
 	private static String createServicePortInstanceCpp(String portName) {
 		return "m_" + portName + "Port";
 	}
 
 	/**
-	 * C++用のサービスインタフェースのimplement名を生成する
-	 * 
-	 * @param ifType
-	 * @return
+	 * C++用のサービスインタフェースのimplement名を生成する.
+	 *
+	 * @param idlFile IDLファイル
+	 * @return C++用のサービスインタフェースのimplement名
 	 */
 	private static String createServiceInterfaceImplementCpp(String idlFile) {
 		return idlFile.replace(".idl", "") + "SVC_impl";
 	}
 
 	/**
-	 * C++用のサービスインタフェースのstub名を生成する
-	 * 
-	 * @param idlFile
-	 * @return
+	 * C++用のサービスインタフェースのstub名を生成する.
+	 *
+	 * @param idlFile IDLファイル
+	 * @return C++用のサービスインタフェースのstub名
 	 */
 	private static String createServiceInterfaceStubCpp(String idlFile) {
 		return idlFile.replace(".idl", "") + "Stub";
 	}
 
 	/**
-	 * C++用のサービスインタフェースのクラス宣言を生成する
-	 * 
-	 * @param ifName
-	 * @return
+	 * C++用のサービスインタフェースのクラス宣言を生成する.
+	 *
+	 * @param ifType インターフェース型
+	 * @return C++用のサービスインタフェースのクラス宣言
 	 */
 	private static String createServiceInterfaceClassCpp(String ifType) {
 		return ifType.contains("::") ? (ifType.split("::")[0] + "_" + ifType.split("::")[1] + "SVC_impl") : ifType;
 	}
 
 	/**
-	 * C++用のサービスインタフェースのインスタンス名を生成する
-	 * 
-	 * @param ifName
-	 * @param insName
-	 * @param valName
-	 * @return
+	 * C++用のサービスインタフェースのインスタンス名を生成する.
+	 *
+	 * @param ifName インターフェース名
+	 * @param insName インスタンス名
+	 * @param valName 変数名
+	 * @return C++用のサービスインタフェースのインスタンス名
 	 */
 	private static String createServiceInterfaceInstanceCpp(String ifName, String insName, String valName) {
 		if (StringUtil.isNotEmpty(valName)) {
@@ -868,11 +868,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++用のコンフィギュレーションのインスタンス名を生成する
-	 * 
-	 * @param configName
-	 * @param valName
-	 * @return
+	 * C++用のコンフィギュレーションのインスタンス名を生成する.
+	 *
+	 * @param configName コンフィグレーション名
+	 * @param valName 変数名
+	 * @return C++用のコンフィギュレーションのインスタンス名
 	 */
 	private static String createConfigurationInsatanceCpp(String configName, String valName) {
 		StringBuilder sb = new StringBuilder();
@@ -889,10 +889,10 @@ public class RtcUtil {
 	 * C++用のソースコード自動反映処理（自動反映実行）
 	 ************************************************************/
 	/**
-	 * C++ソースファイルのmodule_specを更新する
-	 * 
-	 * @param codeFilePath
-	 * @param strList
+	 * C++ソースファイルのmodule_specを更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateModuleSpecCpp(String codeFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"module_spec\"";
@@ -915,10 +915,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースファイルのinitializerを更新する
-	 * 
-	 * @param codeFilePath
-	 * @param strList
+	 * C++ソースファイルのinitializerを更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateInitializerCpp(String codeFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"initializer\"";
@@ -939,10 +939,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースファイルのregistrationを更新する
-	 * 
-	 * @param codeFilePath
-	 * @param strList
+	 * C++ソースファイルのregistrationを更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateRegistrationCpp(String codeFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"registration\"";
@@ -957,10 +957,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースファイルのbind_configを更新する
-	 * 
-	 * @param codeFilePath
-	 * @param strList
+	 * C++ソースファイルのbind_configを更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateBindConfigCpp(String codeFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"bind_config\"";
@@ -975,11 +975,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ソースファイルのcomponent_kindを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param moduleName
-	 * @param newComponentKind
+	 * C++ソースファイルのcomponent_kindを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param moduleName モジュール名
+	 * @param newComponentKind component_kind
 	 */
 	public static void updateComponentKindCppHeader(String headerFilePath, String moduleName, String newComponentKind) {
 		try {
@@ -1042,10 +1042,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのservice_impl_hを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのservice_impl_hを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateServiceImplheaderCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"service_impl_h\"";
@@ -1056,10 +1056,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのconsumer_stub_hを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのconsumer_stub_hを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateConsumerStubheaderCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"consumer_stub_h\"";
@@ -1070,10 +1070,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのport_stub_hを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのport_stub_hを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updatePortStubheaderCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"port_stub_h\"";
@@ -1084,10 +1084,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのpublic_attributeを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのpublic_attributeを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updatePublicAttributeCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"public_attribute\"";
@@ -1102,10 +1102,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのpublic_operationを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのpublic_operationを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updatePublicOperationCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"public_operation\"";
@@ -1120,10 +1120,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのprotected_attributeを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのprotected_attributeを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateProtectedAttributeCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"protected_attribute\"";
@@ -1138,10 +1138,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのprotected_operationを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのprotected_operationを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateProtectedOperationCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"protected_operation\"";
@@ -1156,10 +1156,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのconfig_declareを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのconfig_declareを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateConfigDeclareCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"config_declare\"";
@@ -1174,10 +1174,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのinport_declareを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのinport_declareを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateInportDeclareCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"inport_declare\"";
@@ -1192,10 +1192,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのoutport_declareを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのoutport_declareを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateOutportDeclareCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"outport_declare\"";
@@ -1210,10 +1210,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのcorbaport_declareを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのcorbaport_declareを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateCorbaportDeclareCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"corbaport_declare\"";
@@ -1228,10 +1228,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのservice_declareを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのservice_declareを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateServiceDeclareCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"service_declare\"";
@@ -1246,10 +1246,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのconsumer_declareを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのconsumer_declareを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateConsumerDeclareCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"consumer_declare\"";
@@ -1264,10 +1264,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのprivate_attributeを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのprivate_attributeを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updatePrivateAttributeCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"private_attribute\"";
@@ -1282,10 +1282,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++ヘッダのprivate_operationを更新する
-	 * 
-	 * @param headerFilePath
-	 * @param strList
+	 * C++ヘッダのprivate_operationを更新する.
+	 *
+	 * @param headerFilePath ヘッダファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updatePrivateOperationCppHeader(String headerFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"private_operation\"";
@@ -1303,10 +1303,10 @@ public class RtcUtil {
 	 * Python用のソースコード自動反映処理（自動反映文字列生成）
 	 ************************************************************/
 	/**
-	 * Python用のmodule_specを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * Python用のmodule_specを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return Python用のmodule_spec
 	 */
 	public static List<String> createModuleSpecForPyhon(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -1333,10 +1333,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のIDLインポート文を生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * Python用のIDLインポート文を生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return Python用のIDLインポート文
 	 */
 	public static List<String> createIdlImportForPython(RtcProfile rtcProfile) {
 		List<String> idlImportList = new ArrayList<String>();
@@ -1355,10 +1355,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のservice_implを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * Python用のservice_implを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return Python用のservice_impl
 	 */
 	public static List<String> createServiceImplementForPython(RtcProfile rtcProfile) {
 		List<String> serviceImplList = new ArrayList<String>();
@@ -1379,10 +1379,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のconsumer_importを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * Python用のconsumer_importを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return Python用のconsumer_import
 	 */
 	public static List<String> createConsumerImportForPython(RtcProfile rtcProfile) {
 		List<String> consumerImportList = new ArrayList<String>();
@@ -1401,10 +1401,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のinit_conf_paramを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * Python用のinit_conf_paramを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return Python用のinit_conf_param
 	 */
 	public static List<String> createInitConfParamForPython(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -1450,16 +1450,16 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のコンストラクタを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * Python用のコンストラクタを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return Python用のコンストラクタ
 	 */
 	public static List<String> createConstructorForPython(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
 
 		// コンポーネント種類
-		stringList.add("OpenRTM_aist." + rtcProfile.getBasicInfo().getComponentKind() + "Base.__init__(self, manager)");
+		stringList.add("OpenRTM_aist." + rtcProfile.getBasicInfo().getComponentKind() + "DataFlowComponentBase.__init__(self, manager)");
 
 		stringList.add("");
 		// DataInPort
@@ -1517,10 +1517,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のOnInitializeを生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * Python用のOnInitializeを生成する.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @return Python用のOnInitialize
 	 */
 	public static List<String> createOnIntializeForPython(RtcProfile rtcProfile) {
 		List<String> stringList = new ArrayList<String>();
@@ -1599,10 +1599,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のIDLファイルのインポート文を生成する
-	 * 
-	 * @param idlFile
-	 * @return
+	 * Python用のIDLファイルのインポート文を生成する.
+	 *
+	 * @param idlFile IDLファイル
+	 * @return Python用のIDLファイルのインポート文
 	 */
 	private static String createIdlImportPython(String idlFile) {
 		StringBuilder sb = new StringBuilder();
@@ -1614,10 +1614,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のservice_implを生成する
-	 * 
-	 * @param idlFile
-	 * @return
+	 * Python用のservice_implを生成する.
+	 *
+	 * @param idlFile IDLファイル
+	 * @return Python用のservice_impl
 	 */
 	private static String createServiceImplementPython(String idlFile) {
 		StringBuilder sb = new StringBuilder();
@@ -1630,10 +1630,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のconsumer_importを生成する
-	 * 
-	 * @param ifType
-	 * @return
+	 * Python用のconsumer_importを生成する.
+	 *
+	 * @param ifType インターフェース型
+	 * @return Python用のconsumer_import
 	 */
 	private static String createConsumerImportPython(String ifType) {
 		StringBuilder sb = new StringBuilder();
@@ -1649,12 +1649,12 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のポート型のコンストラクタを生成する
-	 * 
-	 * @param portName
-	 * @param valName
-	 * @param portDataType
-	 * @return
+	 * Python用のポート型のコンストラクタを生成する.
+	 *
+	 * @param portName ポート名
+	 * @param valName 変数名
+	 * @param portDataType データ型
+	 * @return Python用のポート型のコンストラクタ
 	 */
 	private static String createPortDataTypeConstructorPython(String portName, String valName, String portDataType) {
 		StringBuilder sb = new StringBuilder();
@@ -1665,12 +1665,12 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のデータポートのコンストラクタを生成する
-	 * 
-	 * @param portName
-	 * @param valName
-	 * @param portType
-	 * @return
+	 * Python用のデータポートのコンストラクタを生成する.
+	 *
+	 * @param portName ポート名
+	 * @param valName 変数名
+	 * @param portType ポート型
+	 * @return Python用のデータポートのコンストラクタ
 	 */
 	private static String createDataPortConstructorPython(String portName, String valName, String portType) {
 		StringBuilder sb = new StringBuilder();
@@ -1686,10 +1686,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のサービスポートのコンストラクタを生成する
-	 * 
-	 * @param portName
-	 * @return
+	 * Python用のサービスポートのコンストラクタを生成する.
+	 *
+	 * @param portName ポート名
+	 * @return Python用のサービスポートのコンストラクタ
 	 */
 	private static String createServicePortConstructorPython(String portName) {
 		StringBuilder sb = new StringBuilder();
@@ -1701,13 +1701,13 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のProviderサービスインタフェースのコンストラクタを生成する
-	 * 
-	 * @param ifName
-	 * @param insName
-	 * @param valname
-	 * @param ifType
-	 * @return
+	 * Python用のProviderサービスインタフェースのコンストラクタを生成する.
+	 *
+	 * @param ifName インターフェース名
+	 * @param insName インスタンス名
+	 * @param valName 変数名
+	 * @param ifType インターフェース型
+	 * @return Python用のProviderサービスインタフェースのコンストラクタ
 	 */
 	private static String createProviderCostructorPython(String ifName, String insName, String valName, String ifType) {
 		StringBuilder sb = new StringBuilder();
@@ -1720,13 +1720,13 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のConsumerサービスインタフェースのコンストラクタを生成する
-	 * 
-	 * @param ifName
-	 * @param insName
-	 * @param valname
-	 * @param ifType
-	 * @return
+	 * Python用のConsumerサービスインタフェースのコンストラクタを生成する.
+	 *
+	 * @param ifName インターフェース名
+	 * @param insName インスタンス名
+	 * @param valName 変数名
+	 * @param ifType インターフェース型
+	 * @return Python用のConsumerサービスインタフェースのコンストラクタ
 	 */
 	private static String createConsumerCostructorPython(String ifName, String insName, String valName, String ifType) {
 		StringBuilder sb = new StringBuilder();
@@ -1738,11 +1738,12 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のコンフィギュレーション用のOnInitializeを生成する
-	 * 
-	 * @param portName
-	 * @param portType
-	 * @return
+	 * Python用のコンフィギュレーション用のOnInitializeを生成する.
+	 *
+	 * @param confName コンフィグレーション名
+	 * @param valName 変数名
+	 * @param defaultValue デフォルト値
+	 * @return Python用のコンフィギュレーション用のOnInitialize
 	 */
 	private static String createConfigurationOnInitializePython(String confName, String valName, String defaultValue) {
 		StringBuilder sb = new StringBuilder();
@@ -1757,11 +1758,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のデータポート用のOnInitializeを生成する
-	 * 
-	 * @param portName
-	 * @param portType
-	 * @return
+	 * Python用のデータポート用のOnInitializeを生成する.
+	 *
+	 * @param portName ポート名
+	 * @param portType ポート型
+	 * @return Python用のデータポート用のOnInitialize
 	 */
 	private static String createDataPortOnInitializePython(String portName, String portType) {
 		StringBuilder sb = new StringBuilder();
@@ -1776,14 +1777,15 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のサービスインタフェース用のOnInitializeを生成する
-	 * 
-	 * @param portName
-	 * @param ifType
-	 * @param ifName
-	 * @param insName
-	 * @param valName
-	 * @return
+	 * Python用のサービスインタフェース用のOnInitializeを生成する.
+	 *
+	 * @param portName ポート名
+	 * @param directon 方向
+	 * @param ifType インターフェース型
+	 * @param ifName インターフェース名
+	 * @param insName インスタンス名
+	 * @param valName 変数名
+	 * @return Python用のサービスインタフェース用のOnInitialize
 	 */
 	private static String createInterfaceOnInitializePython(String portName, String directon, String ifType,
 			String ifName, String insName, String valName) {
@@ -1802,10 +1804,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のサービスポート用のOnInitializeを生成する
-	 * 
-	 * @param portName
-	 * @return
+	 * Python用のサービスポート用のOnInitializeを生成する.
+	 *
+	 * @param portName ポート名
+	 * @return Python用のサービスポート用のOnInitialize
 	 */
 	private static String createServicePortOnInitializePython(String portName) {
 		StringBuilder sb = new StringBuilder();
@@ -1816,11 +1818,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のデータポートのデータ型のインスタンス名を生成する
-	 * 
-	 * @param portName
-	 * @param valName
-	 * @return
+	 * Python用のデータポートのデータ型のインスタンス名を生成する.
+	 *
+	 * @param portName ポート名
+	 * @param valName 変数名
+	 * @return Python用のデータポートのデータ型のインスタンス名
 	 */
 	private static String createPortDataTypeInstancePython(String portName, String valName) {
 		StringBuilder sb = new StringBuilder();
@@ -1834,11 +1836,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のデータポートのインスタンス名を生成する
-	 * 
-	 * @param portName
-	 * @param portType
-	 * @return
+	 * Python用のデータポートのインスタンス名を生成する.
+	 *
+	 * @param portName ポート名
+	 * @param portType ポート型
+	 * @return Python用のデータポートのインスタンス名
 	 */
 	private static String createDataPortInstancePython(String portName, String portType) {
 		StringBuilder sb = new StringBuilder();
@@ -1849,10 +1851,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のサービスポートのインスタンス名を生成する
-	 * 
-	 * @param portName
-	 * @return
+	 * Python用のサービスポートのインスタンス名を生成する.
+	 *
+	 * @param portName ポート名
+	 * @return Python用のサービスポートのインスタンス名
 	 */
 	private static String createServicePortInstancePython(String portName) {
 		StringBuilder sb = new StringBuilder();
@@ -1863,12 +1865,12 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のサービスインタフェースのインスタンス名を生成する
-	 * 
-	 * @param ifName
-	 * @param insName
-	 * @param valName
-	 * @return
+	 * Python用のサービスインタフェースのインスタンス名を生成する.
+	 *
+	 * @param ifName インターフェース名
+	 * @param insName インスタンス名
+	 * @param valName 変数名
+	 * @return Python用のサービスインタフェースのインスタンス名
 	 */
 	private static String createServiceInterfaceInstancePython(String ifName, String insName, String valName) {
 		StringBuilder sb = new StringBuilder();
@@ -1884,11 +1886,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用のコンフィギュレーションのインスタンス名を生成する
-	 * 
-	 * @param configName
-	 * @param valName
-	 * @return
+	 * Python用のコンフィギュレーションのインスタンス名を生成する.
+	 *
+	 * @param configName コンフィグレーション名
+	 * @param valName 変数名
+	 * @return Python用のコンフィギュレーションのインスタンス名
 	 */
 	private static String createConfigurationInsatancePython(String configName, String valName) {
 		StringBuilder sb = new StringBuilder();
@@ -1905,10 +1907,10 @@ public class RtcUtil {
 	 * Python用のソースコード自動反映処理（自動反映文字列実行）
 	 ************************************************************/
 	/**
-	 * Python用にservice_implを更新する
-	 * 
-	 * @param codeFilePath
-	 * @param strList
+	 * Python用にservice_implを更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateServiceImplementPython(String codeFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"service_impl\"";
@@ -1919,10 +1921,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用にconsumer_importを更新する
-	 * 
-	 * @param codeFilePath
-	 * @param strList
+	 * Python用にconsumer_importを更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateConsumerImportPython(String codeFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"consumer_import\"";
@@ -1933,10 +1935,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用にinit_conf_paramを更新する
-	 * 
-	 * @param codeFilePath
-	 * @param strList
+	 * Python用にinit_conf_paramを更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateInitConfParamPython(String codeFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"init_conf_param\"";
@@ -1951,10 +1953,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用にmodule_specを挿入する
-	 * 
-	 * @param codeFilePath
-	 * @param strList
+	 * Python用にmodule_specを挿入する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateModuleSpecPython(String codeFilePath, List<String> strList) {
 		String rtcTemplateTag = "block=\"module_spec\"";
@@ -1971,10 +1973,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用にidlのimport文を更新する
-	 * 
-	 * @param codeFilePath
-	 * @param strList
+	 * Python用にidlのimport文を更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateIdlImportPython(String codeFilePath, List<String> strList) {
 		if (CollectionUtil.isNotEmpty(strList)) {
@@ -1984,11 +1986,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用にクラス宣言を更新する
-	 * 
-	 * @param codeFilePath
-	 * @param moduleName
-	 * @param newComponentKind
+	 * Python用にクラス宣言を更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param moduleName モジュール名
+	 * @param newComponentKind component_kind
 	 */
 	public static void udpateClassNamePython(String codeFilePath, String moduleName, String newComponentKind) {
 		try {
@@ -2034,10 +2036,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用にconstructorを更新する
-	 * 
-	 * @param codeFilePath
-	 * @param strList
+	 * Python用にconstructorを更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateConstructorPython(String codeFilePath, List<String> strList) {
 		if (CollectionUtil.isNotEmpty(strList)) {
@@ -2051,10 +2053,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用にOnInitializeを更新する
-	 * 
-	 * @param codeFilePath
-	 * @param newConstructorList
+	 * Python用にOnInitializeを更新する.
+	 *
+	 * @param codeFilePath ソースファイルパス
+	 * @param strList 文字列リスト
 	 */
 	public static void updateOnInitializePython(String codeFilePath, List<String> strList) {
 		if (CollectionUtil.isNotEmpty(strList)) {
@@ -2071,23 +2073,24 @@ public class RtcUtil {
 	}
 
 	/**
-	 * RTC-Template用ソースコード自動生成
-	 * 
-	 * @param filePath
-	 * @param insertStr
-	 * @param tagStr
+	 * RTC-Template用ソースコード自動生成.
+	 *
+	 * @param filePath ファイルパス
+	 * @param insertStr 挿入文字列
+	 * @param tagStr 対象文字列
 	 */
 	public static void autoGenerateRtcTemplate(String filePath, List<String> insertStr, String tagStr) {
 		autoGenerateSourceCode(filePath, insertStr, tagStr, "/rtc-template");
 	}
 
 	/**
-	 * ソースコード自動生成（複数行挿入）
-	 * 
-	 * @param filePath
-	 * @param insertStr
-	 * @param startStr
-	 * @param endStr
+	 * ソースコード自動生成（複数行挿入）.
+	 *
+	 * @param filePath ファイルパス
+	 * @param insertStr 挿入文字列
+	 * @param startStr 先頭文字列
+	 * @param endStr 終端文字列
+	 * @return 正常終了したかどうか
 	 */
 	public static boolean autoGenerateSourceCode(String filePath, List<String> insertStr, String startStr,
 			String endStr) {
@@ -2148,11 +2151,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Cppのヘッダファイルのアクティビティのコメント有無を切替える
-	 * 
-	 * @param filePath
-	 * @param methodName
-	 * @param isAdd
+	 * Cppのヘッダファイルのアクティビティのコメント有無を切替える.
+	 *
+	 * @param filePath ファイルパス
+	 * @param methodName メソッド名
+	 * @param isAdd コメント有無
 	 */
 	public static void changeCommentMethodCppHeader(String filePath, String methodName, boolean isAdd) {
 		try {
@@ -2201,11 +2204,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Cppのソースファイルのアクティビティのコメント有無を切替える
-	 * 
-	 * @param filePath
-	 * @param methodName
-	 * @param isAdd
+	 * Cppのソースファイルのアクティビティのコメント有無を切替える.
+	 *
+	 * @param filePath ファイルパス
+	 * @param methodName メソッド名
+	 * @param isAdd コメント有無
 	 */
 	public static void changeCommentMethodCppSource(String filePath, String methodName, boolean isAdd) {
 		try {
@@ -2281,11 +2284,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Pythonのソースコードのアクティビティのコメント有無を切替える
-	 * 
-	 * @param filePath
-	 * @param methodName
-	 * @param isAdd
+	 * Pythonのソースコードのアクティビティのコメント有無を切替える.
+	 *
+	 * @param filePath ファイルパス
+	 * @param methodName メソッド名
+	 * @param isAdd コメント有無
 	 */
 	public static void changeCommentMethodPython(String filePath, String methodName, boolean isAdd) {
 		try {
@@ -2390,10 +2393,10 @@ public class RtcUtil {
 	 ************************************************************/
 
 	/**
-	 * C++用にIDLファイルのコピーおよびImplコードの生成を行う
-	 * 
-	 * @param rtcProfile
-	 * @param rtcDirPath
+	 * C++用にIDLファイルのコピーおよびImplコードの生成を行う.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @param rtcDirPath RTCディレクトリパス
 	 */
 	public static void createServiceProviderImplFileCpp(RtcProfile rtcProfile, String rtcDirPath) {
 		// 全てのProviderに対して処理を行う
@@ -2417,10 +2420,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * 必要となるIDLファイルをIDLフォルダにコピーする
-	 * 
-	 * @param rtcDirPath
-	 * @param idlFileName
+	 * 必要となるIDLファイルをIDLフォルダにコピーする.
+	 *
+	 * @param rtcDirPath RTCディレクトリパス
+	 * @param idlFile IDLファイルName
 	 */
 	private static void copyIdlFile(String rtcDirPath, String idlFileName) {
 		String rtcIdlDirPath = StringUtil.concatenate(File.separator, rtcDirPath, "idl");
@@ -2454,14 +2457,14 @@ public class RtcUtil {
 	}
 
 	/**
-	 * C++用にProviderInterfaceのimplコードを生成する
-	 * 
-	 * @param moduleName
-	 * @param targetDirPath
-	 * @param portName
-	 * @param ifName
-	 * @param ifType
-	 * @param idlFileName
+	 * C++用にProviderInterfaceのimplコードを生成する.
+	 *
+	 * @param rtcDirPath RTCディレクトリパス
+	 * @param moduleName モジュール名
+	 * @param portName ポート名
+	 * @param ifName インターフェース名
+	 * @param ifType インターフェース型
+	 * @param idlFile IDLファイルName
 	 */
 	private static void createProviderImplFileCpp(String rtcDirPath, String moduleName, String portName, String ifName,
 			String ifType, String idlFileName) {
@@ -2487,7 +2490,7 @@ public class RtcUtil {
 				tmpDir.mkdir();
 
 				// rtc-templateを実行する
-				ProcessUtil.startProcessNoReturnWithWorkingDerectory(tmpDirPath, "python", "/usr/bin/rtc-template",
+				ProcessUtil.startProcessNoReturnWithWorkingDerectory(tmpDirPath, "python3", "/usr/bin/rtc-template",
 						"-bcxx", moduleNameArgs, serviceArgs, idlArgs);
 
 				// 作成されるファイル
@@ -2508,10 +2511,10 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用にIDLファイルのコピーおよびidl.pyの生成を行う
-	 * 
-	 * @param rtcProfile
-	 * @param rtcDirPath
+	 * Python用にIDLファイルのコピーおよびidl.pyの生成を行う.
+	 *
+	 * @param rtcProfile RTCプロファイル
+	 * @param rtcDirPath RTCディレクトリパス
 	 */
 	public static void createServiceProviderConsumerIdlFilePython(RtcProfile rtcProfile, String rtcDirPath) {
 		// 全てのProvider,Cosumerに対して処理を行う
@@ -2566,11 +2569,11 @@ public class RtcUtil {
 	}
 
 	/**
-	 * Python用にidl.pyを生成する
-	 * 
-	 * @param rtcDirPath
-	 * @param moduleName
-	 * @param argsList
+	 * Python用にidl.pyを生成する.
+	 *
+	 * @param rtcDirPath RTCディレクトリパス
+	 * @param moduleName モジュール名
+	 * @param argsList 引数リスト
 	 */
 	private static void createIdlPython(String rtcDirPath, String moduleName, List<String> argsList) {
 
@@ -2582,7 +2585,7 @@ public class RtcUtil {
 
 		// rtc-templateを実行する
 		List<String> commandList = new ArrayList<String>();
-		commandList.add("python");
+		commandList.add("python3");
 		commandList.add("/usr/bin/rtc-template");
 		commandList.add("-bpython");
 		commandList.addAll(argsList);
@@ -2617,10 +2620,10 @@ public class RtcUtil {
 	 ************************************************************/
 
 	/**
-	 * ExecutionRateを更新する
-	 * 
-	 * @param configFilePath
-	 * @param newExecutionRate
+	 * ExecutionRateを更新する.
+	 *
+	 * @param configFilePath コンフィグファイルパス
+	 * @param newExecutionRate ExecutionRate
 	 */
 	public static void updateExecutionRateRtcConfig(String configFilePath, Double newExecutionRate) {
 		try {

@@ -1,23 +1,23 @@
 package com.sec.airgraph.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.xml.bind.JAXB;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
-
+import com.sec.airgraph.util.FileUtil;
+import com.sec.airgraph.util.GitUtil;
+import com.sec.airgraph.util.RtmEditorUtil;
+import com.sec.airgraph.util.PropUtil;
+import com.sec.airgraph.util.RtcUtil;
+import com.sec.airgraph.util.StringUtil;
+import com.sec.airgraph.util.YamlUtil;
+import com.sec.airgraph.util.CollectionUtil;
+import com.sec.airgraph.util.Const.COMMON.DIR_NAME;
+import com.sec.airgraph.util.Const.COMMON.FILE_NAME;
+import com.sec.airgraph.util.Const.COMMON.FILE_SUFFIX;
+import com.sec.airgraph.util.Const.RT_COMPONENT.COMPONENT_CONNECTOR_TYPE;
+import com.sec.airgraph.util.Const.RT_COMPONENT.DATAFLOW_TYPE;
+import com.sec.airgraph.util.Const.RT_COMPONENT.INTERFACE_TYPE;
+import com.sec.airgraph.util.Const.RT_COMPONENT.LANGUAGE_KIND;
+import com.sec.airgraph.util.Const.RT_COMPONENT.MODULE_NAME;
+import com.sec.airgraph.util.Const.RT_COMPONENT.PACKAGE_NAME;
+import com.sec.airgraph.util.Const.RT_COMPONENT.SUBSCRIPTION_TYPE;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sec.rtc.entity.rtc.Actions;
 import com.sec.rtc.entity.rtc.CodeDirectory;
@@ -38,27 +38,25 @@ import com.sec.rtc.entity.rts.Property;
 import com.sec.rtc.entity.rts.Rts;
 import com.sec.rtc.entity.rts.RtsProfile;
 import com.sec.rtc.entity.rts.ServicePort;
-import com.sec.airgraph.util.FileUtil;
-import com.sec.airgraph.util.GitUtil;
-import com.sec.airgraph.util.RtmEditorUtil;
-import com.sec.airgraph.util.PropUtil;
-import com.sec.airgraph.util.RtcUtil;
-import com.sec.airgraph.util.StringUtil;
-import com.sec.airgraph.util.YamlUtil;
-import com.sec.airgraph.util.CollectionUtil;
-import com.sec.airgraph.util.Const.COMMON.DIR_NAME;
-import com.sec.airgraph.util.Const.COMMON.FILE_NAME;
-import com.sec.airgraph.util.Const.COMMON.FILE_SUFFIX;
-import com.sec.airgraph.util.Const.RT_COMPONENT.COMPONENT_CONNECTOR_TYPE;
-import com.sec.airgraph.util.Const.RT_COMPONENT.DATAFLOW_TYPE;
-import com.sec.airgraph.util.Const.RT_COMPONENT.INTERFACE_TYPE;
-import com.sec.airgraph.util.Const.RT_COMPONENT.LANGUAGE_KIND;
-import com.sec.airgraph.util.Const.RT_COMPONENT.MODULE_NAME;
-import com.sec.airgraph.util.Const.RT_COMPONENT.PACKAGE_NAME;
-import com.sec.airgraph.util.Const.RT_COMPONENT.SUBSCRIPTION_TYPE;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.xml.bind.JAXB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
 
 /**
- * RTC管理サービス
+ * RTC管理サービス.
  * 
  * @author Tsuyoshi Hirose
  *
@@ -67,12 +65,12 @@ import com.sec.airgraph.util.Const.RT_COMPONENT.SUBSCRIPTION_TYPE;
 public class RtcManagementService {
 
 	/**
-	 * logger
+	 * logger.
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(RtcManagementService.class);
 
 	/**
-	 * インスタンス名の最後につける接尾辞
+	 * インスタンス名の最後につける接尾辞.
 	 */
 	private static final String MODULE_INSTANCE_SUFFIX = "0";
 
@@ -81,9 +79,9 @@ public class RtcManagementService {
 	 ************************************************************/
 
 	/**
-	 * 新規RTS生成処理
+	 * 新規RTS生成処理.
 	 * 
-	 * @return
+	 * @return 新規RTS
 	 */
 	public Rts createNewRtsProfile() {
 		Rts rts = new Rts();
@@ -93,6 +91,7 @@ public class RtcManagementService {
 		rts.getRtsProfile().setVersion("1.0.0");
 
 		// コンポーネント名設定
+		logger.info("createNewRTS" + PACKAGE_NAME.NEW_ID);
 		rts.getModelProfile().setModelId(PACKAGE_NAME.NEW_ID);
 		rts.getModelProfile().setModelName(PACKAGE_NAME.NEW);
 
@@ -100,12 +99,12 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * 指定ディレクトリ配下にあるすべてのRTS読込処理<br>
-	 * ソースコードを読み込むかどうかを指定可能
-	 * 
-	 * @param rtsParentDirPath
-	 * @param loadSourceFile
-	 * @return
+	 * 指定ディレクトリ配下にあるすべてのRTS読込処理.<br>
+	 * ソースコードを読み込むかどうかを指定可能.
+	 *
+	 * @param rtsParentDirPath 指定ディレクトリ 
+	 * @param loadSourceFile ソースコードを読み込むかどうか
+	 * @return 指定ディレクトリ配下にあるすべてのRTS
 	 */
 	public List<Rts> loadRtsProfiles(String rtsParentDirPath, boolean loadSourceFile) {
 		List<Rts> rtsList = new ArrayList<Rts>();
@@ -128,12 +127,12 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * 指定RTS読込処理<br>
-	 * ソースコードを読み込むかどうかを指定可能
-	 * 
-	 * @param packageDir
-	 * @param loadSourceFile
-	 * @return
+	 * 指定RTS読込処理.<br>
+	 * ソースコードを読み込むかどうかを指定可能.
+	 *
+	 * @param packageDir パッケージディレクトリ
+	 * @param loadSourceFile ソースコードを読み込むかどうか
+	 * @return RTS
 	 */
 	public Rts loadRtsProfile(File packageDir, boolean loadSourceFile) {
 		if (FileUtil.exists(packageDir)) {
@@ -215,11 +214,11 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * 指定RTS書込処理
-	 * 
-	 * @param packageDir
-	 * @param rtsProfile
-	 * @param createBackup
+	 * 指定RTS書込処理.
+	 *
+	 * @param packageDir パッケージディレクトリ
+	 * @param rtsProfile rtsプロフィール
+	 * @param createBackup バックアップを作成するかどうか 
 	 */
 	public void saveRtsProfile(File packageDir, RtsProfile rtsProfile, boolean createBackup) {
 		if (FileUtil.exists(packageDir)) {
@@ -237,11 +236,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * RtsProfileをコピーする
-	 * 
-	 * @param rtsProfileFrom
-	 * @param rtsProfileTo
-	 * @return
+	 * RtsProfileをコピーする.
+	 *
+	 * @param rtsProfileFrom RtsProfile
+	 * @param rtsProfileTo コピー先
 	 */
 	public void copyRtsProfile(RtsProfile rtsProfileFrom, RtsProfile rtsProfileTo) {
 		if (rtsProfileFrom != null && rtsProfileTo != null) {
@@ -251,9 +249,9 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * Packageの変更を保存する
+	 * Packageの変更を保存する.
 	 * 
-	 * @param packageData
+	 * @param packageData packageData
 	 */
 	public void updatePackage(String packageData) {
 
@@ -367,10 +365,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * NN情報の設定をコンフィグレーションに反映する
-	 * 
-	 * @param rtcProfile
-	 * @param oldRtcProfile
+	 * NN情報の設定をコンフィグレーションに反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param oldRtcProfile 旧プロフィール
 	 */
 	public void refreactNNInfoChangedToConfiguration(RtcProfile rtcProfile, RtcProfile oldRtcProfile) {
 		// NN情報が変更されているかどうか
@@ -383,11 +381,11 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * RTCの変更をRtsProfileに反映する
-	 * 
-	 * @param rts
-	 * @param rtcProfile
-	 * @param oldRtcProfile
+	 * RTCの変更をRtsProfileに反映する.
+	 *
+	 * @param rts RTS
+	 * @param rtcProfile RTCプロフィール
+	 * @param oldRtcProfile 旧プロフィール
 	 */
 	private void refrectRtcChangeToRtsProfile(Rts rts, RtcProfile rtcProfile, RtcProfile oldRtcProfile) {
 		// IDが変更されているかどうか
@@ -419,14 +417,14 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * RtcProfileの変更をRtsProfileのComponent部分に反映する
-	 * 
-	 * @param rts
-	 * @param rtcProfile
-	 * @param oldRtcProfile
-	 * @param idChanged
-	 * @param isExecChanged
-	 * @param isConfigChanged
+	 * RtcProfileの変更をRtsProfileのComponent部分に反映する.
+	 *
+	 * @param rts RTS
+	 * @param rtcProfile RTCプロフィール
+	 * @param oldRtcProfile 旧プロフィール
+	 * @param idChanged IDが変更されたか
+	 * @param isExecChanged 実行コンテキストが変更されたか
+	 * @param isConfigChanged configが変更されたか
 	 */
 	private void reflectToRtsComponentList(Rts rts, RtcProfile rtcProfile, RtcProfile oldRtcProfile, boolean idChanged,
 			boolean isExecChanged, boolean isConfigChanged) {
@@ -458,11 +456,11 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * RtcProfileの変更をRtsProfileのConnectors部分に反映する
-	 * 
-	 * @param rts
-	 * @param rtcProfile
-	 * @param oldRtcProfile
+	 * RtcProfileの変更をRtsProfileのConnectors部分に反映する.
+	 *
+	 * @param rts RTS
+	 * @param rtcProfile RTCプロフィール
+	 * @param oldRtcProfile 旧プロフィール
 	 */
 	private void reflectToRtsConnectorList(Rts rts, RtcProfile rtcProfile, RtcProfile oldRtcProfile) {
 		for (int i = 0; i < rts.getRtsProfile().getDataPortConnectors().size(); i++) {
@@ -489,9 +487,10 @@ public class RtcManagementService {
 	 ************************************************************/
 
 	/**
-	 * 新規RTC生成処理
-	 * 
-	 * @return
+	 * 新規RTC生成処理.
+	 *
+	 * @param languageKind 言語の種類
+	 * @return 新規RTC
 	 */
 	public Rtc createNewRtcProfile(String languageKind) {
 		Rtc rtc = new Rtc();
@@ -537,11 +536,9 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * すべてのRtcをローカルにCloneする
-	 * 
-	 * @param bindersLocalDirPath
-	 * @param packagesLocalDirPath
-	 * @param rtcsLocalDirPath
+	 * すべてのRtcをローカルにCloneする.
+	 *
+	 * @param binderDirPath バインダーディレクトリパス
 	 */
 	public void cloneRtcsFromBinder(String binderDirPath) {
 
@@ -587,13 +584,13 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * 指定されたディレクトリ配下にあるすべてのRTC読込処理<br>
-	 * ソースコードを読み込むかどうかを指定可能
-	 * 
-	 * @param rtcParentDirPath
-	 * @param modelIdBase
-	 * @param loadSourceFile
-	 * @return
+	 * 指定されたディレクトリ配下にあるすべてのRTC読込処理.<br>
+	 * ソースコードを読み込むかどうかを指定可能.
+	 *
+	 * @param rtcParentDir 指定されたディレクトリ
+	 * @param modelIdBase modelIdBase
+	 * @param loadSourceFile ソースコードを読み込むかどうか
+	 * @return 指定されたディレクトリ配下にあるすべてのRTC
 	 */
 	public List<Rtc> loadRtcProfiles(File rtcParentDir, String modelIdBase, boolean loadSourceFile) {
 		List<Rtc> rtcList = new ArrayList<Rtc>();
@@ -618,13 +615,13 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * 指定RTC読込処理<br>
-	 * ソースコードを読み込むかどうかを指定可能
-	 * 
-	 * @param rtcDir
-	 * @param modelId
-	 * @param loadSourceFile
-	 * @return
+	 * 指定RTC読込処理.<br>
+	 * ソースコードを読み込むかどうかを指定可能.
+	 *
+	 * @param rtcDir RTCのディレクトリ
+	 * @param modelId モデルID
+	 * @param loadSourceFile ソースコードを読み込むかどうか
+	 * @return 指定RTC
 	 */
 	public Rtc loadRtcProfile(File rtcDir, String modelId, boolean loadSourceFile) {
 		if (FileUtil.exists(rtcDir)) {
@@ -729,11 +726,11 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * 指定RTC書込処理
-	 * 
-	 * @param rtcDir
-	 * @param rtcProfile
-	 * @param createBackup
+	 * 指定RTC書込処理.
+	 *
+	 * @param rtcDir RTCのディレクトリ
+	 * @param rtcProfile RTCプロフィール
+	 * @param createBackup バックアップを作成するかどうか
 	 */
 	public void saveRtcProfile(File rtcDir, RtcProfile rtcProfile, boolean createBackup) {
 		if (FileUtil.exists(rtcDir)) {
@@ -753,17 +750,17 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * RtcProfileからPackageのComponent情報を生成する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * RtcProfileからPackageのComponent情報を生成する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @return PackageのComponent情報
 	 */
 	public Component createRtsComponentInfo(RtcProfile rtcProfile) {
 		// コンポーネント情報
 		Component component = new Component();
 		component.setId(rtcProfile.getId());
 		component.setInstanceName(rtcProfile.getBasicInfo().getModuleName() + MODULE_INSTANCE_SUFFIX);
-		component.setPathUri("localhost/" + component.getInstanceName() + FILE_SUFFIX.SUFFIX_RTC);
+		component.setPathUri("localhost:2809/" + component.getInstanceName() + FILE_SUFFIX.SUFFIX_RTC);
 		component.setCompositeType("None");
 		component.setIsRequired(true);
 		component.setActiveConfigurationSet("default");
@@ -818,19 +815,19 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * 接続情報を生成する
-	 * 
-	 * @param srcId
-	 * @param srcInstanceName
-	 * @param srcPortName
-	 * @param srcPathUri
-	 * @param destId
-	 * @param destInstanceName
-	 * @param destPortName
-	 * @param destPathUri
-	 * @param dataType
-	 * @param connectorType
-	 * @return
+	 * 接続情報を生成する.
+	 *
+	 * @param srcId srcId
+	 * @param srcInstanceName srcInstanceName
+	 * @param srcPortName srcPortName
+	 * @param srcPathUri srcPathUri
+	 * @param destId destId
+	 * @param destInstanceName destInstanceName
+	 * @param destPortName destPortName
+	 * @param destPathUri destPathUri
+	 * @param dataType データタイプ
+	 * @param connectorType コネクタタイプ
+	 * @return 接続情報
 	 */
 	public DataPortConnector createDataPortConnector(String srcId, String srcInstanceName, String srcPortName,
 			String srcPathUri, String destId, String destInstanceName, String destPortName, String destPathUri,
@@ -884,10 +881,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * RTCのコンフィギュレーション設定をRTSのコンフィギュレーション設定に変換する
-	 * 
-	 * @param rtcProfile
-	 * @return
+	 * RTCのコンフィギュレーション設定をRTSのコンフィギュレーション設定に変換する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @return RTSのコンフィギュレーション設定
 	 */
 	private List<ConfigurationSet> convertConfigurationSet(RtcProfile rtcProfile) {
 		List<ConfigurationSet> configurationSetList = new ArrayList<ConfigurationSet>();
@@ -912,14 +909,14 @@ public class RtcManagementService {
 	 * ソースコード関連
 	 ************************************************************/
 	/**
-	 * ソースコードを階層的に読み込む
-	 * 
-	 * @param dirPath
-	 * @param targetDirName
-	 * @param targetExtension
-	 * @param ignoreFileName
-	 * @param pathContentMap
-	 * @return
+	 * ソースコードを階層的に読み込む.
+	 *
+	 * @param dirPath ディレクトリパス
+	 * @param targetDirName 対象ディレクトリ名
+	 * @param targetExtension 対象拡張子
+	 * @param ignoreFileName ignoreファイル名
+	 * @param pathContentMap pathContentMap
+	 * @return ソースコード
 	 */
 	public CodeDirectory getCodeFile(String dirPath, String[] targetDirName, String[] targetExtension,
 			String[] ignoreFileName, Map<String, String> pathContentMap) {
@@ -973,11 +970,11 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * コンフィグファイルを読み込む
-	 * 
-	 * @param rtcDirPath
-	 * @param moduleName
-	 * @return
+	 * コンフィグファイルを読み込む.
+	 *
+	 * @param rtcDirPath RTCディレクトリパス 
+	 * @param moduleName モジュール名
+	 * @return コンフィグファイル
 	 */
 	private String loadConfigFile(String rtcDirPath, String moduleName) {
 		String ret = "";
@@ -989,30 +986,30 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * 編集したファイルを保存する
-	 * 
-	 * @param filePath
-	 * @param codeStr
+	 * 編集したファイルを保存する.
+	 *
+	 * @param filePath ファイルパス
+	 * @param codeStr ファイル名
 	 */
 	private void saveCodeFile(String filePath, String codeStr) {
-		FileUtil.writeAll(filePath, codeStr);
+		FileUtil.writeAll(filePath, codeStr, true);
 	}
 
 	/**
-	 * ファイルを削除する
-	 * 
-	 * @param filePath
+	 * ファイルを削除する.
+	 *
+	 * @param filePath ファイルパス
 	 */
 	private void deleteCodeFile(String filePath) {
 		FileUtil.deleteFile(filePath);
 	}
 
 	/**
-	 * RtcProfileの変更をソースコードに反映する
-	 * 
-	 * @param rtcProfile
-	 * @param rtcDirPath
-	 * @param oldRtcProfile
+	 * RtcProfileの変更をソースコードに反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param oldRtcProfile 旧プロフィール
+	 * @param rtcDirPath RTCディレクトリパス
 	 */
 	private void reflectRtcChangeToSourceCode(RtcProfile rtcProfile, RtcProfile oldRtcProfile, String rtcDirPath) {
 		// スペック情報が変更されているかどうか
@@ -1202,11 +1199,11 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * コンフィグファイルに変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param oldRtcProfile
-	 * @param rtcDirPath
+	 * コンフィグファイルに変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param oldRtcProfile 旧プロフィール
+	 * @param rtcDirPath RTCディレクトリパス
 	 */
 	private void reflectRtcChangeToConfigFile(RtcProfile rtcProfile, RtcProfile oldRtcProfile, String rtcDirPath) {
 		// ExecutionRate
@@ -1233,10 +1230,10 @@ public class RtcManagementService {
 	 * C++用のソースコード自動反映処理
 	 ************************************************************/
 	/**
-	 * C++のソースファイルにmodule_specの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param sourceFile
+	 * C++のソースファイルにmodule_specの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	public void updateModuleSpecCpp(RtcProfile rtcProfile, File sourceFile) {
 		List<String> newModuleSpecList = RtcUtil.createModuleSpecForCpp(rtcProfile);
@@ -1244,10 +1241,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のソースファイルにinitializerの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param sourceFile
+	 * C++のソースファイルにinitializerの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	private void updateInitializerCpp(RtcProfile rtcProfile, File sourceFile) {
 		List<String> newInitializerList = RtcUtil.createInitializerCppSource(rtcProfile);
@@ -1255,10 +1252,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のソースファイルにregistrationの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param sourceFile
+	 * C++のソースファイルにregistrationの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	private void updateRegistrationCpp(RtcProfile rtcProfile, File sourceFile) {
 		List<String> newRegistrationList = RtcUtil.createRegistrationCppSource(rtcProfile);
@@ -1266,10 +1263,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のソースファイルにbind_configの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param sourceFile
+	 * C++のソースファイルにbind_configの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	public void updateBindConfigCpp(RtcProfile rtcProfile, File sourceFile) {
 		List<String> newBindConfigList = RtcUtil.createBindConfigCppSource(rtcProfile);
@@ -1277,10 +1274,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のヘッダファイルにservice_impl_hの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param headerFile
+	 * C++のヘッダファイルにservice_impl_hの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param headerFile ヘッダファイル
 	 */
 	private void updateServiceImplementHeaderCppHeader(RtcProfile rtcProfile, File headerFile) {
 		List<String> newServiceImplementHeaderList = RtcUtil.createServiceImplementHeaderCppHeader(rtcProfile);
@@ -1288,10 +1285,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のヘッダファイルにconsumer_stub_hの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param headerFile
+	 * C++のヘッダファイルにconsumer_stub_hの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param headerFile ヘッダファイル
 	 */
 	private void updateConsumerStubHeaderCppHeader(RtcProfile rtcProfile, File headerFile) {
 		List<String> newConsumerStubHeaderList = RtcUtil.createConsumerStubHeaderCppHeader(rtcProfile);
@@ -1299,10 +1296,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のヘッダファイルにport_stub_hの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param headerFile
+	 * C++のヘッダファイルにport_stub_hの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param headerFile ヘッダファイル
 	 */
 	private void updatePortStubHeaderCppHeader(RtcProfile rtcProfile, File headerFile) {
 		List<String> newPortStubHeaderList = RtcUtil.createPortStubHeaderCppHeader(rtcProfile);
@@ -1310,10 +1307,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のヘッダファイルにコンポーネント種類の変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param headerFile
+	 * C++のヘッダファイルにコンポーネント種類の変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param headerFile ヘッダファイル
 	 */
 	private void updateComponentKindCppHeader(RtcProfile rtcProfile, File headerFile) {
 		RtcUtil.updateComponentKindCppHeader(headerFile.getPath(), rtcProfile.getBasicInfo().getModuleName(),
@@ -1321,10 +1318,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のヘッダファイルにconfig_declareの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param headerFile
+	 * C++のヘッダファイルにconfig_declareの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param headerFile ヘッダファイル
 	 */
 	public void updateConfigDeclareCppHeader(RtcProfile rtcProfile, File headerFile) {
 		List<String> newConfigDeclareHeaderList = RtcUtil.craeteConfigDeclareListCppHeader(rtcProfile);
@@ -1332,10 +1329,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のヘッダファイルにinport_declareの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param headerFile
+	 * C++のヘッダファイルにinport_declareの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param headerFile ヘッダファイル
 	 */
 	private void updateInportDeclareCppHeader(RtcProfile rtcProfile, File headerFile) {
 		List<String> newInportDeclareHeaderList = RtcUtil.createInportDeclareListCppHeader(rtcProfile);
@@ -1343,10 +1340,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のヘッダファイルにoutport_declareの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param headerFile
+	 * C++のヘッダファイルにoutport_declareの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param headerFile ヘッダファイル
 	 */
 	private void updateOutportDeclareCppHeader(RtcProfile rtcProfile, File headerFile) {
 		List<String> newOutportDeclareHeaderList = RtcUtil.createOutportDeclareListCppHeader(rtcProfile);
@@ -1354,12 +1351,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のヘッダファイルにcorbaport_declareの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param rtcDirPath
-	 * @param headerFile
-	 * @param rtcTemplate
+	 * C++のヘッダファイルにcorbaport_declareの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param headerFile ヘッダファイル
 	 */
 	private void updateCorbaportDeclareCppHeader(RtcProfile rtcProfile, File headerFile) {
 		List<String> newCorbaportDeclareHeaderList = RtcUtil.createCorbaportDeclareListCppHeader(rtcProfile);
@@ -1367,10 +1362,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のヘッダファイルにservice_declareの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param headerFile
+	 * C++のヘッダファイルにservice_declareの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param headerFile ヘッダファイル
 	 */
 	private void updateServiceDeclareCppHeader(RtcProfile rtcProfile, File headerFile) {
 		List<String> newServiceDeclareHeaderList = RtcUtil.createServiceDeclareListCppHeader(rtcProfile);
@@ -1378,10 +1373,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * C++のヘッダファイルにconsumer_declareの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param headerFile
+	 * C++のヘッダファイルにconsumer_declareの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param headerFile ヘッダファイル
 	 */
 	private void updateConsumerDeclareCppHeader(RtcProfile rtcProfile, File headerFile) {
 		List<String> newConsumerDeclareHeaderList = RtcUtil.createConsumerDeclareListCppHeader(rtcProfile);
@@ -1389,22 +1384,22 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * IDLファイルの設定およびImplファイルの生成を行う
-	 * 
-	 * @param rtcProfile
-	 * @param rtcDirPath
+	 * IDLファイルの設定およびImplファイルの生成を行う.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param rtcDirPath RTCディレクトリパス
 	 */
 	private void updateServiceProviderImplFileCpp(RtcProfile rtcProfile, String rtcDirPath) {
 		RtcUtil.createServiceProviderImplFileCpp(rtcProfile, rtcDirPath);
 	}
 
 	/**
-	 * Cppのソース・ヘッダファイルの各アクティビティメソッドの有効無効を切り替える
-	 * 
-	 * @param rtcProfile
-	 * @param oldRtcProfile
-	 * @param sourceFile
-	 * @param headerFile
+	 * Cppのソース・ヘッダファイルの各アクティビティメソッドの有効無効を切り替える.
+	 *
+	 * @param actions アクティビティメソッド 
+	 * @param oldActions 旧アクティビティメソッド
+	 * @param sourceFile ソースファイル
+	 * @param headerFile ヘッダファイル
 	 */
 	public void updateCommentMethodCpp(Actions actions, Actions oldActions, File sourceFile, File headerFile) {
 		// onInitialize
@@ -1519,10 +1514,10 @@ public class RtcManagementService {
 	 * Python用のソースコード自動反映処理
 	 ************************************************************/
 	/**
-	 * PythonのソースファイルにModuleSpecの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param sourceFile
+	 * PythonのソースファイルにModuleSpecの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	public void updateModuleSpecPython(RtcProfile rtcProfile, File sourceFile) {
 		List<String> moduleSpec = RtcUtil.createModuleSpecForPyhon(rtcProfile);
@@ -1530,10 +1525,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * PythonのソースファイルのIDLインポート文の変更を反映する
-	 * 
-	 * @param rtcDirPath
-	 * @param sourceFile
+	 * PythonのソースファイルのIDLインポート文の変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	private void updateIdlImportPython(RtcProfile rtcProfile, File sourceFile) {
 		List<String> newIdlImportList = RtcUtil.createIdlImportForPython(rtcProfile);
@@ -1541,10 +1536,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * Pythonのソースファイルにservice_implの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param sourceFile
+	 * Pythonのソースファイルにservice_implの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	private void updateServiceImplementPython(RtcProfile rtcProfile, File sourceFile) {
 		List<String> newServiceImplementList = RtcUtil.createServiceImplementForPython(rtcProfile);
@@ -1552,10 +1547,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * Pythonのソースファイルにconsumer_declareの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param sourceFile
+	 * Pythonのソースファイルにconsumer_declareの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	private void updateConsumerImportPython(RtcProfile rtcProfile, File sourceFile) {
 		List<String> newConsumerImportList = RtcUtil.createConsumerImportForPython(rtcProfile);
@@ -1563,10 +1558,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * Pythonのソースファイルにinit_conf_paramの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param sourceFile
+	 * Pythonのソースファイルにinit_conf_paramの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	public void updateInitConfParamPython(RtcProfile rtcProfile, File sourceFile) {
 		List<String> newInitConfParamList = RtcUtil.createInitConfParamForPython(rtcProfile);
@@ -1574,10 +1569,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * Pythonのソースファイルにコンポーネント種類の変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param headerFile
+	 * Pythonのソースファイルにコンポーネント種類の変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	private void updateComponentKindPython(RtcProfile rtcProfile, File sourceFile) {
 		RtcUtil.udpateClassNamePython(sourceFile.getPath(), rtcProfile.getBasicInfo().getModuleName(),
@@ -1585,10 +1580,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * PythonのソースファイルにConstroctorの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param sourceFile
+	 * PythonのソースファイルにConstroctorの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	private void updateConstructorPython(RtcProfile rtcProfile, File sourceFile) {
 		List<String> newConstructorList = RtcUtil.createConstructorForPython(rtcProfile);
@@ -1596,10 +1591,10 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * PythonのソースファイルにOnInitializeの変更を反映する
-	 * 
-	 * @param rtcProfile
-	 * @param sourceFile
+	 * PythonのソースファイルにOnInitializeの変更を反映する.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param sourceFile ソースファイル
 	 */
 	public void updateOnInitializePython(RtcProfile rtcProfile, File sourceFile) {
 		List<String> newOnInitializeList = RtcUtil.createOnIntializeForPython(rtcProfile);
@@ -1607,21 +1602,21 @@ public class RtcManagementService {
 	}
 
 	/**
-	 * IDLファイルの設定およびidl.pyファイルの生成を行う
-	 * 
-	 * @param rtcProfile
-	 * @param rtcDirPath
+	 * IDLファイルの設定およびidl.pyファイルの生成を行う.
+	 *
+	 * @param rtcProfile RTCプロフィール
+	 * @param rtcDirPath RTCディレクトリパス
 	 */
 	private void updateServiceProviderConsumerIdlFilePython(RtcProfile rtcProfile, String rtcDirPath) {
 		RtcUtil.createServiceProviderConsumerIdlFilePython(rtcProfile, rtcDirPath);
 	}
 
 	/**
-	 * Pythonのソースファイルの各アクティビティメソッドの有効無効を切り替える
-	 * 
-	 * @param actions
-	 * @param oldActions
-	 * @param sourceFile
+	 * Pythonのソースファイルの各アクティビティメソッドの有効無効を切り替える.
+	 *
+	 * @param actions アクティビティメソッド
+	 * @param oldActions 旧アクティビティメソッド
+	 * @param sourceFile ソースファイル
 	 */
 	public void updateCommentMethodPython(Actions actions, Actions oldActions, File sourceFile) {
 		// onInitialize
